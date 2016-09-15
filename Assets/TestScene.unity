@@ -586,7 +586,7 @@ Transform:
   - {fileID: 1156814596}
   - {fileID: 1710385149}
   m_Father: {fileID: 1682039148}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!1 &126988413
 GameObject:
   m_ObjectHideFlags: 0
@@ -883,7 +883,7 @@ Transform:
   - {fileID: 938058715}
   - {fileID: 1878917572}
   m_Father: {fileID: 1682039148}
-  m_RootOrder: 2
+  m_RootOrder: 1
 --- !u!1 &426021962
 GameObject:
   m_ObjectHideFlags: 0
@@ -1328,6 +1328,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c96f6e25cfef6f8429a924a9bb018cb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wires:
+  - SelectableOjbect: {fileID: 1666967398}
+    WireUnsnippedObject: {fileID: 1068044399}
+    WireSnippedObject: {fileID: 1218182669}
+    LedONObject: {fileID: 1063779571}
+    LedOFFObject: {fileID: 659201866}
+    TextMeshGameObject: {fileID: 1968664771}
+  - SelectableOjbect: {fileID: 648772508}
+    WireUnsnippedObject: {fileID: 1168415858}
+    WireSnippedObject: {fileID: 1027474539}
+    LedONObject: {fileID: 714964162}
+    LedOFFObject: {fileID: 1594752893}
+    TextMeshGameObject: {fileID: 2005391973}
+  - SelectableOjbect: {fileID: 65755431}
+    WireUnsnippedObject: {fileID: 272262845}
+    WireSnippedObject: {fileID: 1603436883}
+    LedONObject: {fileID: 1475325817}
+    LedOFFObject: {fileID: 908007917}
+    TextMeshGameObject: {fileID: 2100234184}
+  - SelectableOjbect: {fileID: 1264409838}
+    WireUnsnippedObject: {fileID: 12658430}
+    WireSnippedObject: {fileID: 126988413}
+    LedONObject: {fileID: 579769502}
+    LedOFFObject: {fileID: 35631302}
+    TextMeshGameObject: {fileID: 23381916}
+  - SelectableOjbect: {fileID: 586509913}
+    WireUnsnippedObject: {fileID: 938058714}
+    WireSnippedObject: {fileID: 1156814595}
+    LedONObject: {fileID: 1749006872}
+    LedOFFObject: {fileID: 35607570}
+    TextMeshGameObject: {fileID: 946292406}
+  - SelectableOjbect: {fileID: 1831568870}
+    WireUnsnippedObject: {fileID: 1878917571}
+    WireSnippedObject: {fileID: 1710385148}
+    LedONObject: {fileID: 591120000}
+    LedOFFObject: {fileID: 1126517720}
+    TextMeshGameObject: {fileID: 564490482}
 --- !u!1 &578617545
 GameObject:
   m_ObjectHideFlags: 0
@@ -2223,7 +2260,7 @@ MonoBehaviour:
   m_Script: {fileID: -706292897, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HighlightScale: {x: 1.5, y: 1, z: 1}
+  HighlightScale: {x: 1.2, y: 1, z: 1}
   OutlineAmount: 0
 --- !u!1 &946292404
 GameObject:
@@ -3733,8 +3770,8 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
   m_Children:
   - {fileID: 1027257753}
-  - {fileID: 88847914}
   - {fileID: 422565193}
+  - {fileID: 88847914}
   m_Father: {fileID: 1026246266}
   m_RootOrder: 3
 --- !u!1 &1710385148
@@ -4359,7 +4396,7 @@ MonoBehaviour:
   m_Script: {fileID: -706292897, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HighlightScale: {x: 1.5, y: 1, z: 1}
+  HighlightScale: {x: 1.2, y: 1, z: 1}
   OutlineAmount: 0
 --- !u!1 &1901143424
 GameObject:
