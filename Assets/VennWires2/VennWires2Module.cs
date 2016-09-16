@@ -11,6 +11,7 @@ public class VennWires2Module : MonoBehaviour
     private List<Color> colors = new List<Color>() { Color.black, Color.white, Color.red, Color.blue, Color.green, Color.yellow };
     private KMBombModule module;
     private KMBombInfo bombInfo;
+    private KMAudio kmAudio;
 
     [System.Serializable]
     public struct WireInfo
@@ -85,6 +86,7 @@ public class VennWires2Module : MonoBehaviour
         info.SelectableOjbect.Highlight = info.WireSnippedObject.GetComponent<KMHighlightable>();
         info.WireUnsnippedObject.SetActive(false);
         info.WireSnippedObject.SetActive(true);
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.WireSnip, info.SelectableOjbect.transform);
         foreach (WireInfo wire in wires)
             if (CheckWireCut(wire) && wire.WireUnsnippedObject.activeSelf == true)
                 return false;
@@ -156,6 +158,16 @@ public class VennWires2Module : MonoBehaviour
             if (bombInfo == null)
                 bombInfo = GetComponent<KMBombInfo>();
             return bombInfo;
+        }
+    }
+
+    public KMAudio Audio
+    {
+        get
+        {
+            if (kmAudio == null)
+                kmAudio = GetComponent<KMAudio>();
+            return kmAudio;
         }
     }
 }
