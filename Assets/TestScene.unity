@@ -1255,6 +1255,7 @@ GameObject:
   - 114: {fileID: 575619095}
   - 114: {fileID: 575619096}
   - 114: {fileID: 575619098}
+  - 114: {fileID: 575619099}
   m_Layer: 0
   m_Name: VennWires2Component
   m_TagString: Untagged
@@ -1328,43 +1329,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c96f6e25cfef6f8429a924a9bb018cb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wires:
-  - SelectableOjbect: {fileID: 1666967398}
-    WireUnsnippedObject: {fileID: 1068044399}
-    WireSnippedObject: {fileID: 1218182669}
-    LedONObject: {fileID: 1063779571}
-    LedOFFObject: {fileID: 659201866}
-    TextMeshGameObject: {fileID: 1968664771}
-  - SelectableOjbect: {fileID: 648772508}
-    WireUnsnippedObject: {fileID: 1168415858}
-    WireSnippedObject: {fileID: 1027474539}
-    LedONObject: {fileID: 714964162}
-    LedOFFObject: {fileID: 1594752893}
-    TextMeshGameObject: {fileID: 2005391973}
-  - SelectableOjbect: {fileID: 65755431}
-    WireUnsnippedObject: {fileID: 272262845}
-    WireSnippedObject: {fileID: 1603436883}
-    LedONObject: {fileID: 1475325817}
-    LedOFFObject: {fileID: 908007917}
-    TextMeshGameObject: {fileID: 2100234184}
-  - SelectableOjbect: {fileID: 1264409838}
-    WireUnsnippedObject: {fileID: 12658430}
-    WireSnippedObject: {fileID: 126988413}
-    LedONObject: {fileID: 579769502}
-    LedOFFObject: {fileID: 35631302}
-    TextMeshGameObject: {fileID: 23381916}
-  - SelectableOjbect: {fileID: 586509913}
-    WireUnsnippedObject: {fileID: 938058714}
-    WireSnippedObject: {fileID: 1156814595}
-    LedONObject: {fileID: 1749006872}
-    LedOFFObject: {fileID: 35607570}
-    TextMeshGameObject: {fileID: 946292406}
-  - SelectableOjbect: {fileID: 1831568870}
-    WireUnsnippedObject: {fileID: 1878917571}
-    WireSnippedObject: {fileID: 1710385148}
-    LedONObject: {fileID: 591120000}
-    LedOFFObject: {fileID: 1126517720}
-    TextMeshGameObject: {fileID: 564490482}
+--- !u!114 &575619099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 575619094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 2144496390, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &578617545
 GameObject:
   m_ObjectHideFlags: 0

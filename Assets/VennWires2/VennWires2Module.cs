@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 public class VennWires2Module : MonoBehaviour
 {
-    public WireInfo[] wires;
+    private WireInfo[] wires;
     private bool activated;
     private List<int> leds;
     private List<Color> colors = new List<Color>() { Color.black, Color.white, Color.red, Color.blue, Color.green, Color.yellow };
@@ -26,10 +26,19 @@ public class VennWires2Module : MonoBehaviour
     public void Start()
     {
         leds = new List<int>();
-        Module.OnActivate += OnActivate;
+        wires = new WireInfo[6];
         for (int i = 0; i < wires.Length; i++)
         {
-            WireInfo info = wires[i];
+            WireInfo info = new WireInfo();
+            i += 1;
+            info.SelectableOjbect = FindChildrenGO(gameObject, "VennWire" + i).GetComponent<KMSelectable>();
+            info.WireUnsnippedObject = FindChildrenGO(gameObject, "Wires_Unsnipped_" + i);
+            info.WireSnippedObject = FindChildrenGO(gameObject, "Wires_Snipped_" + i);
+            info.LedONObject = FindChildrenGO(gameObject, "LED_" + i + "_ON");
+            info.LedOFFObject = FindChildrenGO(gameObject, "LED_" + i);
+            info.TextMeshGameObject = FindChildrenGO(gameObject, "Text" + i).GetComponent<TextMesh>();
+            i -= 1;
+            wires[i] = info;
             if (Random.Range(0, 2) == 1)
                 leds.Add(i);
             int text = Random.Range(0, 3);
@@ -54,6 +63,7 @@ public class VennWires2Module : MonoBehaviour
                 return OnWireInteract(info);
             };
         }
+        Module.OnActivate += OnActivate;
     }
 
     public void OnActivate()
@@ -114,6 +124,19 @@ public class VennWires2Module : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public GameObject FindChildrenGO(GameObject parent, string childrenName)
+    {
+        foreach (Transform children in parent.transform)
+        {
+            if (children.gameObject.name == childrenName)
+                return children.gameObject;
+            GameObject go = FindChildrenGO(children.gameObject, childrenName);
+            if (go != null)
+                return go;
+        }
+        return null;
     }
 
     public KMBombModule Module
