@@ -8,7 +8,7 @@ public class VennWires2Module : MonoBehaviour
     private WireInfo[] wires;
     private bool activated;
     private List<int> leds;
-    private List<Color> colors = new List<Color>() { Color.black, Color.white, Color.red, Color.blue, Color.green, Color.yellow };
+    private List<Color> colors = new List<Color>() { Color.black, Color.white, Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.cyan };
     private KMBombModule module;
     private KMBombInfo bombInfo;
     private KMAudio kmAudio;

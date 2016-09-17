@@ -229,6 +229,7 @@ td, th {
     background-size: 100%;
     width: 51em; /* = 8.5in at 12pt (1em) */
     min-height: 66em; /* = 11in at 12pt (1em) */
+    max-height: 66em; /* Max print size */
 }
 @media print {
     .page {
