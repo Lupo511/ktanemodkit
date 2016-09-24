@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.Reflection;
 
 public class VennWires2Module : MonoBehaviour
 {
@@ -85,20 +84,6 @@ public class VennWires2Module : MonoBehaviour
         if (!CheckWireCut(info))
             Module.HandleStrike();
         info.SelectableOjbect.Highlight = info.WireSnippedObject.GetComponent<KMHighlightable>();
-        //Update the proxy class
-#if !UNITY_EDITOR
-        foreach (Assembly asm in System.AppDomain.CurrentDomain.GetAssemblies())
-        {
-            if (asm.FullName.Contains("Assembly-CSharp"))
-            {
-                System.Type modSelectableType = asm.GetType("ModSelectable");
-        MethodInfo copySettingsFromProxy = modSelectableType.GetMethod("CopySettingsFromProxy", BindingFlags.Instance);
-                object selectableInstance = GetComponent(modSelectableType);
-                copySettingsFromProxy.Invoke(selectableInstance, null);
-                break;
-            }
-        }
-#endif
         info.WireUnsnippedObject.SetActive(false);
         info.WireSnippedObject.SetActive(true);
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.WireSnip, info.SelectableOjbect.transform);
