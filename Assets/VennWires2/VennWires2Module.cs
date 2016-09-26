@@ -92,10 +92,15 @@ public class VennWires2Module : MonoBehaviour
             if (asm.FullName.Contains("Assembly-CSharp"))
             {
                 System.Type modSelectableType = asm.GetType("ModSelectable");
-                MethodInfo copySettingsFromProxy = modSelectableType.GetMethod("CopySettingsFromProxy", BindingFlags.Instance);
-                System.Type modHighlightableType = asm.GetType("ModHighlitable");
+                Debug.Log("modSelectableType: " + modSelectableType.FullName);
+                MethodInfo copySettingsFromProxy = modSelectableType.GetMethod("CopySettingsFromProxy", BindingFlags.Instance | BindingFlags.Public);
+                Debug.Log("copySettingsFromProxy: " + copySettingsFromProxy.Name);
+                System.Type modHighlightableType = asm.GetType("ModHighlightable");
+                Debug.Log("modHighlitableType: " + modHighlightableType.FullName);
                 info.WireSnippedObject.AddComponent(modHighlightableType);
+                Debug.Log("modHighlitableComponent: " + info.WireSnippedObject.GetComponent("ModHighlitable"));
                 object selectableInstance = info.SelectableOjbect.GetComponent(modSelectableType);
+                Debug.Log("selectableInstance: " + selectableInstance);
                 copySettingsFromProxy.Invoke(selectableInstance, null);
                 break;
             }
