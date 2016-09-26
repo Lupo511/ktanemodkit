@@ -41,6 +41,7 @@ public class VennWires2Module : MonoBehaviour
             info.TextMeshGameObject = FindChildrenGO(gameObject, "Text" + i).GetComponent<TextMesh>();
             i -= 1;
             wires[i] = info;
+            info.WireSnippedObject.SetActive(false);
             if (Random.Range(0, 2) == 1)
                 leds.Add(i);
             int text = Random.Range(0, 3);
@@ -86,7 +87,7 @@ public class VennWires2Module : MonoBehaviour
             Module.HandleStrike();
         info.WireSnippedObject.SetActive(true);
         info.WireUnsnippedObject.SetActive(false);
-        /*info.SelectableOjbect.Highlight = info.WireSnippedObject.GetComponent<KMHighlightable>();
+        info.SelectableOjbect.Highlight = info.WireSnippedObject.GetComponent<KMHighlightable>();
         //Update the proxy class
 #if !UNITY_EDITOR
         foreach (Assembly asm in System.AppDomain.CurrentDomain.GetAssemblies())
@@ -107,7 +108,7 @@ public class VennWires2Module : MonoBehaviour
                 break;
             }
         }
-#endif*/
+#endif
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.WireSnip, info.SelectableOjbect.transform);
         foreach (WireInfo wire in wires)
             if (CheckWireCut(wire) && wire.WireUnsnippedObject.activeSelf == true)
