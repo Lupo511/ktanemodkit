@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Reflection;
 
 public class VennWires2Module : MonoBehaviour
 {
@@ -83,10 +84,28 @@ public class VennWires2Module : MonoBehaviour
             return false;
         if (!CheckWireCut(info))
             Module.HandleStrike();
-        //Update the proxy class
         info.SelectableOjbect.Highlight = info.WireSnippedObject.GetComponent<KMHighlightable>();
-        info.WireSnippedObject.AddComponent<ModHighlightable>();
-        info.SelectableOjbect.GetComponent<ModSelectable>().CopySettingsFromProxy();
+        //Update the proxy class
+#if !UNITY_EDITOR
+        foreach (Assembly asm in System.AppDomain.CurrentDomain.GetAssemblies())
+        {
+            if (asm.FullName.Contains("Assembly-CSharp"))
+            {
+                System.Type modSelectableType = asm.GetType("ModSelectable");
+                Debug.Log("modSelectableType: " + modSelectableType.FullName);
+                MethodInfo copySettingsFromProxy = modSelectableType.GetMethod("CopySettingsFromProxy", BindingFlags.Instance | BindingFlags.Public);
+                Debug.Log("copySettingsFromProxy: " + copySettingsFromProxy.Name);
+                System.Type modHighlightableType = asm.GetType("ModHighlightable");
+                Debug.Log("modHighlitableType: " + modHighlightableType.FullName);
+                info.WireSnippedObject.AddComponent(modHighlightableType);
+                Debug.Log("modHighlitableComponent: " + info.WireSnippedObject.GetComponent("ModHighlitable"));
+                object selectableInstance = info.SelectableOjbect.GetComponent(modSelectableType);
+                Debug.Log("selectableInstance: " + selectableInstance);
+                copySettingsFromProxy.Invoke(selectableInstance, null);
+                break;
+            }
+        }
+#endif
         info.WireUnsnippedObject.SetActive(false);
         info.WireSnippedObject.SetActive(true);
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.WireSnip, info.SelectableOjbect.transform);
