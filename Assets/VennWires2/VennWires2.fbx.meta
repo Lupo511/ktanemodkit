@@ -79,6 +79,12 @@ ModelImporter:
     100142: Wires_Unsnipped_4
     100144: Wires_Unsnipped_5
     100146: Wires_Unsnipped_6
+    100148: Wires_Snipped_1_1
+    100150: Wires_Snipped_2_1
+    100152: Wires_Snipped_3_1
+    100154: Wires_Snipped_4_1
+    100156: Wires_Snipped_5_1
+    100158: Wires_Snipped_6_1
     400000: Base
     400002: Boolean_1
     400004: Boolean_2
@@ -153,6 +159,12 @@ ModelImporter:
     400142: Wires_Unsnipped_4
     400144: Wires_Unsnipped_5
     400146: Wires_Unsnipped_6
+    400148: Wires_Snipped_1_1
+    400150: Wires_Snipped_2_1
+    400152: Wires_Snipped_3_1
+    400154: Wires_Snipped_4_1
+    400156: Wires_Snipped_5_1
+    400158: Wires_Snipped_6_1
     2300000: Base
     2300002: Boolean_1
     2300004: Boolean_2
@@ -197,6 +209,18 @@ ModelImporter:
     2300082: Wires_Unsnipped_4
     2300084: Wires_Unsnipped_5
     2300086: Wires_Unsnipped_6
+    2300088: Wires_Snipped_1_1
+    2300090: Wires_Snipped_2_1
+    2300092: Wires_Snipped_3_1
+    2300094: Wires_Snipped_4_1
+    2300096: Wires_Snipped_5_1
+    2300098: Wires_Snipped_6_1
+    2300100: Wires_Snipped_1
+    2300102: Wires_Snipped_2
+    2300104: Wires_Snipped_3
+    2300106: Wires_Snipped_4
+    2300108: Wires_Snipped_5
+    2300110: Wires_Snipped_6
     3300000: Base
     3300002: Boolean_1
     3300004: Boolean_2
@@ -241,6 +265,18 @@ ModelImporter:
     3300082: Wires_Unsnipped_4
     3300084: Wires_Unsnipped_5
     3300086: Wires_Unsnipped_6
+    3300088: Wires_Snipped_1_1
+    3300090: Wires_Snipped_2_1
+    3300092: Wires_Snipped_3_1
+    3300094: Wires_Snipped_4_1
+    3300096: Wires_Snipped_5_1
+    3300098: Wires_Snipped_6_1
+    3300100: Wires_Snipped_1
+    3300102: Wires_Snipped_2
+    3300104: Wires_Snipped_3
+    3300106: Wires_Snipped_4
+    3300108: Wires_Snipped_5
+    3300110: Wires_Snipped_6
     4300000: Component_PuzzleBackground
     4300002: Base
     4300004: LightGlow6
@@ -285,6 +321,18 @@ ModelImporter:
     4300082: Wires_Snipped_5L
     4300084: Wires_Snipped_6L
     4300086: Wires_Snipped_6R
+    4300088: Wires_Snipped_1_1
+    4300090: Wires_Snipped_2_1
+    4300092: Wires_Snipped_3_1
+    4300094: Wires_Snipped_4_1
+    4300096: Wires_Snipped_5_1
+    4300098: Wires_Snipped_6_1
+    4300100: Wires_Snipped_1
+    4300102: Wires_Snipped_2
+    4300104: Wires_Snipped_3
+    4300106: Wires_Snipped_4
+    4300108: Wires_Snipped_5
+    4300110: Wires_Snipped_6
   materials:
     importMaterials: 1
     materialName: 0
