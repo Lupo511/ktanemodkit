@@ -41,6 +41,7 @@ public class VennWires2Module : MonoBehaviour
             info.TextMeshGameObject = FindChildrenGO(gameObject, "Text" + i).GetComponent<TextMesh>();
             i -= 1;
             wires[i] = info;
+            info.WireSnippedObject.SetActive(false);
             if (Random.Range(0, 2) == 1)
                 leds.Add(i);
             int text = Random.Range(0, 3);
@@ -84,6 +85,8 @@ public class VennWires2Module : MonoBehaviour
             return false;
         if (!CheckWireCut(info))
             Module.HandleStrike();
+        info.WireSnippedObject.SetActive(true);
+        info.WireUnsnippedObject.SetActive(false);
         info.SelectableOjbect.Highlight = info.WireSnippedObject.GetComponent<KMHighlightable>();
         //Update the proxy class
 #if !UNITY_EDITOR
@@ -95,19 +98,17 @@ public class VennWires2Module : MonoBehaviour
                 Debug.Log("modSelectableType: " + modSelectableType.FullName);
                 MethodInfo copySettingsFromProxy = modSelectableType.GetMethod("CopySettingsFromProxy", BindingFlags.Instance | BindingFlags.Public);
                 Debug.Log("copySettingsFromProxy: " + copySettingsFromProxy.Name);
-                System.Type modHighlightableType = asm.GetType("ModHighlightable");
-                Debug.Log("modHighlitableType: " + modHighlightableType.FullName);
-                info.WireSnippedObject.AddComponent(modHighlightableType);
-                Debug.Log("modHighlitableComponent: " + info.WireSnippedObject.GetComponent("ModHighlitable"));
+                MethodInfo setHighlightMethod = modSelectableType.BaseType.GetMethod("SetHighlight", BindingFlags.Instance | BindingFlags.Public);
+                Debug.Log("setHighlight: " + setHighlightMethod.Name);
                 object selectableInstance = info.SelectableOjbect.GetComponent(modSelectableType);
-                Debug.Log("selectableInstance: " + selectableInstance);
+                Debug.Log("selectableInstance: " + selectableInstance.GetType().FullName);
+                setHighlightMethod.Invoke(selectableInstance, new object[] { false });
                 copySettingsFromProxy.Invoke(selectableInstance, null);
+                setHighlightMethod.Invoke(selectableInstance, new object[] { true });
                 break;
             }
         }
 #endif
-        info.WireUnsnippedObject.SetActive(false);
-        info.WireSnippedObject.SetActive(true);
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.WireSnip, info.SelectableOjbect.transform);
         foreach (WireInfo wire in wires)
             if (CheckWireCut(wire) && wire.WireUnsnippedObject.activeSelf == true)
