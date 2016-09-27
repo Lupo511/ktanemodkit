@@ -41,7 +41,6 @@ public class VennWires2Module : MonoBehaviour
             info.TextMeshGameObject = FindChildrenGO(gameObject, "Text" + i).GetComponent<TextMesh>();
             i -= 1;
             wires[i] = info;
-            info.WireSnippedObject.SetActive(false);
             if (Random.Range(0, 2) == 1)
                 leds.Add(i);
             int text = Random.Range(0, 3);
@@ -81,37 +80,22 @@ public class VennWires2Module : MonoBehaviour
 
     public bool OnWireInteract(WireInfo info)
     {
-        if (!activated)
-            return false;
         if (!CheckWireCut(info))
             Module.HandleStrike();
-        info.WireSnippedObject.SetActive(true);
-        info.WireUnsnippedObject.SetActive(false);
-        info.SelectableOjbect.Highlight = info.WireSnippedObject.GetComponent<KMHighlightable>();
-        //Update the proxy class
-#if !UNITY_EDITOR
-        foreach (Assembly asm in System.AppDomain.CurrentDomain.GetAssemblies())
-        {
-            if (asm.FullName.Contains("Assembly-CSharp"))
-            {
-                System.Type modSelectableType = asm.GetType("ModSelectable");
-                Debug.Log("modSelectableType: " + modSelectableType.FullName);
-                MethodInfo copySettingsFromProxy = modSelectableType.GetMethod("CopySettingsFromProxy", BindingFlags.Instance | BindingFlags.Public);
-                Debug.Log("copySettingsFromProxy: " + copySettingsFromProxy.Name);
-                MethodInfo setHighlightMethod = modSelectableType.BaseType.GetMethod("SetHighlight", BindingFlags.Instance | BindingFlags.Public);
-                Debug.Log("setHighlight: " + setHighlightMethod.Name);
-                object selectableInstance = info.SelectableOjbect.GetComponent(modSelectableType);
-                Debug.Log("selectableInstance: " + selectableInstance.GetType().FullName);
-                setHighlightMethod.Invoke(selectableInstance, new object[] { false });
-                copySettingsFromProxy.Invoke(selectableInstance, null);
-                setHighlightMethod.Invoke(selectableInstance, new object[] { true });
-                break;
-            }
-        }
-#endif
+        //Hacky way to update the highlight
+        info.WireUnsnippedObject.GetComponent<MeshFilter>().mesh = info.WireSnippedObject.GetComponent<MeshFilter>().mesh;
+        info.WireUnsnippedObject.GetComponent<MeshRenderer>().materials = info.WireSnippedObject.GetComponent<MeshRenderer>().materials;
+        info.WireUnsnippedObject.transform.position = info.WireSnippedObject.transform.position;
+        info.WireUnsnippedObject.transform.rotation = info.WireSnippedObject.transform.rotation;
+        BoxCollider oldCollider = info.WireUnsnippedObject.GetComponent<BoxCollider>();
+        BoxCollider newCollider = info.WireUnsnippedObject.AddComponent<BoxCollider>();
+        oldCollider.center = newCollider.center;
+        oldCollider.size = newCollider.size;
+        Destroy(newCollider);
+        info.WireUnsnippedObject.transform.GetChild(0).GetComponent<MeshFilter>().mesh = info.WireSnippedObject.GetComponent<MeshFilter>().mesh;
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.WireSnip, info.SelectableOjbect.transform);
         foreach (WireInfo wire in wires)
-            if (CheckWireCut(wire) && wire.WireUnsnippedObject.activeSelf == true)
+            if (CheckWireCut(wire) && wire.WireUnsnippedObject.transform.position != wire.WireSnippedObject.transform.position)
                 return false;
         Module.HandlePass();
         return false;
