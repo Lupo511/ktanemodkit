@@ -64,6 +64,14 @@ public class VennWires2Module : MonoBehaviour
             {
                 return OnWireInteract(info);
             };
+            //Much hax
+            foreach (MonoBehaviour component in info.SelectableOjbect.GetComponents<MonoBehaviour>())
+            {
+                if (component.GetType().FullName == "ModSelectable")
+                {
+                    component.GetType().BaseType.GetField("ForceInteractionHighlight", BindingFlags.Public | BindingFlags.Instance).SetValue(component, true);
+                }
+            }
         }
         Module.OnActivate += OnActivate;
     }
