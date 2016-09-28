@@ -80,7 +80,7 @@
 						If there are less than 2 black wires, cut the wire.<br/>
 						If the bomb has one or more button modules, and if any wire has the color of any button, don't cut the wire.<br/>
 						If every wire is of the same color, cut the wire.<br/>
-						If none of the above apply, cut the wire.<br/>
+						If none of the above apply, cut the wire.
 					</td>
 				</tr>
 				<tr>
@@ -93,7 +93,9 @@
 						If the text says "A"
 					</td>
 					<td>
-						Action
+						If the number of stock modules (non modded ones) on the bomb is not odd, cut the wire.<br/>
+						If the number of wires with the "A" label and the number of wires with the "B" label is the same, don't cut the wire.<br/>
+						If none of the above apply, cut the wire only if the last digit of the timer is odd.
 					</td>
 				</tr>
 				<tr>
@@ -101,7 +103,11 @@
 						If the text says "B"
 					</td>
 					<td>
-						Action
+						If the last digit of the serial number is equal to the number of ports on the bomb, don't cut the wire.<br/>
+						If the number of strikes and the number of green wires are equal, don't cut the wire.<br/>
+						If the number of modules on the bomb is odd, cut the wire.<br/>
+						If the total number of wires (including other modules) on the bomb is even, don't cut the wire.<br/>
+						If none of the above apply, cut the wire.<br/>
 					</td>
 				</tr>
 				<tr>
