@@ -24,8 +24,9 @@
 			</p>
 
 			<ul>
-				<li>Each wire has a LED above it and a space below it that can either have "A", "B" or be blank.</li>
-				<li>For <b>each</b> wire/LED/text combination, use the Venn diagram below to find the correct section, then find the <b>first rule that applies</b> in that section to decide whether or not to cut the wire.</li>
+				<li>Each wire has a LED above it that can either be on or off.</li>
+				<li>Each wire has a space below it that can read "A", "B" or be blank.</li>
+				<li>For <b>each</b> color/LED combination, use the Venn diagram below to find the correct section, then find the <b>first rule that applies</b> in that section to decide whether or not to cut the wire.</li>
 				<li>The Venn diagram is based on the <b>additive color model</b> to figure out color components.</li>
 				<li>If the bomb as a Stereo RCA port, invert the results (i.e. only cut the wires you don't have to cut).</li>
 			</ul>
@@ -54,7 +55,10 @@
 						If the text says "A"
 					</td>
 					<td>
-						Action
+						If the bomb has more than 3 batteries, cut the wire.<br/>
+						If the alarm in the room is currently active, don't cut the wire.<br/>
+						If the bomb has more than 5 modules (including needy modules), don't cut the wire.<br/>
+						If none of the above apply, cut the wire.
 					</td>
 				</tr>
 				<tr>
@@ -62,7 +66,10 @@
 						If the text says "B"
 					</td>
 					<td>
-						Action
+						If the last digit of the serial number matches the number of blue wires, don't cut the wire.<br/>
+						If the number of already cut wires is odd, cut the wire.<br/>
+						If there is no red wire, cut the wire.<br/>
+						If none of the above apply, don't cut the wire.
 					</td>
 				</tr>
 				<tr>
@@ -247,16 +254,6 @@
 						Action
 					</td>
 				</tr>
-			</table>
-		</div>
-	</div>
-	<div class="page page-bg-01">
-        <div class="page-header">
-			<span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
-			<span class="page-header-section-title">More Complicated Wires</span>
-		</div>
-        <div class="page-content">
-			<table>
 				<tr>
 					<td colspan="2">
 						<strong>Section H</strong>
@@ -460,16 +457,6 @@
 						Action
 					</td>
 				</tr>
-			</table>
-		</div>
-	</div>
-	<div class="page page-bg-01">
-        <div class="page-header">
-			<span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
-			<span class="page-header-section-title">More Complicated Wires</span>
-		</div>
-        <div class="page-content">
-			<table>
 				<tr>
 					<td colspan="2">
 						<strong>Section O</strong>
