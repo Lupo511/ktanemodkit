@@ -57,7 +57,7 @@
 					<td>
 						If the bomb has more than 3 batteries, cut the wire.<br/>
 						If the alarm in the room is currently active, don't cut the wire.<br/>
-						If the bomb has more than 5 modules (including needy modules), don't cut the wire.<br/>
+						If the bomb has more than 5 modules (not including needy modules), don't cut the wire.<br/>
 						If none of the above apply, cut the wire.
 					</td>
 				</tr>
@@ -77,7 +77,10 @@
 						If the text is empty
 					</td>
 					<td>
-						Action
+						If there are less than 2 black wires, cut the wire.<br/>
+						If the bomb has one or more button modules, and if any wire has the color of any button, don't cut the wire.<br/>
+						If every wire is of the same color, cut the wire.<br/>
+						If none of the above apply, cut the wire.<br/>
 					</td>
 				</tr>
 				<tr>
