@@ -56,7 +56,7 @@
 					</td>
 					<td>
 						If the bomb has more than 3 batteries, cut the wire.<br/>
-						If the alarm in the room is currently active, don't cut the wire.<br/>
+						If the alarm clock in the room is currently active, don't cut the wire.<br/>
 						If the bomb has more than 5 modules (not including needy modules), don't cut the wire.<br/>
 						If none of the above apply, cut the wire.
 					</td>
@@ -105,9 +105,9 @@
 					<td>
 						If the last digit of the serial number is equal to the number of ports on the bomb, don't cut the wire.<br/>
 						If the number of strikes and the number of green wires are equal, don't cut the wire.<br/>
-						If the number of modules on the bomb is odd, cut the wire.<br/>
+						If the number of solved modules is the same as the number of batteries on the bomb, cut the wire.<br/>
 						If the total number of wires (including other modules) on the bomb is even, don't cut the wire.<br/>
-						If none of the above apply, cut the wire.<br/>
+						If none of the above apply, cut the wire.
 					</td>
 				</tr>
 				<tr>
@@ -115,7 +115,8 @@
 						If the text is empty
 					</td>
 					<td>
-						Action
+						If there are duplicate wires color/LED/note combinations on this module, cut the wire.<br/>
+						If there is a red wire to the right of this one, don't cut the wire.<br/>
 					</td>
 				</tr>
 				<tr>
@@ -128,7 +129,10 @@
 						If the text says "A"
 					</td>
 					<td>
-						Action
+						If the bomb has a Stereo RCA port, cut the wire.<br/> <!-- This one might be too much -->
+						If the clock in the room has an even digit in it, don't cut the wire.<br/>
+						If the timer contains a prime number, cut the wire.<br/>
+						If none of the above apply, don't cut the wire.
 					</td>
 				</tr>
 				<tr>
@@ -136,7 +140,10 @@
 						If the text says "B"
 					</td>
 					<td>
-						Action
+						If the number of already cut wires is even, don't cut the wire.<br/>
+						If there are no blue wires and there are no duplicate modules on the bomb, cut the wire.<br/>
+						If the bomb has more than one parallel port, don't cut the wire.<br/>
+						If none of the above apply, cut the wire.<br/>
 					</td>
 				</tr>
 				<tr>
