@@ -91,6 +91,8 @@ public class VennWires2Module : MonoBehaviour
 
     public bool OnWireInteract(WireInfo info)
     {
+        if (info.WireUnsnippedObject.transform.position == info.WireSnippedObject.transform.position)
+            return false;
         if (!CheckWireCut(info))
             Module.HandleStrike();
         //Hacky way to update the highlight
