@@ -13,6 +13,8 @@ public class VennWires2Module : MonoBehaviour
     private KMBombModule module;
     private KMBombInfo bombInfo;
     private KMAudio kmAudio;
+    //To get a rulet: rules[color][led][text]
+    private Dictionary<Color, Dictionary<bool, Dictionary<string, List<KeyValuePair<string, bool>>>>> rules;
 
     [System.Serializable]
     public struct WireInfo
@@ -74,6 +76,7 @@ public class VennWires2Module : MonoBehaviour
             }
         }
         Module.OnActivate += OnActivate;
+        rules = new Dictionary<Color, Dictionary<bool, Dictionary<string, List<KeyValuePair<string, bool>>>>>();
     }
 
     public void OnActivate()
@@ -119,12 +122,34 @@ public class VennWires2Module : MonoBehaviour
         activated = false;
     }
 
-    public bool CheckWireCut(WireInfo index)
+    public bool CheckWireCut(WireInfo info)
     {
         bool cut = false;
+        Color color = info.WireUnsnippedObject.GetComponent<Renderer>().materials[0].color;
+        bool ledON = info.LedONObject.activeSelf;
+        string text = info.TextMeshGameObject.text;
+        if (rules.ContainsKey(color))
+        {
+            if (rules[color].ContainsKey(ledON))
+            {
+                if (rules[color][ledON].ContainsKey(text))
+                {
+                    foreach (KeyValuePair<string, bool> kv in rules[color][ledON][text])
+                    {
+                        if (CheckRule(kv.Key))
+                            return kv.Value;
+                    }
+                }
+            }
+        }
         if (MustInvert())
             cut = !cut;
         return cut;
+    }
+
+    public bool CheckRule(string rule)
+    {
+        return false;
     }
 
     public bool MustInvert()
