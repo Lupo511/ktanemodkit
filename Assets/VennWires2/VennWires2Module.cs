@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 public class VennWires2Module : MonoBehaviour
 {
@@ -149,8 +150,66 @@ public class VennWires2Module : MonoBehaviour
         return cut;
     }
 
+    //Rule format: <QueryType>;<Query>[;QueryInfo]|<equals|greater|smaller|contains>;<Operand>[;AdditionalInfo]
     public bool CheckRule(string rule)
     {
+        string[] parts = rule.Split('|');
+        string[] query = parts[0].Split(';');
+        List<string> queryResults = new List<string>();
+        switch (parts[0])
+        {
+            case "BombInfo":
+                switch (parts[1])
+                {
+                    case "Batteries":
+                        foreach (string batteries in BombInfo.QueryWidgets(KMBombInfo.QUERYKEY_GET_PORTS, null))
+                        {
+                            Dictionary<string, int> batteryInfo = JsonConvert.DeserializeObject<Dictionary<string, int>>(batteries);
+                            if (batteryInfo["numbatteries"] == 1)
+                                queryResults.Add("D");
+                            else if (batteryInfo["numbatteries"] == 2)
+                                queryResults.Add("A;A");
+                        }
+                        break;
+                    case "Ports":
+                        foreach (string ports in BombInfo.QueryWidgets(KMBombInfo.QUERYKEY_GET_PORTS, null))
+                        {
+                            Dictionary<string, List<string>> portInfo = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(ports);
+                            string str = "";
+                            foreach (string port in portInfo["presentPorts"])
+                            {
+                                if (str != "")
+                                    str += ";";
+                                str += port;
+                            }
+                            queryResults.Add(str);
+                        }
+                        break;
+                }
+                break;
+        }
+        string[] condition = parts[1].Split(';');
+        switch (condition[0])
+        {
+            case "equals":
+                if (queryResults.Count == int.Parse(condition[1]))
+                    return true;
+                break;
+            case "greater":
+                if (queryResults.Count < int.Parse(condition[1]))
+                    return true;
+                break;
+            case "smaller":
+                if (queryResults.Count > int.Parse(condition[1]))
+                    return true;
+                break;
+            case "contains":
+                Regex regex = new Regex(condition[1]);
+                foreach (string str in queryResults)
+                    if (regex.IsMatch(str))
+                        return true;
+                break;
+        }
         return false;
     }
 
