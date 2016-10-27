@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: c2ec5b0af4231db4eb1d283b0819b436
+timeCreated: 1477589877
+licenseType: Free
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 0
+  platformData:
+    Any:
+      enabled: 1
+      settings: {}
+    Editor:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
+    WindowsStoreApps:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  userData: 
+  assetBundleName: mod.bundle
+  assetBundleVariant: 
