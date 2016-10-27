@@ -44,7 +44,6 @@ GameObject:
   - 33: {fileID: 3340708}
   - 23: {fileID: 2345656}
   - 114: {fileID: 11413462}
-  - 114: {fileID: 11414912}
   m_Layer: 0
   m_Name: Submit Button
   m_TagString: Untagged
@@ -151,7 +150,6 @@ GameObject:
   - 33: {fileID: 3355462}
   - 23: {fileID: 2380504}
   - 114: {fileID: 11406932}
-  - 114: {fileID: 11458982}
   m_Layer: 0
   m_Name: Right Button
   m_TagString: Untagged
@@ -274,7 +272,6 @@ GameObject:
   - 33: {fileID: 3382110}
   - 23: {fileID: 2382142}
   - 114: {fileID: 11478188}
-  - 114: {fileID: 11468762}
   m_Layer: 0
   m_Name: Left Button
   m_TagString: Untagged
@@ -1193,19 +1190,6 @@ MonoBehaviour:
   Highlight: {fileID: 11467536}
   SelectableArea: {fileID: 0}
   DefaultSelectableIndex: 0
---- !u!114 &11414912
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 111152}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -706292897, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HighlightScale: {x: 0, y: 0, z: 0}
-  OutlineAmount: 0.01
 --- !u!114 &11427068
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1244,19 +1228,6 @@ MonoBehaviour:
   ModuleType: EnglishTest
   ModuleDisplayName: English Test
   RequiresTimerVisibility: 0
---- !u!114 &11458982
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 133092}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -706292897, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HighlightScale: {x: 0, y: 0, z: 0}
-  OutlineAmount: 0.01
 --- !u!114 &11466260
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1281,19 +1252,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightScale: {x: 1, y: 1, z: 1}
   OutlineAmount: 0
---- !u!114 &11468762
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 195018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -706292897, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HighlightScale: {x: 0, y: 0, z: 0}
-  OutlineAmount: 0.01
 --- !u!114 &11471268
 MonoBehaviour:
   m_ObjectHideFlags: 1
