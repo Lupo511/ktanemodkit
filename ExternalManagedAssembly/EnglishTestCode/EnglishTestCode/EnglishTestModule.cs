@@ -226,6 +226,7 @@ public class EnglishTestModule : MonoBehaviour
         background.transform.localPosition = new Vector3(wordBegin - (getGameObjectSize(OptionsText.gameObject).x / 2) + wordWidth / 2, 0, 0.000001f);
         background.transform.localScale = new Vector3(wordWidth / 10, 1, getGameObjectSize(OptionsText.gameObject).y / 10);
         background.transform.localRotation = Quaternion.Euler(new Vector3(-90, 0, 0));
+        background.GetComponent<Renderer>().materials[0].shader = UnlitShader;
         background.GetComponent<Renderer>().materials[0].color = Color.green;
     }
 
