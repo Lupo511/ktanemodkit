@@ -114,12 +114,12 @@ public class EnglishTestModule : MonoBehaviour
     private void selectQuestion()
     {
         currentQuestion = questions[UnityEngine.Random.Range(0, questions.Count)];
-        currentAnswerIndex = UnityEngine.Random.Range(0, currentQuestion.Answers.Count);
+        currentAnswerIndex = 0;
 
         TopText.text = "Question " + (solvedQuestions + 1) + "/" + targetQuestions;
         TopText.gameObject.SetActive(true);
 
-        setBottomText(currentQuestion.QuestionText.Replace("%", currentQuestion.Answers[currentAnswerIndex]));
+        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[currentAnswerIndex] + "</i>"));
         BottomText.gameObject.SetActive(true);
     }
 
