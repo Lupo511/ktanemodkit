@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Reflection;
 using System.Collections;
 using System.Text.RegularExpressions;
@@ -23,7 +24,7 @@ public class EnglishTestModule : MonoBehaviour
     {
         activated = false;
         solvedQuestions = 0;
-        solvedQuestions = 3;
+        targetQuestions = 3;
 
         Module.OnActivate += OnActivate;
         findChildGameObjectByName(gameObject, "Submit Button").GetComponent<KMSelectable>().OnInteract += OnSubmitInteract;
@@ -112,8 +113,8 @@ public class EnglishTestModule : MonoBehaviour
 
     private void selectQuestion()
     {
-        currentQuestion = questions[Random.Range(0, questions.Count)];
-        currentAnswerIndex = Random.Range(0, currentQuestion.Answers.Count);
+        currentQuestion = questions[UnityEngine.Random.Range(0, questions.Count)];
+        currentAnswerIndex = UnityEngine.Random.Range(0, currentQuestion.Answers.Count);
 
         TopText.text = "Question " + (solvedQuestions + 1) + "/" + targetQuestions;
         TopText.gameObject.SetActive(true);
@@ -124,29 +125,48 @@ public class EnglishTestModule : MonoBehaviour
 
     private void setBottomText(string text)
     {
+        float maxX = BottomDisplay.AddComponent<BoxCollider>().size.x * BottomDisplay.transform.localScale.x;
+        float maxZ = BottomDisplay.GetComponent<BoxCollider>().size.z * BottomDisplay.transform.localScale.z;
         BottomText.fontSize = 35;
         BottomText.text = text;
         string originalText = BottomText.text;
-        while (BottomText.GetComponent<Renderer>().bounds.max.x > BottomDisplay.GetComponent<Renderer>().bounds.max.x)
+        while (getGameObjectSize(BottomText.gameObject).x > maxX)
         {
             string currentText = BottomText.text;
             List<int> indices = findAllIndicesOf(currentText, ' ');
             int i = indices.Count - 1;
-            while (BottomText.GetComponent<Renderer>().bounds.max.x > BottomDisplay.GetComponent<Renderer>().bounds.max.x)
+            if (i >= 0)
             {
-                BottomText.text = currentText.Substring(0, indices[i]);
-                i--;
-                if (i < 0)
-                    break;
+                while (getGameObjectSize(BottomText.gameObject).x > maxX)
+                {
+                    BottomText.text = currentText.Substring(0, indices[i]);
+                    i--;
+                    if (i < 0)
+                        break;
+                }
             }
             if (i >= 0)
+            {
                 BottomText.text += "\n" + currentText.Substring(indices[i + 1] + 1);
+            }
+            else
+            {
+                BottomText.fontSize--;
+            }
             if (findAllIndicesOf(BottomText.text, '\n').Count > 4)
             {
                 BottomText.fontSize--;
                 BottomText.text = originalText;
             }
         }
+        BottomText.gameObject.AddComponent<BoxCollider>();
+    }
+
+    private Vector3 getGameObjectSize(GameObject go)
+    {
+        Vector3 size = go.AddComponent<BoxCollider>().size;
+        Destroy(go.GetComponent<BoxCollider>()); //Check not working
+        return size;
     }
 
     private List<int> findAllIndicesOf(string str, char chr)
