@@ -7,11 +7,14 @@ using System.Collections.Generic;
 
 public class EnglishTestModule : MonoBehaviour
 {
+    public Shader UnlitShader;
+
     private KMBombModule module;
     private GameObject topDisplay;
     private TextMesh topText;
     private GameObject bottomDisplay;
     private TextMesh bottomText;
+    private TextMesh optionsText;
 
     private bool activated;
     private List<Question> questions;
@@ -97,17 +100,36 @@ public class EnglishTestModule : MonoBehaviour
 
     private bool OnSubmitInteract()
     {
+        if (!activated)
+            return false;
+
         selectQuestion();
         return false;
     }
 
     private bool OnLeftInteract()
     {
+        if (!activated)
+            return false;
+
+        currentAnswerIndex--;
+        if (currentAnswerIndex < 0)
+            currentAnswerIndex = currentQuestion.Answers.Count - 1;
+        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[currentAnswerIndex] + "</i>"));
+        updateOptionsText();
         return false;
     }
 
     private bool OnRightInteract()
     {
+        if (!activated)
+            return false;
+
+        currentAnswerIndex++;
+        if (currentAnswerIndex >= currentQuestion.Answers.Count)
+            currentAnswerIndex = 0;
+        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[currentAnswerIndex] + "</i>"));
+        updateOptionsText();
         return false;
     }
 
@@ -121,11 +143,14 @@ public class EnglishTestModule : MonoBehaviour
 
         setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[currentAnswerIndex] + "</i>"));
         BottomText.gameObject.SetActive(true);
+
+        updateOptionsText();
+        OptionsText.gameObject.SetActive(true);
     }
 
     private void setBottomText(string text)
     {
-        float maxX = BottomDisplay.AddComponent<BoxCollider>().size.x * BottomDisplay.transform.localScale.x;
+        float maxX = BottomDisplay.GetComponent<BoxCollider>().size.x * BottomDisplay.transform.localScale.x - 0.007f;
         float maxZ = BottomDisplay.GetComponent<BoxCollider>().size.z * BottomDisplay.transform.localScale.z;
         BottomText.fontSize = 35;
         BottomText.text = text;
@@ -153,19 +178,62 @@ public class EnglishTestModule : MonoBehaviour
             {
                 BottomText.fontSize--;
             }
-            if (findAllIndicesOf(BottomText.text, '\n').Count > 4)
+            if (findAllIndicesOf(BottomText.text, '\n').Count > 3)
             {
                 BottomText.fontSize--;
                 BottomText.text = originalText;
             }
         }
-        BottomText.gameObject.AddComponent<BoxCollider>();
+    }
+
+    private void updateOptionsText()
+    {
+        OptionsText.fontSize = 35;
+        float wordWidth = 0;
+        float wordBegin = 0;
+        while (true)
+        {
+            string str = "";
+            for (int i = 0; i < currentQuestion.Answers.Count; i++)
+            {
+                if (i > 0)
+                    str += " ";
+
+                if (i == currentAnswerIndex)
+                {
+                    OptionsText.text = currentQuestion.Answers[i];
+                    wordWidth = getGameObjectSize(OptionsText.gameObject).x;
+                    OptionsText.text = str;
+                    wordBegin = getGameObjectSize(OptionsText.gameObject).x;
+                    str += "<color=#000000>" + currentQuestion.Answers[i] + "</color>";
+                }
+                else
+                {
+                    str += currentQuestion.Answers[i];
+                }
+            }
+            OptionsText.text = str;
+            if (getGameObjectSize(OptionsText.gameObject).x < BottomDisplay.GetComponent<BoxCollider>().size.x * BottomDisplay.transform.localScale.x)
+                break;
+            OptionsText.fontSize--;
+        }
+
+        if (OptionsText.transform.childCount > 0)
+            Destroy(OptionsText.transform.GetChild(0).gameObject);
+        GameObject background = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        background.name = "Highlight plane";
+        background.transform.parent = OptionsText.gameObject.transform;
+        background.transform.localPosition = new Vector3(wordBegin - (getGameObjectSize(OptionsText.gameObject).x / 2) + wordWidth / 2, 0, 0.000001f);
+        background.transform.localScale = new Vector3(wordWidth / 10, 1, getGameObjectSize(OptionsText.gameObject).y / 10);
+        background.transform.localRotation = Quaternion.Euler(new Vector3(-90, 0, 0));
+        background.GetComponent<Renderer>().materials[0].color = Color.green;
     }
 
     private Vector3 getGameObjectSize(GameObject go)
     {
-        Vector3 size = go.AddComponent<BoxCollider>().size;
-        Destroy(go.GetComponent<BoxCollider>()); //Check not working
+        BoxCollider col = go.AddComponent<BoxCollider>();
+        Vector3 size = col.size;
+        Destroy(col);
         return size;
     }
 
@@ -240,6 +308,16 @@ public class EnglishTestModule : MonoBehaviour
             if (bottomText == null)
                 bottomText = findChildGameObjectByName(gameObject, "Bottom Text").GetComponent<TextMesh>();
             return bottomText;
+        }
+    }
+
+    public TextMesh OptionsText
+    {
+        get
+        {
+            if (optionsText == null)
+                optionsText = findChildGameObjectByName(gameObject, "Options Text").GetComponent<TextMesh>();
+            return optionsText;
         }
     }
 }

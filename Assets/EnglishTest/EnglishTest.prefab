@@ -133,7 +133,7 @@ GameObject:
   - 23: {fileID: 2305532}
   - 102: {fileID: 10283020}
   m_Layer: 0
-  m_Name: Bottom Text
+  m_Name: Options Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -157,6 +157,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &135238
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 490468}
+  - 23: {fileID: 2389486}
+  - 102: {fileID: 10216792}
+  m_Layer: 0
+  m_Name: Bottom Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
 --- !u!1 &135248
 GameObject:
   m_ObjectHideFlags: 1
@@ -254,6 +271,7 @@ GameObject:
   - 4: {fileID: 472878}
   - 33: {fileID: 3309596}
   - 23: {fileID: 2326532}
+  - 65: {fileID: 6518500}
   m_Layer: 0
   m_Name: Bottom Display
   m_TagString: Untagged
@@ -343,12 +361,12 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 120558}
   m_LocalRotation: {x: -0.7071068, y: -0.00000023040462, z: 0.00000023040465, w: -0.7071067}
-  m_LocalPosition: {x: -0.0765, y: 0.01508055, z: 0.0387}
+  m_LocalPosition: {x: 0, y: 0.0151, z: -0.0422}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 89.980194, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 490710}
-  m_RootOrder: 6
+  m_RootOrder: 7
 --- !u!4 &418590
 Transform:
   m_ObjectHideFlags: 1
@@ -363,7 +381,7 @@ Transform:
   - {fileID: 434522}
   - {fileID: 406514}
   m_Father: {fileID: 490710}
-  m_RootOrder: 8
+  m_RootOrder: 9
 --- !u!4 &434264
 Transform:
   m_ObjectHideFlags: 1
@@ -378,7 +396,7 @@ Transform:
   - {fileID: 446568}
   - {fileID: 449536}
   m_Father: {fileID: 490710}
-  m_RootOrder: 9
+  m_RootOrder: 10
 --- !u!4 &434522
 Transform:
   m_ObjectHideFlags: 1
@@ -406,7 +424,7 @@ Transform:
   - {fileID: 401834}
   - {fileID: 448940}
   m_Father: {fileID: 490710}
-  m_RootOrder: 7
+  m_RootOrder: 8
 --- !u!4 &440176
 Transform:
   m_ObjectHideFlags: 1
@@ -498,6 +516,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 490710}
   m_RootOrder: 5
+--- !u!4 &490468
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 135238}
+  m_LocalRotation: {x: -0.7071068, y: -0.00000023040462, z: 0.00000023040465, w: -0.7071067}
+  m_LocalPosition: {x: -0.0765, y: 0.01508055, z: 0.0387}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 89.980194, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 490710}
+  m_RootOrder: 6
 --- !u!4 &490710
 Transform:
   m_ObjectHideFlags: 1
@@ -515,6 +546,7 @@ Transform:
   - {fileID: 453410}
   - {fileID: 465870}
   - {fileID: 472878}
+  - {fileID: 490468}
   - {fileID: 414768}
   - {fileID: 435072}
   - {fileID: 418590}
@@ -924,6 +956,32 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
+--- !u!23 &2389486
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 135238}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 9d5d3d87feb360442a747612f6d5fbb5, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 1
+  m_ReflectionProbeUsage: 1
+  m_ProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
 --- !u!33 &3309596
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -994,6 +1052,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 151128}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &6518500
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 188040}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.99999994, z: 0.99999994}
+  m_Center: {x: -2.3283064e-10, y: 0, z: 0}
 --- !u!95 &9552760
 Animator:
   serializedVersion: 3
@@ -1011,6 +1081,31 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!102 &10216792
+TextMesh:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 135238}
+  m_Text: 'The quick brown
+
+    fox jumps over
+
+    the lazy dog'
+  m_OffsetZ: 0
+  m_CharacterSize: 0.004
+  m_LineSpacing: 1
+  m_Anchor: 0
+  m_Alignment: 0
+  m_TabSize: 4
+  m_FontSize: 35
+  m_FontStyle: 0
+  m_RichText: 1
+  m_Font: {fileID: 12800000, guid: c1b5b48188d0d5f459be4a332e87c921, type: 3}
+  m_Color:
+    serializedVersion: 2
+    rgba: 4278255360
 --- !u!102 &10254586
 TextMesh:
   serializedVersion: 3
@@ -1102,16 +1197,12 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 120558}
-  m_Text: 'The quick brown
-
-    fox jumps over
-
-    the lazy dog'
+  m_Text: Option1 Option2 Option3
   m_OffsetZ: 0
   m_CharacterSize: 0.004
   m_LineSpacing: 1
-  m_Anchor: 0
-  m_Alignment: 0
+  m_Anchor: 4
+  m_Alignment: 1
   m_TabSize: 4
   m_FontSize: 35
   m_FontStyle: 0
@@ -1265,6 +1356,7 @@ MonoBehaviour:
   m_Script: {fileID: 993498448, guid: c2ec5b0af4231db4eb1d283b0819b436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UnlitShader: {fileID: 0}
 --- !u!114 &11478188
 MonoBehaviour:
   m_ObjectHideFlags: 1
