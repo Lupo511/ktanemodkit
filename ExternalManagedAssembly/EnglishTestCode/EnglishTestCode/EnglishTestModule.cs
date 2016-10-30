@@ -10,6 +10,7 @@ public class EnglishTestModule : MonoBehaviour
     public Shader UnlitShader;
 
     private KMBombModule module;
+    private KMAudio audio;
     private GameObject topDisplay;
     private TextMesh topText;
     private GameObject bottomDisplay;
@@ -21,7 +22,7 @@ public class EnglishTestModule : MonoBehaviour
     private int solvedQuestions;
     private int targetQuestions;
     private Question currentQuestion;
-    private int currentAnswerIndex;
+    private int selectedAnswerIndex;
 
     public void Start()
     {
@@ -91,6 +92,11 @@ public class EnglishTestModule : MonoBehaviour
 #endif
     }
 
+    public void OnDestroy()
+    {
+        StopAllCoroutines();
+    }
+
     private void OnActivate()
     {
         activated = true;
@@ -102,8 +108,11 @@ public class EnglishTestModule : MonoBehaviour
     {
         if (!activated)
             return false;
+        if (currentQuestion == null)
+            return false;
 
-        selectQuestion();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Submit Button").transform);
+        StartCoroutine(nextQuestion(selectedAnswerIndex == currentQuestion.CorrectAnswerIndex));
         return false;
     }
 
@@ -111,11 +120,14 @@ public class EnglishTestModule : MonoBehaviour
     {
         if (!activated)
             return false;
+        if (currentQuestion == null)
+            return false;
 
-        currentAnswerIndex--;
-        if (currentAnswerIndex < 0)
-            currentAnswerIndex = currentQuestion.Answers.Count - 1;
-        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[currentAnswerIndex] + "</i>"));
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Left Button").transform);
+        selectedAnswerIndex--;
+        if (selectedAnswerIndex < 0)
+            selectedAnswerIndex = currentQuestion.Answers.Count - 1;
+        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>"));
         updateOptionsText();
         return false;
     }
@@ -124,24 +136,57 @@ public class EnglishTestModule : MonoBehaviour
     {
         if (!activated)
             return false;
+        if (currentQuestion == null)
+            return false;
 
-        currentAnswerIndex++;
-        if (currentAnswerIndex >= currentQuestion.Answers.Count)
-            currentAnswerIndex = 0;
-        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[currentAnswerIndex] + "</i>"));
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Right Button").transform);
+        selectedAnswerIndex++;
+        if (selectedAnswerIndex >= currentQuestion.Answers.Count)
+            selectedAnswerIndex = 0;
+        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>"));
         updateOptionsText();
         return false;
+    }
+
+    private IEnumerator nextQuestion(bool correct)
+    {
+        currentQuestion = null;
+        BottomText.gameObject.SetActive(false);
+        OptionsText.gameObject.SetActive(false);
+        if (!correct)
+        {
+            Module.HandleStrike();
+            solvedQuestions = 0;
+            TopText.color = Color.red;
+            TopText.text = "Incorrect";
+        }
+        else
+        {
+            solvedQuestions++;
+            if (solvedQuestions == targetQuestions)
+            {
+                TopText.text = "Test passed";
+                Module.HandlePass();
+                yield break;
+            }
+            TopText.text = "Correct";
+        }
+        yield return new WaitForSeconds(3);
+        TopText.color = Color.green;
+        selectQuestion();
     }
 
     private void selectQuestion()
     {
         currentQuestion = questions[UnityEngine.Random.Range(0, questions.Count)];
-        currentAnswerIndex = 0;
+        int result = UnityEngine.Random.Range(0, 100);
+        Debug.Log(result);
+        selectedAnswerIndex = result > 15 ? 0 : UnityEngine.Random.Range(0, currentQuestion.Answers.Count);
 
         TopText.text = "Question " + (solvedQuestions + 1) + "/" + targetQuestions;
         TopText.gameObject.SetActive(true);
 
-        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[currentAnswerIndex] + "</i>"));
+        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>"));
         BottomText.gameObject.SetActive(true);
 
         updateOptionsText();
@@ -199,7 +244,7 @@ public class EnglishTestModule : MonoBehaviour
                 if (i > 0)
                     str += " ";
 
-                if (i == currentAnswerIndex)
+                if (i == selectedAnswerIndex)
                 {
                     OptionsText.text = currentQuestion.Answers[i];
                     wordWidth = getGameObjectSize(OptionsText.gameObject).x;
@@ -269,6 +314,16 @@ public class EnglishTestModule : MonoBehaviour
             if (module == null)
                 module = GetComponent<KMBombModule>();
             return module;
+        }
+    }
+
+    public KMAudio Audio
+    {
+        get
+        {
+            if (audio == null)
+                audio = GetComponent<KMAudio>();
+            return audio;
         }
     }
 
