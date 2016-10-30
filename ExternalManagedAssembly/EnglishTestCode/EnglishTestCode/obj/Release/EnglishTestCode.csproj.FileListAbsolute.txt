@@ -1,0 +1,5 @@
+F:\Lupo\Documents\GitHub\ktanemodkit\Assets\Plugins\EnglishTestCode.dll
+F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Release\EnglishTestCode.csprojResolveAssemblyReference.cache
+F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Release\EnglishTestCode.Properties.Resources.resources
+F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Release\EnglishTestCode.csproj.GenerateResource.Cache
+F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Release\EnglishTestCode.dll

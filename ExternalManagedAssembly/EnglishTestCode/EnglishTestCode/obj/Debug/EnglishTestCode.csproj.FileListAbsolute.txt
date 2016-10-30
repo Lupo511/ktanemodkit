@@ -4,10 +4,3 @@ F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\Eng
 F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\bin\Debug\UnityEngine.dll
 F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\bin\Debug\KMFramework.xml
 F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\bin\Debug\UnityEngine.xml
-F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Debug\EnglishTestCode.csprojResolveAssemblyReference.cache
-F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Debug\EnglishTestCode.Properties.Resources.resources
-F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Debug\EnglishTestCode.csproj.GenerateResource.Cache
-F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Debug\EnglishTestCode.dll
-F:\Lupo\Documents\GitHub\ktanemodkit\ExternalManagedAssembly\EnglishTestCode\EnglishTestCode\obj\Debug\EnglishTestCode.pdb
-F:\Lupo\Documents\GitHub\ktanemodkit\Assets\Plugins\EnglishTestCode.dll
-F:\Lupo\Documents\GitHub\ktanemodkit\Assets\Plugins\EnglishTestCode.pdb
