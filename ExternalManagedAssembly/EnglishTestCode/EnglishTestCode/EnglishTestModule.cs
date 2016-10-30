@@ -42,6 +42,8 @@ public class EnglishTestModule : MonoBehaviour
             string line = lines[i];
             if (string.IsNullOrEmpty(line))
                 continue;
+            if (line.StartsWith("//"))
+                continue;
             Regex regex = new Regex(@"(?<=\[).*(?=\])");
             Match match = regex.Match(line);
             if (match.Success)
