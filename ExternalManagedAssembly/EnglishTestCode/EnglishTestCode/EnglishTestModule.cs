@@ -181,9 +181,7 @@ public class EnglishTestModule : MonoBehaviour
     private void selectQuestion()
     {
         currentQuestion = questions[UnityEngine.Random.Range(0, questions.Count)];
-        int result = UnityEngine.Random.Range(0, 100);
-        Debug.Log(result);
-        selectedAnswerIndex = result > 15 ? 0 : UnityEngine.Random.Range(0, currentQuestion.Answers.Count);
+        selectedAnswerIndex = UnityEngine.Random.Range(0, 100) > 15 ? 0 : UnityEngine.Random.Range(0, currentQuestion.Answers.Count);
 
         TopText.text = "Question " + (solvedQuestions + 1) + "/" + targetQuestions;
         TopText.gameObject.SetActive(true);
