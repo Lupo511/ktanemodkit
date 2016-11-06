@@ -355,7 +355,7 @@ Oh no, I forgot to [right|rite|wright|!write] my essay!
 //road rode rowed
 I walk a lonely [!road|rode|rowed], the only one that I have ever known.
 I [road|!rode|rowed] into town on a horse with no name.
-I [road|rode|!rowed] as hard as I can!
+I [road|rode|!rowed] the boat as hard as I can!
 
 //ring wring
 If you liked it, then you should have put a [!ring|wring] on it!
@@ -401,3 +401,7 @@ He has a [waited|!weighted] blanket.
 //weak week
 SLEEP IS FOR THE [!WEAK|WEEK].
 I'm sleeping for a [weak|!week].
+
+//everyday every day
+This is an [!everyday|every day] occurrence.
+This happens [everyday|every day].
