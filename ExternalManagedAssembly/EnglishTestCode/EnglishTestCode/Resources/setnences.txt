@@ -405,3 +405,7 @@ I'm sleeping for a [weak|!week].
 //everyday every day
 This is an [!everyday|every day] occurrence.
 This happens [everyday|every day].
+
+//perfect prefect
+The employee feared that when the [perfect|!prefect] became the CEO, he would have his pay cut.
+Wow, you look [!perfect|prefect] today!
