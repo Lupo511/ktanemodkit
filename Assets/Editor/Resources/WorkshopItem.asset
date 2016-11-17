@@ -14,6 +14,6 @@ MonoBehaviour:
   WorkshopPublishedFileID: 794764799
   Title: English Test
   Description: 
-  PreviewImage: {fileID: 0}
+  PreviewImage: {fileID: 2800000, guid: c6eaeaf190566c545844cefa7d2d3d6d, type: 3}
   Tags:
   - Regular Module
