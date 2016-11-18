@@ -84,24 +84,24 @@ public class EnglishTestModule : MonoBehaviour
 
     private bool OnSubmitInteract()
     {
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Submit Button").transform);
         if (!activated)
             return false;
         if (currentQuestion == null)
             return false;
 
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Submit Button").transform);
         StartCoroutine(nextQuestion(selectedAnswerIndex == currentQuestion.CorrectAnswerIndex));
         return false;
     }
 
     private bool OnLeftInteract()
     {
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Left Button").transform);
         if (!activated)
             return false;
         if (currentQuestion == null)
             return false;
 
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Left Button").transform);
         selectedAnswerIndex--;
         if (selectedAnswerIndex < 0)
             selectedAnswerIndex = currentQuestion.Answers.Count - 1;
@@ -112,12 +112,12 @@ public class EnglishTestModule : MonoBehaviour
 
     private bool OnRightInteract()
     {
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Right Button").transform);
         if (!activated)
             return false;
         if (currentQuestion == null)
             return false;
 
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Right Button").transform);
         selectedAnswerIndex++;
         if (selectedAnswerIndex >= currentQuestion.Answers.Count)
             selectedAnswerIndex = 0;
