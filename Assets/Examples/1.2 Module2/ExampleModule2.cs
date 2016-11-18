@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 public class ExampleModule2 : MonoBehaviour
 {
     public KMSelectable[] buttons;
-
+    KMAudio.KMAudioRef audioRef;
     int correctIndex;
 
     void Start()
@@ -17,7 +17,13 @@ public class ExampleModule2 : MonoBehaviour
     {
         correctIndex = Random.Range(0, 4);
         GetComponent<KMBombModule>().OnActivate += OnActivate;
-        
+        GetComponent<KMSelectable>().OnCancel += OnCancel;
+        GetComponent<KMSelectable>().OnLeft += OnLeft;
+        GetComponent<KMSelectable>().OnLeft += OnRight;
+        GetComponent<KMSelectable>().OnSelect += OnSelect;
+        GetComponent<KMSelectable>().OnDeselect += OnDeselect;
+        GetComponent<KMSelectable>().OnHighlight += OnHighlight;
+
         for (int i = 0; i < buttons.Length; i++)
         {
             string label = i == correctIndex ? "A" : "B";
@@ -26,7 +32,33 @@ public class ExampleModule2 : MonoBehaviour
             buttonText.text = label;
             int j = i;
             buttons[i].OnInteract += delegate () { Debug.Log("Press #" + j); OnPress(j == correctIndex); return false; };
+            buttons[i].OnInteractEnded += OnRelease;
         }
+    }
+
+    private void OnDeselect()
+    {
+        Debug.Log("ExampleModule2 OnDeselect.");
+    }
+
+    private void OnLeft()
+    {
+        Debug.Log("ExampleModule2 OnLeft.");
+    }
+
+    private void OnRight()
+    {
+        Debug.Log("ExampleModule2 OnRight.");
+    }
+
+    private void OnSelect()
+    {
+        Debug.Log("ExampleModule2 OnSelect.");
+    }
+
+    private void OnHighlight()
+    {
+        Debug.Log("ExampleModule2 OnHighlight.");
     }
 
     void OnActivate()
@@ -52,16 +84,36 @@ public class ExampleModule2 : MonoBehaviour
         Debug.Log("Battery count: " + batteryCount);
     }
 
+    bool OnCancel()
+    {
+        Debug.Log("ExampleModule2 cancel.");
+
+        return true;
+    }
+
+    //On pressing button a looped sound will play
     void OnPress(bool correctButton)
     {
         Debug.Log("Pressed " + correctButton + " button");
+
         if (correctButton)
         {
+            audioRef = GetComponent<KMAudio>().PlayGameSoundAtTransformWithRef(KMSoundOverride.SoundEffect.AlarmClockBeep, transform);
             GetComponent<KMBombModule>().HandlePass();
         }
         else
         {
-            GetComponent<KMBombModule>().HandleStrike();
+            audioRef = GetComponent<KMAudio>().PlaySoundAtTransformWithRef("doublebeep125loop", transform);
+        }
+    }
+
+    //On releasing a button a looped sound will stop
+    void OnRelease()
+    {
+        Debug.Log("OnInteractEnded Released");
+        if(audioRef != null && audioRef.StopSound != null)
+        {
+            audioRef.StopSound();
         }
     }
 }
