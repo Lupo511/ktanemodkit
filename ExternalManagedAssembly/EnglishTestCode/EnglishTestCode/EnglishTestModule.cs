@@ -68,30 +68,6 @@ public class EnglishTestModule : MonoBehaviour
                 Debug.Log("Couldn't find options match for string at line " + i);
             }
         }
-
-#if !UNITY_EDITOR
-        foreach (MonoBehaviour component in findChildGameObjectByName(gameObject, "Submit Button").GetComponents<MonoBehaviour>())
-        {
-            if (component.GetType().FullName == "ModSelectable")
-            {
-                component.GetType().BaseType.GetField("ForceInteractionHighlight", BindingFlags.Public | BindingFlags.Instance).SetValue(component, true);
-            }
-        }
-        foreach (MonoBehaviour component in findChildGameObjectByName(gameObject, "Left Button").GetComponents<MonoBehaviour>())
-        {
-            if (component.GetType().FullName == "ModSelectable")
-            {
-                component.GetType().BaseType.GetField("ForceInteractionHighlight", BindingFlags.Public | BindingFlags.Instance).SetValue(component, true);
-            }
-        }
-        foreach (MonoBehaviour component in findChildGameObjectByName(gameObject, "Right Button").GetComponents<MonoBehaviour>())
-        {
-            if (component.GetType().FullName == "ModSelectable")
-            {
-                component.GetType().BaseType.GetField("ForceInteractionHighlight", BindingFlags.Public | BindingFlags.Instance).SetValue(component, true);
-            }
-        }
-#endif
     }
 
     public void OnDestroy()
