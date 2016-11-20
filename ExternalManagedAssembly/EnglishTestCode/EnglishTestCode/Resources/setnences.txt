@@ -160,7 +160,7 @@ I'm out of [!breath|breathe].
 I find it difficult to [breath|!breathe] without an inhaler.
 
 Take a [!drink|drank|drunk] if you're thirsty.
-She look like she once [drink|!drank|drunk] from the spring of youth.
+She looks like she once [drink|!drank|drunk] from the spring of youth.
 This kind of tea was [drink|drank|!drunk] in Japan since the early eighth century.
 Just a sip of alcohol makes me feel too [drink|drank|!drunk].
 
