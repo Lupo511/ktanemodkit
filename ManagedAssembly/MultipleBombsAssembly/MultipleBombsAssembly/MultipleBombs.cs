@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Records;
+﻿using Assets.Scripts.Missions;
+using Assets.Scripts.Records;
 using Events;
 using System;
 using System.Collections;
@@ -23,7 +24,7 @@ namespace MultipleBombsAssembly
         {
             if (SceneManager.Instance != null)
             {
-                if (SceneManager.Instance.CurrentState == SceneManager.State.Gameplay)
+                if (SceneManager.Instance.CurrentState == SceneManager.State.Gameplay && GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                 {
                     if (!gameplayInitialized)
                     {
@@ -131,6 +132,10 @@ namespace MultipleBombsAssembly
                 }
             }
             Debug.Log("[MultipleBombs]Custom bomb activated");
+            yield return new WaitForSeconds(2f);
+
+            bomb.GetTimer().StartTimer();
+            Debug.Log("[MultipleBombs]Custom bomb timer started");
         }
     }
 }
