@@ -42,6 +42,12 @@ namespace MultipleBombsAssembly
                 }
                 else if (gameplayInitialized)
                 {
+                    Debug.Log("[MultipleBombs]Cleaning custom bombs");
+                    StopAllCoroutines();
+                    foreach (Bomb bomb in FindObjectsOfType<Bomb>())
+                    {
+                        bomb.gameObject.SetActive(false);
+                    }
                     gameplayInitialized = false;
                 }
             }
