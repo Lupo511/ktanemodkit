@@ -12,13 +12,11 @@ namespace MultipleBombsAssembly
 {
     public class MultipleBombs : MonoBehaviour
     {
-        private Rect windowRect;
         private bool gameplayInitialized;
 
         public void Awake()
         {
             gameplayInitialized = false;
-            windowRect = new Rect(0, 0, 300, 200);
         }
 
         public void Update()
@@ -122,33 +120,6 @@ namespace MultipleBombsAssembly
                 }
             }
             Debug.Log("[MultipleBombs]Custom bomb activated");
-        }
-
-        public void OnGUI()
-        {
-            windowRect = GUI.Window(1337, windowRect, windowFunction, "Multiple Bombs Debug");
-        }
-
-        private void windowFunction(int id)
-        {
-            if (id == 1337)
-            {
-                GUILayout.BeginVertical();
-                if (GUILayout.Button("Generate new bomb"))
-                {
-                    Debug.Log("[MultipleBombs]New bomb requested");
-                    GameplayState gameplayState = FindObjectOfType<GameplayState>();
-                    BombGenerator bombGenerator = FindObjectOfType<BombGenerator>();
-                    if (gameplayState != null)
-                    {
-                        if (bombGenerator != null)
-                        {
-                            StartCoroutine(CreateNewBomb(gameplayState, bombGenerator));
-                        }
-                    }
-                }
-                GUILayout.EndVertical();
-            }
         }
     }
 }
