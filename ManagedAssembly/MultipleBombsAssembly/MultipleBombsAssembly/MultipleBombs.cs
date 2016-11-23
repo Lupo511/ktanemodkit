@@ -29,12 +29,17 @@ namespace MultipleBombsAssembly
                     {
                         Debug.Log("[MultipleBombs]Initializing multiple bombs");
                         gameplayInitialized = true;
-                        foreach (BombComponent component in FindObjectOfType<Bomb>().BombComponents)
+                        Bomb vanillaBomb = FindObjectOfType<Bomb>();
+                        foreach (BombComponent component in vanillaBomb.BombComponents)
                         {
                             component.OnPass = onComponentPass;
                         }
-                        Debug.Log("[MultipleBombs]Vanilla components initialized");
-                        StartCoroutine(CreateNewBomb(SceneManager.Instance.GameplayState, FindObjectOfType<BombGenerator>()));
+                        vanillaBomb.gameObject.transform.position += new Vector3(-0.5f, 0, 0);
+                        vanillaBomb.gameObject.transform.eulerAngles += new Vector3(0, -30, 0);
+                        vanillaBomb.GetComponent<FloatingHoldable>().Initialize();
+                        Debug.Log("[MultipleBombs]Default bomb initialized");
+
+                        StartCoroutine(CreateNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.5f, 0, 0), new Vector3(0, 30, 0)));
                         Debug.Log("[MultipleBombs]All bombs generated");
                     }
                 }
@@ -77,19 +82,25 @@ namespace MultipleBombsAssembly
             return false;
         }
 
-        private IEnumerator CreateNewBomb(GameplayState gameplayState, BombGenerator bombGenerator)
+        private IEnumerator CreateNewBomb(BombGenerator bombGenerator, Vector3 position, Vector3 eulerAngles)
         {
             Debug.Log("[MultipleBombs]Generating new bomb");
 
-            gameplayState.Room.BombSpawnPosition.transform.position += new Vector3(0.5f, 0, 0);
-            Bomb bomb = bombGenerator.CreateBomb(gameplayState.Mission.GeneratorSetting, gameplayState.Room.BombSpawnPosition, (new System.Random()).Next(), Assets.Scripts.Missions.BombTypeEnum.Default);
-            gameplayState.Room.BombSpawnPosition.transform.position -= new Vector3(0.5f, 0, 0);
+            GameplayState gameplayState = SceneManager.Instance.GameplayState;
+
+            GameObject spawnPointGO = new GameObject("CustomBombSpawnPoint");
+            spawnPointGO.transform.position = position;
+            spawnPointGO.transform.eulerAngles = eulerAngles;
+            HoldableSpawnPoint spawnPoint = spawnPointGO.AddComponent<HoldableSpawnPoint>();
+            spawnPoint.HoldableTarget = gameplayState.Room.BombSpawnPosition.HoldableTarget;
+
+            Bomb bomb = bombGenerator.CreateBomb(gameplayState.Mission.GeneratorSetting, spawnPoint, (new System.Random()).Next(), Assets.Scripts.Missions.BombTypeEnum.Default);
 
             GameObject roomGO = (GameObject)gameplayState.GetType().GetField("roomGO", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameplayState);
             Selectable mainSelectable = roomGO.GetComponent<Selectable>();
-            List<Selectable> childern = mainSelectable.Children.ToList();
-            childern.Insert(2, bomb.GetComponent<Selectable>());
-            mainSelectable.Children = childern.ToArray();
+            List<Selectable> children = mainSelectable.Children.ToList();
+            children.Insert(2, bomb.GetComponent<Selectable>());
+            mainSelectable.Children = children.ToArray();
             bomb.GetComponent<Selectable>().Parent = mainSelectable;
             bomb.GetTimer().text.gameObject.SetActive(false);
             bomb.GetTimer().LightGlow.enabled = false;
