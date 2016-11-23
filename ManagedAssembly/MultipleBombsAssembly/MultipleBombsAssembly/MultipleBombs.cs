@@ -34,10 +34,12 @@ namespace MultipleBombsAssembly
                         {
                             component.OnPass = onComponentPass;
                         }
+                        vanillaBomb.gameObject.transform.position += new Vector3(-0.4f, 0, 0);
                         vanillaBomb.gameObject.transform.eulerAngles += new Vector3(0, -30, 0);
                         vanillaBomb.GetComponent<FloatingHoldable>().Initialize();
                         Debug.Log("[MultipleBombs]Default bomb initialized");
 
+                        StartCoroutine(CreateNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
                         Debug.Log("[MultipleBombs]All bombs generated");
                     }
                 }
