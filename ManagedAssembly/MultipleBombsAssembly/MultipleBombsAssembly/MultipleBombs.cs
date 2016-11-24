@@ -114,14 +114,14 @@ namespace MultipleBombsAssembly
                         vanillaBomb.GetComponent<FloatingHoldable>().Initialize();
                         Debug.Log("[MultipleBombs]Default bomb initialized");
 
-                        StartCoroutine(CreateNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
+                        StartCoroutine(createNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
                         vanillaBomb.GetComponent<Selectable>().Parent.Init();
                         Debug.Log("[MultipleBombs]All bombs generated");
                     }
                 }
                 else if (gameplayInitialized)
                 {
-                    Debug.Log("[MultipleBombs]Cleaning custom bombs");
+                    Debug.Log("[MultipleBombs]Cleaning up");
                     StopAllCoroutines();
                     foreach (Bomb bomb in FindObjectsOfType<Bomb>())
                     {
@@ -153,12 +153,23 @@ namespace MultipleBombsAssembly
                         return true;
                 Debug.Log("[MultipleBombs]All bombs solved, what a winner!");
                 SceneManager.Instance.GameplayState.OnWin();
+                StopAllCoroutines();
+                foreach (Bomb bomb in FindObjectsOfType<Bomb>())
+                    if (bomb != SceneManager.Instance.GameplayState.Bomb)
+                        StartCoroutine(timedDestroy(bomb.gameObject, 9f));
+                gameplayInitialized = false;
                 return true;
             }
             return false;
         }
 
-        private IEnumerator CreateNewBomb(BombGenerator bombGenerator, Vector3 position, Vector3 eulerAngles)
+        private IEnumerator timedDestroy(GameObject gameObject, float delaySeconds)
+        {
+            yield return new WaitForSeconds(delaySeconds);
+            Destroy(gameObject);
+        }
+
+        private IEnumerator createNewBomb(BombGenerator bombGenerator, Vector3 position, Vector3 eulerAngles)
         {
             Debug.Log("[MultipleBombs]Generating new bomb");
 
