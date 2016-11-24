@@ -7,16 +7,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using TMPro;
 using UnityEngine;
 
 namespace MultipleBombsAssembly
 {
     public class MultipleBombs : MonoBehaviour
     {
+        private bool setupRoomInitialized;
         private bool gameplayInitialized;
+        private const int maxBombCount = 2;
+        private int bombsCount = 1;
 
         public void Awake()
         {
+            setupRoomInitialized = false;
             gameplayInitialized = false;
         }
 
@@ -24,10 +29,78 @@ namespace MultipleBombsAssembly
         {
             if (SceneManager.Instance != null)
             {
+                if (SceneManager.Instance.CurrentState == SceneManager.State.Setup)
+                {
+                    if (!setupRoomInitialized)
+                    {
+                        FreeplayDevice device = FindObjectOfType<FreeplayDevice>();
+                        if (device != null)
+                        {
+                            Debug.Log("[MultipleBombs]Adding FreePlay option");
+                            setupRoomInitialized = true;
+                            GameObject modulesObject = device.ModuleCountIncrement.transform.parent.gameObject;
+                            GameObject bombsObject = (GameObject)Instantiate(modulesObject, modulesObject.transform.position, modulesObject.transform.rotation, modulesObject.transform.parent);
+                            device.ObjectsToDisableOnLidClose.Add(bombsObject);
+                            bombsObject.transform.localPosition = modulesObject.transform.localPosition + new Vector3(0, 0f, -0.025f);
+                            bombsObject.transform.FindChild("ModuleCountLabel").GetComponent<TextMeshPro>().text = "Bombs";
+                            TextMeshPro valueText = bombsObject.transform.FindChild("ModuleCountValue").GetComponent<TextMeshPro>();
+                            valueText.text = bombsCount.ToString();
+                            bombsObject.transform.FindChild("ModuleCountLED").gameObject.SetActive(false);
+
+                            GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            background.GetComponent<Renderer>().material.color = Color.black;
+                            background.transform.localScale = new Vector3(0.048f, 0.023f, 0.005f); //Accurate Y would be 0.025
+                            background.transform.parent = bombsObject.transform;
+                            background.transform.localPosition = valueText.gameObject.transform.localPosition + new Vector3(0.00025f, -0.0027f, 0);
+                            background.transform.localEulerAngles = valueText.gameObject.transform.localEulerAngles;
+
+                            GameObject incrementButton = bombsObject.transform.FindChild("Modules_INCR_btn").gameObject;
+                            GameObject decrementButton = bombsObject.transform.FindChild("Modules_DECR_btn").gameObject;
+                            Selectable deviceSelectable = device.GetComponent<Selectable>();
+                            List<Selectable> children = deviceSelectable.Children.ToList();
+                            children.Insert(2, incrementButton.GetComponent<Selectable>());
+                            children.Insert(2, decrementButton.GetComponent<Selectable>());
+                            deviceSelectable.Children = children.ToArray();
+                            incrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
+                            {
+                                if (bombsCount >= maxBombCount)
+                                    return;
+                                bombsCount++;
+                                valueText.text = bombsCount.ToString();
+                            });
+                            decrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
+                            {
+                                if (bombsCount <= 1)
+                                    return;
+                                bombsCount--;
+                                valueText.text = bombsCount.ToString();
+                            });
+                            //string textColor = "#" + valueText.color.r.ToString("x2") + valueText.color.g.ToString("x2") + valueText.color.b.ToString("x2");
+                            incrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
+                            {
+                                device.Screen.CurrentState = FreeplayScreen.State.Start;
+                                device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
+                            });
+                            decrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
+                            {
+                                device.Screen.CurrentState = FreeplayScreen.State.Start;
+                                device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
+                            });
+                            Debug.Log("[MultipleBombs]FreePlay option added");
+                        }
+                    }
+                }
+                else if (setupRoomInitialized)
+                {
+                    setupRoomInitialized = false;
+                }
                 if (SceneManager.Instance.CurrentState == SceneManager.State.Gameplay && GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                 {
                     if (!gameplayInitialized)
                     {
+                        if (bombsCount == 1)
+                            return;
+
                         Debug.Log("[MultipleBombs]Initializing multiple bombs");
                         gameplayInitialized = true;
                         Bomb vanillaBomb = FindObjectOfType<Bomb>();
