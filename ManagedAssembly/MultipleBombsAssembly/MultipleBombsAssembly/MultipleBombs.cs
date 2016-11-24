@@ -61,6 +61,7 @@ namespace MultipleBombsAssembly
                             children.Insert(2, incrementButton.GetComponent<Selectable>());
                             children.Insert(2, decrementButton.GetComponent<Selectable>());
                             deviceSelectable.Children = children.ToArray();
+                            deviceSelectable.Init();
                             incrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
                             {
                                 if (bombsCount >= maxBombCount)
@@ -114,6 +115,7 @@ namespace MultipleBombsAssembly
                         Debug.Log("[MultipleBombs]Default bomb initialized");
 
                         StartCoroutine(CreateNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
+                        vanillaBomb.GetComponent<Selectable>().Parent.Init();
                         Debug.Log("[MultipleBombs]All bombs generated");
                     }
                 }
@@ -175,6 +177,7 @@ namespace MultipleBombsAssembly
             List<Selectable> children = mainSelectable.Children.ToList();
             children.Insert(2, bomb.GetComponent<Selectable>());
             mainSelectable.Children = children.ToArray();
+            mainSelectable.ChildRowLength++;
             bomb.GetComponent<Selectable>().Parent = mainSelectable;
             bomb.GetTimer().text.gameObject.SetActive(false);
             bomb.GetTimer().LightGlow.enabled = false;
