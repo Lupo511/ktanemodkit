@@ -1,2 +1,0 @@
-#The last selected number of bombs that will be used as default
-BombsNumber=1

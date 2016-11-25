@@ -23,24 +23,7 @@ namespace MultipleBombsAssembly
         {
             setupRoomInitialized = false;
             gameplayInitialized = false;
-            int count;
-            if (int.TryParse(ConfigManager.GetValue("BombsNumber", "1"), out count))
-            {
-                if (count > maxBombCount)
-                {
-                    bombsCount = 1;
-                    Debug.Log("[MultipleBombs]Config error: BombsNumber is greater than the maximum number allowed, ignoring it");
-                }
-                else
-                {
-                    bombsCount = count;
-                }
-            }
-            else
-            {
-                bombsCount = 1;
-                Debug.Log("[MultipleBombs]Config error: Couldn't parse BombsNumber from config as int, ignoring it");
-            }
+            bombsCount = 1;
         }
 
         public void Update()
@@ -117,8 +100,6 @@ namespace MultipleBombsAssembly
                 {
                     if (!gameplayInitialized)
                     {
-                        ConfigManager.SetValue("BombsNumber", bombsCount.ToString());
-                        ConfigManager.Save();
                         if (bombsCount == 1)
                             return;
 
