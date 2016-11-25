@@ -207,6 +207,7 @@ namespace MultipleBombsAssembly
                         return true;
                 Debug.Log("[MultipleBombs]All bombs solved, what a winner!");
                 SceneManager.Instance.GameplayState.OnWin();
+                RecordManager.Instance.SetResult(GameResultEnum.Defused, source.Bomb.GetTimer().TimeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
                 StopAllCoroutines();
                 foreach (Bomb bomb in FindObjectsOfType<Bomb>())
                     if (bomb != SceneManager.Instance.GameplayState.Bomb)
