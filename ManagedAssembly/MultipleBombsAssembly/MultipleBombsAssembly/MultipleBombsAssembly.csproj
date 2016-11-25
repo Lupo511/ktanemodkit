@@ -56,9 +56,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="BombInfoRedirection.cs" />
+    <Compile Include="ConfigManager.cs" />
     <Compile Include="MultipleBombs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AssemblyResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AssemblyResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\modSettings.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
