@@ -110,12 +110,29 @@ namespace MultipleBombsAssembly
                         {
                             component.OnPass = onComponentPass;
                         }
-                        vanillaBomb.gameObject.transform.position += new Vector3(-0.4f, 0, 0);
-                        vanillaBomb.gameObject.transform.eulerAngles += new Vector3(0, -30, 0);
+                        GameObject spawn0 = GameObject.Find("MultipleBombs_Spawn_0");
+                        if (spawn0 != null)
+                        {
+                            vanillaBomb.gameObject.transform.position = spawn0.transform.position;
+                            vanillaBomb.gameObject.transform.rotation = spawn0.transform.rotation;
+                        }
+                        else
+                        {
+                            vanillaBomb.gameObject.transform.position += new Vector3(-0.4f, 0, 0);
+                            vanillaBomb.gameObject.transform.eulerAngles += new Vector3(0, -30, 0);
+                        }
                         vanillaBomb.GetComponent<FloatingHoldable>().Initialize();
                         Debug.Log("[MultipleBombs]Default bomb initialized");
 
-                        StartCoroutine(createNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
+                        GameObject spawn1 = GameObject.Find("MultipleBombs_Spawn_1");
+                        if (spawn1 != null)
+                        {
+                            StartCoroutine(createNewBomb(FindObjectOfType<BombGenerator>(), spawn1.transform.position, spawn1.transform.eulerAngles));
+                        }
+                        else
+                        {
+                            StartCoroutine(createNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
+                        }
                         vanillaBomb.GetComponent<Selectable>().Parent.Init();
                         Debug.Log("[MultipleBombs]All bombs generated");
 
