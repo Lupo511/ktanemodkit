@@ -161,9 +161,28 @@ namespace MultipleBombsAssembly
                 source.Bomb.GetTimer().StopTimer();
                 source.Bomb.GetTimer().Blink(1.5f);
                 DarkTonic.MasterAudio.MasterAudio.PlaySound3DAtTransformAndForget("bomb_defused", base.transform, 1f, null, 0f, null);
-                if (BombEvents.OnBombSolved != null)
+                foreach (KMBombInfo info in FindObjectsOfType<KMBombInfo>())
                 {
-                    BombEvents.OnBombSolved();
+                    ModBombComponent component = info.GetComponent<ModBombComponent>();
+                    if (component != null && component.Bomb == source.Bomb)
+                    {
+                        if (info.OnBombSolved != null)
+                            info.OnBombSolved();
+                    }
+                }
+                foreach (NeedyComponent component in FindObjectsOfType<NeedyComponent>())
+                {
+                    if (component.Bomb == source.Bomb)
+                    {
+                        component.TurnOff(true);
+                    }
+                }
+                foreach (TimerComponent timer in FindObjectsOfType<TimerComponent>())
+                {
+                    if (timer.Bomb == source.Bomb)
+                    {
+                        timer.StrikeIndicator.StopAllCoroutines();
+                    }
                 }
                 foreach (Bomb bomb in FindObjectsOfType<Bomb>())
                     if (!bomb.IsSolved())
