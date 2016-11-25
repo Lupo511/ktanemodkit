@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BombInfoRedirection.cs" />
     <Compile Include="MultipleBombs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

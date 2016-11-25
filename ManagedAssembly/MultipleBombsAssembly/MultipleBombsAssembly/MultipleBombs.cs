@@ -117,6 +117,23 @@ namespace MultipleBombsAssembly
                         StartCoroutine(createNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
                         vanillaBomb.GetComponent<Selectable>().Parent.Init();
                         Debug.Log("[MultipleBombs]All bombs generated");
+
+                        foreach (KMBombInfo info in FindObjectsOfType<KMBombInfo>())
+                        {
+                            ModBombComponent component = info.GetComponent<ModBombComponent>();
+                            if (component != null)
+                            {
+                                info.TimeHandler = new KMBombInfo.GetTimeHandler(() => BombInfoRedirection.GetTime(component));
+                                info.FormattedTimeHandler = new KMBombInfo.GetFormattedTimeHandler(() => BombInfoRedirection.GetFormattedTime(component));
+                                info.StrikesHandler = new KMBombInfo.GetStrikesHandler(() => BombInfoRedirection.GetStrikes(component));
+                                info.ModuleNamesHandler = new KMBombInfo.GetModuleNamesHandler(() => BombInfoRedirection.GetModuleNames(component));
+                                info.SolvableModuleNamesHandler = new KMBombInfo.GetSolvableModuleNamesHandler(() => BombInfoRedirection.GetSolvableModuleNames(component));
+                                info.SolvedModuleNamesHandler = new KMBombInfo.GetSolvedModuleNamesHandler(() => BombInfoRedirection.GetSolvedModuleNames(component));
+                                info.WidgetQueryResponsesHandler = new KMBombInfo.GetWidgetQueryResponsesHandler((string queryKey, string queryInfo) => BombInfoRedirection.GetWidgetQueryResponses(component, queryKey, queryInfo));
+                                info.IsBombPresentHandler = new KMBombInfo.KMIsBombPresent(() => BombInfoRedirection.IsBombPresent(component));
+                            }
+                        }
+                        Debug.Log("[MultipleBombs]All KMBombInfo redirected");
                     }
                 }
                 else if (gameplayInitialized)
