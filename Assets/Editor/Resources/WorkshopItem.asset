@@ -13,6 +13,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WorkshopPublishedFileID: 806104225
   Title: Multiple Bombs
-  Description: 
+  Description: "What's better than a bomb? Two bombs! Take your multitasking skills
+    to a new level by defusing two independent bombs at the same time! Two separate
+    serials, two separate widget collections, two separate timers, and more!\r\nYou
+    can easily change the mod settings from an option in the Free Play menu.\r\nAlso,
+    it can work together with custom bomb casings and custom gameplay rooms, so that
+    you can have total control over customization!\r\n\r\n[h1]For mod developers[/h1]\r\n[u]Gameplay
+    Rooms[/u]\r\nIf you're making a gameplay room and you want to customize the spawns
+    of all the bombs, you can do so by simply creating empty gameobjects following
+    the naming scheme specified below at the position and rotation where you want
+    the bombs to spawn.\r\nThe objects must be named:\r\n[code]MultipleBombs_Spawn_X[/code]\r\nwhere
+    [i]X[/i] is the index of the bomb that spawn is for (starting from 0).\r\nImportant
+    note: if the bomb count is set to 1, the default bomb spawn is going to be used,
+    while the MultipleBombs spawns are going to be used when the bomb count is 2 or
+    greater. This allows you (if you want) to specify a different bomb spawn if the
+    bomb is just a single one."
   PreviewImage: {fileID: 2800000, guid: be95b037aca480441806d4efa6da4ce2, type: 3}
-  Tags: []
+  Tags:
+  - Other
