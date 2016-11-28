@@ -18,6 +18,7 @@ namespace MultipleBombsAssembly
         private bool gameplayInitialized;
         private const int maxBombCount = 2;
         private int bombsCount;
+        private List<KMBombInfo> redirectedInfos;
 
         public void Awake()
         {
@@ -114,6 +115,7 @@ namespace MultipleBombsAssembly
 
                         Debug.Log("[MultipleBombs]Initializing multiple bombs");
                         gameplayInitialized = true;
+                        redirectedInfos = new List<KMBombInfo>();
                         Bomb vanillaBomb = FindObjectOfType<Bomb>();
                         foreach (BombComponent component in vanillaBomb.BombComponents)
                         {
@@ -131,6 +133,7 @@ namespace MultipleBombsAssembly
                             vanillaBomb.gameObject.transform.eulerAngles += new Vector3(0, -30, 0);
                         }
                         vanillaBomb.GetComponent<FloatingHoldable>().Initialize();
+                        RedirectPresentBombInfos(vanillaBomb);
                         Debug.Log("[MultipleBombs]Default bomb initialized");
 
                         GameObject spawn1 = GameObject.Find("MultipleBombs_Spawn_1");
@@ -144,23 +147,6 @@ namespace MultipleBombsAssembly
                         }
                         vanillaBomb.GetComponent<Selectable>().Parent.Init();
                         Debug.Log("[MultipleBombs]All bombs generated");
-
-                        foreach (KMBombInfo info in FindObjectsOfType<KMBombInfo>())
-                        {
-                            ModBombComponent component = info.GetComponent<ModBombComponent>();
-                            if (component != null)
-                            {
-                                info.TimeHandler = new KMBombInfo.GetTimeHandler(() => BombInfoRedirection.GetTime(component));
-                                info.FormattedTimeHandler = new KMBombInfo.GetFormattedTimeHandler(() => BombInfoRedirection.GetFormattedTime(component));
-                                info.StrikesHandler = new KMBombInfo.GetStrikesHandler(() => BombInfoRedirection.GetStrikes(component));
-                                info.ModuleNamesHandler = new KMBombInfo.GetModuleNamesHandler(() => BombInfoRedirection.GetModuleNames(component));
-                                info.SolvableModuleNamesHandler = new KMBombInfo.GetSolvableModuleNamesHandler(() => BombInfoRedirection.GetSolvableModuleNames(component));
-                                info.SolvedModuleNamesHandler = new KMBombInfo.GetSolvedModuleNamesHandler(() => BombInfoRedirection.GetSolvedModuleNames(component));
-                                info.WidgetQueryResponsesHandler = new KMBombInfo.GetWidgetQueryResponsesHandler((string queryKey, string queryInfo) => BombInfoRedirection.GetWidgetQueryResponses(component, queryKey, queryInfo));
-                                info.IsBombPresentHandler = new KMBombInfo.KMIsBombPresent(() => BombInfoRedirection.IsBombPresent(component));
-                            }
-                        }
-                        Debug.Log("[MultipleBombs]All KMBombInfo redirected");
 
                         SceneManager.Instance.GameplayState.Bomb.GetTimer().TimerTick = SceneManager.Instance.GameplayState.GetPaceMaker().OnTimerTick;
                         foreach (NeedyComponent component in FindObjectsOfType<NeedyComponent>())
@@ -181,6 +167,26 @@ namespace MultipleBombsAssembly
                     gameplayInitialized = false;
                 }
             }
+        }
+
+        private void RedirectPresentBombInfos(Bomb bomb)
+        {
+            foreach (KMBombInfo info in FindObjectsOfType<KMBombInfo>())
+            {
+                if (!redirectedInfos.Contains(info))
+                {
+                    info.TimeHandler = new KMBombInfo.GetTimeHandler(() => BombInfoRedirection.GetTime(bomb));
+                    info.FormattedTimeHandler = new KMBombInfo.GetFormattedTimeHandler(() => BombInfoRedirection.GetFormattedTime(bomb));
+                    info.StrikesHandler = new KMBombInfo.GetStrikesHandler(() => BombInfoRedirection.GetStrikes(bomb));
+                    info.ModuleNamesHandler = new KMBombInfo.GetModuleNamesHandler(() => BombInfoRedirection.GetModuleNames(bomb));
+                    info.SolvableModuleNamesHandler = new KMBombInfo.GetSolvableModuleNamesHandler(() => BombInfoRedirection.GetSolvableModuleNames(bomb));
+                    info.SolvedModuleNamesHandler = new KMBombInfo.GetSolvedModuleNamesHandler(() => BombInfoRedirection.GetSolvedModuleNames(bomb));
+                    info.WidgetQueryResponsesHandler = new KMBombInfo.GetWidgetQueryResponsesHandler((string queryKey, string queryInfo) => BombInfoRedirection.GetWidgetQueryResponses(bomb, queryKey, queryInfo));
+                    info.IsBombPresentHandler = new KMBombInfo.KMIsBombPresent(() => BombInfoRedirection.IsBombPresent(bomb));
+                    redirectedInfos.Add(info);
+                }
+            }
+            Debug.Log("[MultipleBombs]KMBombInfos redirected");
         }
 
         private bool onComponentPass(BombComponent source)
@@ -272,6 +278,7 @@ namespace MultipleBombsAssembly
             }
 
             Debug.Log("[MultipleBombs]Bomb generated");
+            RedirectPresentBombInfos(bomb);
             yield return new WaitForSeconds(2f);
 
             Debug.Log("[MultipleBombs]Activating custom bomb timer");

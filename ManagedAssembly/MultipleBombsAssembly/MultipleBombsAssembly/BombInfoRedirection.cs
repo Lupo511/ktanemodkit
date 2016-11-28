@@ -7,34 +7,30 @@ namespace MultipleBombsAssembly
 {
     public static class BombInfoRedirection
     {
-        internal static float GetTime(ModBombComponent caller)
+        internal static float GetTime(Bomb bomb)
         {
-            Bomb bomb = caller.Bomb;
             if (bomb == null)
                 return 0f;
             return bomb.GetTimer().TimeRemaining;
         }
 
-        internal static string GetFormattedTime(ModBombComponent caller)
+        internal static string GetFormattedTime(Bomb bomb)
         {
-            Bomb bomb = caller.Bomb;
             if (bomb == null)
                 return "";
             return TimerComponent.GetFormattedTime(bomb.GetTimer().TimeRemaining, true);
         }
 
-        internal static int GetStrikes(ModBombComponent caller)
+        internal static int GetStrikes(Bomb bomb)
         {
-            Bomb bomb = caller.Bomb;
             if (bomb == null)
                 return 0;
             return bomb.NumStrikes;
         }
 
-        internal static List<string> GetModuleNames(ModBombComponent caller)
+        internal static List<string> GetModuleNames(Bomb bomb)
         {
             List<string> modules = new List<string>();
-            Bomb bomb = caller.Bomb;
             if (bomb == null)
                 return modules;
             foreach (BombComponent component in bomb.BombComponents)
@@ -47,10 +43,9 @@ namespace MultipleBombsAssembly
             return modules;
         }
 
-        internal static List<string> GetSolvableModuleNames(ModBombComponent caller)
+        internal static List<string> GetSolvableModuleNames(Bomb bomb)
         {
             List<string> modules = new List<string>();
-            Bomb bomb = caller.Bomb;
             if (bomb == null)
                 return modules;
             foreach (BombComponent component in bomb.BombComponents)
@@ -63,10 +58,9 @@ namespace MultipleBombsAssembly
             return modules;
         }
 
-        internal static List<string> GetSolvedModuleNames(ModBombComponent caller)
+        internal static List<string> GetSolvedModuleNames(Bomb bomb)
         {
             List<string> modules = new List<string>();
-            Bomb bomb = caller.Bomb;
             if (bomb == null)
                 return modules;
             foreach (BombComponent component in bomb.BombComponents)
@@ -79,10 +73,9 @@ namespace MultipleBombsAssembly
             return modules;
         }
 
-        internal static List<string> GetWidgetQueryResponses(ModBombComponent caller, string queryKey, string queryInfo)
+        internal static List<string> GetWidgetQueryResponses(Bomb bomb, string queryKey, string queryInfo)
         {
             List<string> responses = new List<string>();
-            Bomb bomb = caller.Bomb;
             if (bomb == null)
                 return responses;
             foreach (Widget widget in bomb.WidgetManager.GetWidgets())
@@ -94,9 +87,9 @@ namespace MultipleBombsAssembly
             return responses;
         }
 
-        internal static bool IsBombPresent(ModBombComponent caller)
+        internal static bool IsBombPresent(Bomb bomb)
         {
-            return caller.Bomb != null;
+            return bomb != null;
         }
     }
 }
