@@ -88,12 +88,15 @@ namespace MultipleBombsAssembly
                                 device.Screen.CurrentState = FreeplayScreen.State.Start;
                                 device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                             });
-                            float newMaxTime = FreeplayDevice.MAX_SECONDS_TO_SOLVE * maxBombCount;
-                            if (ModManager.Instance.GetMaximumModules() > FreeplayDevice.MAX_MODULE_COUNT)
+                            if (FreeplayDevice.MAX_SECONDS_TO_SOLVE == 600f)
                             {
-                                newMaxTime += (ModManager.Instance.GetMaximumModules() - FreeplayDevice.MAX_MODULE_COUNT) * 60 * (maxBombCount - 1);
+                                float newMaxTime = FreeplayDevice.MAX_SECONDS_TO_SOLVE * maxBombCount;
+                                if (ModManager.Instance.GetMaximumModules() > FreeplayDevice.MAX_MODULE_COUNT)
+                                {
+                                    newMaxTime += (ModManager.Instance.GetMaximumModules() - FreeplayDevice.MAX_MODULE_COUNT) * 60 * (maxBombCount - 1);
+                                }
+                                FreeplayDevice.MAX_SECONDS_TO_SOLVE = newMaxTime;
                             }
-                            FreeplayDevice.MAX_SECONDS_TO_SOLVE = newMaxTime;
                             Debug.Log("[MultipleBombs]FreePlay option added");
                         }
                     }
