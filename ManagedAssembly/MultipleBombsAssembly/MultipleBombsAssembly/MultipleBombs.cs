@@ -161,6 +161,13 @@ namespace MultipleBombsAssembly
                             }
                         }
                         Debug.Log("[MultipleBombs]All KMBombInfo redirected");
+
+                        SceneManager.Instance.GameplayState.Bomb.GetTimer().TimerTick = SceneManager.Instance.GameplayState.GetPaceMaker().OnTimerTick;
+                        foreach (NeedyComponent component in FindObjectsOfType<NeedyComponent>())
+                        {
+                            component.Bomb.GetTimer().TimerTick += (TimerComponent.TimerTickEvent)Delegate.CreateDelegate(typeof(TimerComponent.TimerTickEvent), component.GetType().GetMethod("OnBombTimerTick", BindingFlags.Instance | BindingFlags.NonPublic));
+                        }
+                        Debug.Log("[MultipleBombs]Timer ticks redirected");
                     }
                 }
                 else if (gameplayInitialized)
