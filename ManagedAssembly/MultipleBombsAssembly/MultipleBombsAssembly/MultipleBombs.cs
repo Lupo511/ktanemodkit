@@ -28,7 +28,7 @@ namespace MultipleBombsAssembly
         private bool gameplayInitialized;
         private const int maxBombCount = 2;
         private int bombsCount;
-        private List<KMBombInfo> redirectedInfos;
+        private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private List<NeedyComponent> activatedNeedies;
         private MethodInfo gameplaySetBombMethod = typeof(GameplayState).GetMethod("set_Bomb", BindingFlags.Instance | BindingFlags.NonPublic);
         private FieldInfo needystateField = typeof(NeedyComponent).GetField("state", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -152,7 +152,7 @@ namespace MultipleBombsAssembly
 
                         Debug.Log("[MultipleBombs]Initializing multiple bombs");
                         gameplayInitialized = true;
-                        redirectedInfos = new List<KMBombInfo>();
+                        redirectedInfos = new Dictionary<KMBombInfo, Bomb>();
                         activatedNeedies = new List<NeedyComponent>();
 
                         Bomb vanillaBomb = FindObjectOfType<Bomb>();
@@ -253,7 +253,7 @@ namespace MultipleBombsAssembly
         {
             foreach (KMBombInfo info in FindObjectsOfType<KMBombInfo>())
             {
-                if (!redirectedInfos.Contains(info))
+                if (!redirectedInfos.ContainsKey(info))
                 {
                     info.TimeHandler = new KMBombInfo.GetTimeHandler(() => BombInfoRedirection.GetTime(bomb));
                     info.FormattedTimeHandler = new KMBombInfo.GetFormattedTimeHandler(() => BombInfoRedirection.GetFormattedTime(bomb));
@@ -263,7 +263,7 @@ namespace MultipleBombsAssembly
                     info.SolvedModuleNamesHandler = new KMBombInfo.GetSolvedModuleNamesHandler(() => BombInfoRedirection.GetSolvedModuleNames(bomb));
                     info.WidgetQueryResponsesHandler = new KMBombInfo.GetWidgetQueryResponsesHandler((string queryKey, string queryInfo) => BombInfoRedirection.GetWidgetQueryResponses(bomb, queryKey, queryInfo));
                     info.IsBombPresentHandler = new KMBombInfo.KMIsBombPresent(() => BombInfoRedirection.IsBombPresent(bomb));
-                    redirectedInfos.Add(info);
+                    redirectedInfos.Add(info, bomb);
                 }
             }
             Debug.Log("[MultipleBombs]KMBombInfos redirected");
@@ -302,6 +302,16 @@ namespace MultipleBombsAssembly
                     if (timer.Bomb == source.Bomb)
                     {
                         timer.StrikeIndicator.StopAllCoroutines();
+                    }
+                }
+                foreach (KMBombInfo bombInfo in FindObjectsOfType<KMBombInfo>())
+                {
+                    if (redirectedInfos[bombInfo] == source.Bomb)
+                    {
+                        if (bombInfo.OnBombSolved != null)
+                        {
+                            bombInfo.OnBombSolved();
+                        }
                     }
                 }
                 foreach (Bomb bomb in FindObjectsOfType<Bomb>())
