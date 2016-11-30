@@ -63,6 +63,10 @@
     </Compile>
     <Compile Include="BombInfoRedirection.cs" />
     <Compile Include="ConfigManager.cs" />
+    <Compile Include="CustomNeedies\CustomModNeedyComponent.cs" />
+    <Compile Include="CustomNeedies\CustomNeedyKnobComponent.cs" />
+    <Compile Include="CustomNeedies\CustomNeedyDischargeComponent.cs" />
+    <Compile Include="CustomNeedies\CustomNeedyVentComponent.cs" />
     <Compile Include="MultipleBombs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

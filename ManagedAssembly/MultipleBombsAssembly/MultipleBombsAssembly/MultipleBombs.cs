@@ -14,14 +14,33 @@ namespace MultipleBombsAssembly
 {
     public class MultipleBombs : MonoBehaviour
     {
+        protected enum NeedyStateEnum
+        {
+            InitialSetup,
+            AwaitingActivation,
+            Running,
+            Cooldown,
+            Terminated,
+            BombComplete
+        }
+
         private bool setupRoomInitialized;
         private bool gameplayInitialized;
         private const int maxBombCount = 2;
         private int bombsCount;
         private List<KMBombInfo> redirectedInfos;
+        private List<NeedyComponent> activatedNeedies;
+        private MethodInfo gameplaySetBombMethod = typeof(GameplayState).GetMethod("set_Bomb", BindingFlags.Instance | BindingFlags.NonPublic);
+        private FieldInfo needystateField = typeof(NeedyComponent).GetField("state", BindingFlags.Instance | BindingFlags.NonPublic);
+        private FieldInfo needyplayerChangedBombEventCountField = typeof(NeedyComponent).GetField("playerChangedBombEventCount", BindingFlags.Instance | BindingFlags.NonPublic);
+        private FieldInfo needychangedBombResponseInProgressField = typeof(NeedyComponent).GetField("changedBombResponseInProgress", BindingFlags.Instance | BindingFlags.NonPublic);
+        private FieldInfo needyactivationChanceAfterFirstChangeField = typeof(NeedyComponent).GetField("activationChanceAfterFirstChange", BindingFlags.Instance | BindingFlags.NonPublic);
+        private MethodInfo needyStartRunningMethod = typeof(NeedyComponent).GetMethod("StartRunning", BindingFlags.Instance | BindingFlags.NonPublic);
+        private MethodInfo needyResetAndStartMethod = typeof(NeedyComponent).GetMethod("ResetAndStart", BindingFlags.Instance | BindingFlags.NonPublic);
 
         public void Awake()
         {
+            Debug.Log("[MultipleBombs]Initializing");
             setupRoomInitialized = false;
             gameplayInitialized = false;
             bombsCount = 1;
@@ -116,6 +135,8 @@ namespace MultipleBombsAssembly
                         Debug.Log("[MultipleBombs]Initializing multiple bombs");
                         gameplayInitialized = true;
                         redirectedInfos = new List<KMBombInfo>();
+                        activatedNeedies = new List<NeedyComponent>();
+
                         Bomb vanillaBomb = FindObjectOfType<Bomb>();
                         foreach (BombComponent component in vanillaBomb.BombComponents)
                         {
@@ -134,6 +155,13 @@ namespace MultipleBombsAssembly
                         }
                         vanillaBomb.GetComponent<FloatingHoldable>().Initialize();
                         RedirectPresentBombInfos(vanillaBomb);
+                        foreach (BombComponent component in vanillaBomb.BombComponents)
+                        {
+                            if (component is NeedyComponent)
+                            {
+                                component.StartCoroutine(startNeedyAfter((NeedyComponent)component, ((NeedyComponent)component).SecondsBeforeForcedActivation + 8f));
+                            }
+                        }
                         Debug.Log("[MultipleBombs]Default bomb initialized");
 
                         GameObject spawn1 = GameObject.Find("MultipleBombs_Spawn_1");
@@ -148,12 +176,45 @@ namespace MultipleBombsAssembly
                         vanillaBomb.GetComponent<Selectable>().Parent.Init();
                         Debug.Log("[MultipleBombs]All bombs generated");
 
-                        SceneManager.Instance.GameplayState.Bomb.GetTimer().TimerTick = SceneManager.Instance.GameplayState.GetPaceMaker().OnTimerTick;
-                        foreach (NeedyComponent component in FindObjectsOfType<NeedyComponent>())
+                        //Remove needies events (vanillaBomb is equal to SceneManager.Instance.GameplayState.Bomb)
+                        vanillaBomb.GetTimer().TimerTick = new TimerComponent.TimerTickEvent((elapsed, remaining) => SceneManager.Instance.GameplayState.GetPaceMaker().OnTimerTick(elapsed, remaining));
+                        BombComponentEvents.OnComponentPass = new BombComponentEvents.ComponentPassEvent((BombComponent component, bool finalPass) =>
                         {
-                            component.Bomb.GetTimer().TimerTick += (TimerComponent.TimerTickEvent)Delegate.CreateDelegate(typeof(TimerComponent.TimerTickEvent), component, component.GetType().GetMethod("OnBombTimerTick", BindingFlags.Instance | BindingFlags.NonPublic));
+                            SceneManager.Instance.GameplayState.GetPaceMaker().OnComponentPass(component, finalPass);
+                            foreach (BombComponent bombComponent in component.Bomb.BombComponents)
+                            {
+                                if (bombComponent is NeedyComponent)
+                                {
+                                    if (bombComponent != component && !finalPass)
+                                    {
+                                        bombComponent.StartCoroutine(startNeedyChange((NeedyComponent)bombComponent, 0.25f));
+                                    }
+                                }
+                            }
+                        });
+                        BombComponentEvents.OnComponentStrike = new BombComponentEvents.ComponentStrikeEvent((BombComponent component, bool finalStrike) =>
+                        {
+                            SceneManager.Instance.GameplayState.GetPaceMaker().OnComponentPass(component, finalStrike);
+                            foreach (BombComponent bombComponent in component.Bomb.BombComponents)
+                            {
+                                if (bombComponent is NeedyComponent)
+                                {
+                                    if (bombComponent != component && !finalStrike)
+                                    {
+                                        bombComponent.StartCoroutine(startNeedyChange((NeedyComponent)bombComponent, 0.25f));
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    foreach (NeedyComponent component in activatedNeedies)
+                    {
+                        if ((NeedyStateEnum)needystateField.GetValue(component) == NeedyStateEnum.Cooldown)
+                        {
+                            component.StopAllCoroutines();
+                            component.StartCoroutine(resetAndStartNeedy(component));
+                            activatedNeedies.Remove(component);
                         }
-                        Debug.Log("[MultipleBombs]Timer ticks redirected");
                     }
                 }
                 else if (gameplayInitialized)
@@ -165,6 +226,7 @@ namespace MultipleBombsAssembly
                         bomb.gameObject.SetActive(false);
                     }
                     gameplayInitialized = false;
+                    activatedNeedies.Clear();
                 }
             }
         }
@@ -246,6 +308,51 @@ namespace MultipleBombsAssembly
             Destroy(gameObject);
         }
 
+        private void StartNeedy(NeedyComponent needy)
+        {
+            Bomb oldBomb = SceneManager.Instance.GameplayState.Bomb;
+            gameplaySetBombMethod.Invoke(SceneManager.Instance.GameplayState, new object[] { needy.Bomb });
+            needyStartRunningMethod.Invoke(needy, null);
+            gameplaySetBombMethod.Invoke(SceneManager.Instance.GameplayState, new object[] { oldBomb });
+            activatedNeedies.Add(needy);
+        }
+
+        private IEnumerator startNeedyAfter(NeedyComponent component, float seconds)
+        {
+            yield return new WaitForSeconds(seconds);
+            StartNeedy(component);
+        }
+
+        private IEnumerator startNeedyChange(NeedyComponent component, float seconds)
+        {
+            if ((bool)needychangedBombResponseInProgressField.GetValue(component))
+                yield break;
+            needychangedBombResponseInProgressField.SetValue(component, true);
+            yield return new WaitForSeconds(seconds);
+            int count = (int)needyplayerChangedBombEventCountField.GetValue(component);
+            count++;
+            needyplayerChangedBombEventCountField.SetValue(component, count);
+            if (count > 1)
+            {
+                StartNeedy(component);
+            }
+            else if (UnityEngine.Random.value < (float)needyactivationChanceAfterFirstChangeField.GetValue(component))
+            {
+                StartNeedy(component);
+            }
+            needychangedBombResponseInProgressField.SetValue(component, false);
+        }
+
+        private IEnumerator resetAndStartNeedy(NeedyComponent component)
+        {
+            yield return new WaitForSeconds(UnityEngine.Random.Range(component.ResetDelayMin, component.ResetDelayMax));
+            Bomb oldBomb = SceneManager.Instance.GameplayState.Bomb;
+            gameplaySetBombMethod.Invoke(SceneManager.Instance.GameplayState, new object[] { component.Bomb });
+            needyResetAndStartMethod.Invoke(component, null);
+            gameplaySetBombMethod.Invoke(SceneManager.Instance.GameplayState, new object[] { oldBomb });
+            activatedNeedies.Add(component);
+        }
+
         private IEnumerator createNewBomb(BombGenerator bombGenerator, Vector3 position, Vector3 eulerAngles)
         {
             Debug.Log("[MultipleBombs]Generating new bomb");
@@ -278,6 +385,7 @@ namespace MultipleBombsAssembly
             }
 
             Debug.Log("[MultipleBombs]Bomb generated");
+
             RedirectPresentBombInfos(bomb);
             yield return new WaitForSeconds(2f);
 
@@ -301,6 +409,14 @@ namespace MultipleBombsAssembly
 
             bomb.GetTimer().StartTimer();
             Debug.Log("[MultipleBombs]Custom bomb timer started");
+
+            foreach (BombComponent component in bomb.BombComponents)
+            {
+                if (component is NeedyComponent)
+                {
+                    component.StartCoroutine(startNeedyAfter((NeedyComponent)component, ((NeedyComponent)component).SecondsBeforeForcedActivation));
+                }
+            }
         }
     }
 }
