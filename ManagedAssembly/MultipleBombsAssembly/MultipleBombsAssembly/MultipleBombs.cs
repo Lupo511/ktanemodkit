@@ -117,6 +117,17 @@ namespace MultipleBombsAssembly
                                 }
                                 FreeplayDevice.MAX_SECONDS_TO_SOLVE = newMaxTime;
                             }
+
+                            modulesObject.transform.FindChild("Modules_INCR_btn").GetComponent<Selectable>().OnHighlight = new Action(() =>
+                            {
+                                device.Screen.CurrentState = FreeplayScreen.State.Start;
+                                device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
+                            });
+                            modulesObject.transform.FindChild("Modules_DECR_btn").GetComponent<Selectable>().OnHighlight = new Action(() =>
+                            {
+                                device.Screen.CurrentState = FreeplayScreen.State.Start;
+                                device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
+                            });
                             Debug.Log("[MultipleBombs]FreePlay option added");
                         }
                     }
