@@ -156,6 +156,7 @@ namespace MultipleBombsAssembly
                         gameplayInitialized = true;
                         redirectedInfos = new Dictionary<KMBombInfo, Bomb>();
                         activatedNeedies = new List<NeedyComponent>();
+                        BombInfoRedirection.SetBombCount(bombsCount);
 
                         Bomb vanillaBomb = FindObjectOfType<Bomb>();
                         foreach (BombComponent component in vanillaBomb.BombComponents)

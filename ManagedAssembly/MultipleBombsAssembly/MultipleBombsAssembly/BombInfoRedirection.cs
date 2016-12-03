@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,13 @@ namespace MultipleBombsAssembly
 {
     public static class BombInfoRedirection
     {
+        private static int bombCount = 1;
+
+        internal static void SetBombCount(int count)
+        {
+            bombCount = count;
+        }
+
         internal static float GetTime(Bomb bomb)
         {
             if (bomb == null)
@@ -83,6 +91,12 @@ namespace MultipleBombsAssembly
                 string queryResponse = widget.GetQueryResponse(queryKey, queryInfo);
                 if (queryResponse != null && queryResponse != "")
                     responses.Add(queryResponse);
+            }
+            if (queryKey == "MultipleBombs")
+            {
+                Dictionary<string, int> response = new Dictionary<string, int>();
+                response.Add("bombCount", bombCount);
+                responses.Add(JsonConvert.SerializeObject(response));
             }
             return responses;
         }
