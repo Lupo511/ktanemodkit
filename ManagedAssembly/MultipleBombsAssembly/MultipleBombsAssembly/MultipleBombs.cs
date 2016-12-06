@@ -28,8 +28,8 @@ namespace MultipleBombsAssembly
         private bool gameplayInitialized;
         private const int maxBombCount = 2;
         private int bombsCount;
-        private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private Dictionary<string, int> multipleBombsMissions;
+        private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private List<NeedyComponent> activatedNeedies;
         private MethodInfo gameplaySetBombMethod = typeof(GameplayState).GetMethod("set_Bomb", BindingFlags.Instance | BindingFlags.NonPublic);
         private FieldInfo needystateField = typeof(NeedyComponent).GetField("state", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -192,6 +192,7 @@ namespace MultipleBombsAssembly
                         foreach (BombComponent component in vanillaBomb.BombComponents)
                         {
                             component.OnPass = onComponentPass;
+                            component.OnStrike = onComponentStrike;
                         }
                         GameObject spawn0 = GameObject.Find("MultipleBombs_Spawn_0");
                         if (spawn0 != null)
@@ -377,6 +378,22 @@ namespace MultipleBombsAssembly
             return false;
         }
 
+        private bool onComponentStrike(BombComponent source)
+        {
+            bool lastStrike = source.Bomb.OnStrike(source);
+            GameRecord currentRecord = RecordManager.Instance.GetCurrentRecord();
+            if (currentRecord.GetStrikeCount() == currentRecord.Strikes.Length)
+            {
+                if (!lastStrike)
+                {
+                    List<StrikeSource> strikes = currentRecord.Strikes.ToList();
+                    strikes.Add(null);
+                    currentRecord.Strikes = strikes.ToArray();
+                }
+            }
+            return lastStrike;
+        }
+
         private IEnumerator timedDestroy(GameObject gameObject, float delaySeconds)
         {
             yield return new WaitForSeconds(delaySeconds);
@@ -456,6 +473,7 @@ namespace MultipleBombsAssembly
                 foreach (BombComponent component in bomb.BombComponents)
                 {
                     component.OnPass = onComponentPass;
+                    component.OnStrike = onComponentStrike;
                 }
             }
 
