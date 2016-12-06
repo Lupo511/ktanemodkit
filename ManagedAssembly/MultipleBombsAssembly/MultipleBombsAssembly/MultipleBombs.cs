@@ -170,7 +170,7 @@ namespace MultipleBombsAssembly
                 {
                     setupRoomInitialized = false;
                 }
-                if (SceneManager.Instance.CurrentState == SceneManager.State.Gameplay && GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
+                if (SceneManager.Instance.CurrentState == SceneManager.State.Gameplay && GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
                 {
                     if (!gameplayInitialized)
                     {
