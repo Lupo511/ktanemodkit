@@ -145,21 +145,21 @@ namespace MultipleBombsAssembly
                             {
                                 if (!multipleBombsMissions.ContainsKey(mission.ID))
                                 {
-                                    int bombCount = 1;
+                                    int missionBombCount = 1;
                                     for (int i = mission.GeneratorSetting.ComponentPools.Count - 1; i >= 0; i--)
                                     {
                                         ComponentPool pool = mission.GeneratorSetting.ComponentPools[i];
                                         if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
                                         {
                                             mission.GeneratorSetting.ComponentPools.RemoveAt(i);
-                                            bombCount++;
+                                            missionBombCount++;
                                         }
                                     }
-                                    if (bombCount >= 2)
+                                    if (missionBombCount >= 2)
                                     {
-                                        if (bombCount > maxBombCount)
-                                            bombCount = maxBombCount;
-                                        multipleBombsMissions.Add(mission.ID, bombCount);
+                                        if (missionBombCount > maxBombCount)
+                                            missionBombCount = maxBombCount;
+                                        multipleBombsMissions.Add(mission.ID, missionBombCount);
                                     }
                                 }
                             }
@@ -170,10 +170,12 @@ namespace MultipleBombsAssembly
                 {
                     setupRoomInitialized = false;
                 }
-                if (SceneManager.Instance.CurrentState == SceneManager.State.Gameplay && GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
+                if (SceneManager.Instance.CurrentState == SceneManager.State.Gameplay && (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad)))
                 {
                     if (!gameplayInitialized)
                     {
+                        Debug.Log("[MultipleBombs]Initializing multiple bombs");
+                        gameplayInitialized = true;
                         int bombsToSpawn = 1;
                         if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                             bombsToSpawn = bombsCount;
@@ -181,9 +183,8 @@ namespace MultipleBombsAssembly
                             bombsToSpawn = multipleBombsMissions[GameplayState.MissionToLoad];
                         if (bombsToSpawn == 1)
                             return;
+                        Debug.Log("[MultipleBombs]Bombs to spawn: " + bombsToSpawn);
 
-                        Debug.Log("[MultipleBombs]Initializing multiple bombs");
-                        gameplayInitialized = true;
                         redirectedInfos = new Dictionary<KMBombInfo, Bomb>();
                         activatedNeedies = new List<NeedyComponent>();
                         BombInfoRedirection.SetBombCount(bombsToSpawn);
