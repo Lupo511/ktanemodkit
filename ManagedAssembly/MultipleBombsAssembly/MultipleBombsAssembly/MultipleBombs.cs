@@ -42,6 +42,7 @@ namespace MultipleBombsAssembly
         private ResultFreeplayPageMonitor freePlayExplodedPageMonitor;
         private ResultMissionPageMonitor missionDefusedPageMonitor;
         private ResultMissionPageMonitor missionExplodedPageMonitor;
+        private MissionDetailPageMonitor missionDetailPageMonitor;
 
         public void Awake()
         {
@@ -165,6 +166,12 @@ namespace MultipleBombsAssembly
                                     }
                                 }
                             }
+                            if (missionDetailPageMonitor == null)
+                            {
+                                missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
+                            }
+                            missionDetailPageMonitor.MissionList = multipleBombsMissions;
+                            Debug.Log("[MultipleBombs]BombBinder info added");
                         }
                     }
                 }

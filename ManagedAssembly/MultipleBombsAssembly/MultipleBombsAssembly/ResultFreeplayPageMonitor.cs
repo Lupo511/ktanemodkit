@@ -15,7 +15,6 @@ namespace MultipleBombsAssembly
         {
             if (bombCount >= 2)
             {
-                Debug.Log("Starting coroutine");
                 StartCoroutine(changeTextNextFrame(bombCount));
                 bombCount = 1;
             }
@@ -28,7 +27,6 @@ namespace MultipleBombsAssembly
 
         private IEnumerator changeTextNextFrame(int bombCount)
         {
-            Debug.Log("Coroutine started");
             yield return null;
             ResultFreeplayPage page = GetComponent<ResultFreeplayPage>();
             page.MissionName.Text = "Free Play - " + bombCount + " Bombs";

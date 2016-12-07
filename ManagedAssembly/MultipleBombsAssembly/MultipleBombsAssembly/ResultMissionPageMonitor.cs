@@ -16,7 +16,6 @@ namespace MultipleBombsAssembly
         {
             if (bombCount >= 2)
             {
-                Debug.Log("Starting coroutine");
                 StartCoroutine(changeTextNextFrame(bombCount));
                 bombCount = 1;
             }
@@ -35,7 +34,6 @@ namespace MultipleBombsAssembly
 
         private IEnumerator changeTextNextFrame(int bombCount)
         {
-            Debug.Log("Coroutine started");
             yield return null;
             ResultMissionPage page = GetComponent<ResultMissionPage>();
             //page.NumModules.text = "<size=0.1>" + bombCount + " x </size>" + page.NumModules.text;
