@@ -38,8 +38,10 @@ namespace MultipleBombsAssembly
         private FieldInfo needyactivationChanceAfterFirstChangeField = typeof(NeedyComponent).GetField("activationChanceAfterFirstChange", BindingFlags.Instance | BindingFlags.NonPublic);
         private MethodInfo needyStartRunningMethod = typeof(NeedyComponent).GetMethod("StartRunning", BindingFlags.Instance | BindingFlags.NonPublic);
         private MethodInfo needyResetAndStartMethod = typeof(NeedyComponent).GetMethod("ResetAndStart", BindingFlags.Instance | BindingFlags.NonPublic);
-        private ResultFreeplayPageMonitor defusedPageMonitor;
-        private ResultFreeplayPageMonitor explodedPageMonitor;
+        private ResultFreeplayPageMonitor freePlayDefusedPageMonitor;
+        private ResultFreeplayPageMonitor freePlayExplodedPageMonitor;
+        private ResultMissionPageMonitor missionDefusedPageMonitor;
+        private ResultMissionPageMonitor missionExplodedPageMonitor;
 
         public void Awake()
         {
@@ -262,16 +264,26 @@ namespace MultipleBombsAssembly
                         Debug.Log("[MultipleBombs]Needy events redirected");
 
                         //Setup results screen
-                        if (defusedPageMonitor == null)
+                        if (freePlayDefusedPageMonitor == null)
                         {
-                            defusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayDefusedPage.gameObject.AddComponent<ResultFreeplayPageMonitor>();
+                            freePlayDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayDefusedPage.gameObject.AddComponent<ResultFreeplayPageMonitor>();
                         }
-                        if (explodedPageMonitor == null)
+                        if (freePlayExplodedPageMonitor == null)
                         {
-                            explodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultFreeplayPageMonitor>();
+                            freePlayExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultFreeplayPageMonitor>();
                         }
-                        defusedPageMonitor.SetBombCount(bombsToSpawn);
-                        explodedPageMonitor.SetBombCount(bombsToSpawn);
+                        freePlayDefusedPageMonitor.SetBombCount(bombsToSpawn);
+                        freePlayExplodedPageMonitor.SetBombCount(bombsToSpawn);
+                        if (missionDefusedPageMonitor == null)
+                        {
+                            missionDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultDefusedPage.gameObject.AddComponent<ResultMissionPageMonitor>();
+                        }
+                        if (missionExplodedPageMonitor == null)
+                        {
+                            missionExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultExplodedPage.gameObject.AddComponent<ResultMissionPageMonitor>();
+                        }
+                        missionDefusedPageMonitor.SetBombCount(bombsToSpawn);
+                        missionExplodedPageMonitor.SetBombCount(bombsToSpawn);
                         Debug.Log("[MultipleBombs]Result screens initialized");
                     }
                     foreach (NeedyComponent component in activatedNeedies)
