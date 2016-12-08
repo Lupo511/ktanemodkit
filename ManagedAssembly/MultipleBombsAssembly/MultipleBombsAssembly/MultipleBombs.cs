@@ -155,7 +155,7 @@ namespace MultipleBombsAssembly
                                         if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
                                         {
                                             mission.GeneratorSetting.ComponentPools.RemoveAt(i);
-                                            missionBombCount++;
+                                            missionBombCount += pool.Count;
                                         }
                                     }
                                     if (missionBombCount >= 2)
