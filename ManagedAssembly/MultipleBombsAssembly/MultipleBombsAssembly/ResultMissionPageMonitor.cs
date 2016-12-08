@@ -23,6 +23,7 @@ namespace MultipleBombsAssembly
 
         private void OnDisable()
         {
+            StopAllCoroutines();
             ResultMissionPage page = GetComponent<ResultMissionPage>();
             page.NumStrikes.alignment = originalAllignment;
         }
@@ -34,10 +35,10 @@ namespace MultipleBombsAssembly
 
         private IEnumerator changeTextNextFrame(int bombCount)
         {
-            yield return null;
             ResultMissionPage page = GetComponent<ResultMissionPage>();
-            //page.NumModules.text = "<size=0.1>" + bombCount + " x </size>" + page.NumModules.text;
             originalAllignment = page.NumStrikes.alignment;
+            yield return null;
+            //page.NumModules.text = "<size=0.1>" + bombCount + " x </size>" + page.NumModules.text;
             page.NumStrikes.alignment = TMPro.AlignmentTypes.Right;
             page.NumStrikes.text = bombCount + " Bombs\n" + page.NumStrikes.text + "\n ";
         }

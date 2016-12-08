@@ -20,6 +20,7 @@ namespace MultipleBombsAssembly
 
         private void OnDisable()
         {
+            StopAllCoroutines();
             GetComponent<MissionDetailPage>().TextStrikes.alignment = originalAlignment;
         }
 

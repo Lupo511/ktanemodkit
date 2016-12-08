@@ -20,6 +20,11 @@ namespace MultipleBombsAssembly
             }
         }
 
+        private void OnDisable()
+        {
+            StopAllCoroutines();
+        }
+
         public void SetBombCount(int count)
         {
             bombCount = count;
