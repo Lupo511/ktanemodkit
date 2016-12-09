@@ -28,6 +28,7 @@ namespace MultipleBombsAssembly
         private bool gameplayInitialized;
         private const int maxBombCount = 2;
         private int bombsCount;
+        private int currentBombCount;
         private Dictionary<string, int> multipleBombsMissions;
         private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private List<NeedyComponent> activatedNeedies;
@@ -185,18 +186,18 @@ namespace MultipleBombsAssembly
                     {
                         Debug.Log("[MultipleBombs]Initializing multiple bombs");
                         gameplayInitialized = true;
-                        int bombsToSpawn = 1;
+                        currentBombCount = 1;
                         if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
-                            bombsToSpawn = bombsCount;
+                            currentBombCount = bombsCount;
                         else
-                            bombsToSpawn = multipleBombsMissions[GameplayState.MissionToLoad];
-                        if (bombsToSpawn == 1)
+                            currentBombCount = multipleBombsMissions[GameplayState.MissionToLoad];
+                        if (currentBombCount == 1)
                             return;
-                        Debug.Log("[MultipleBombs]Bombs to spawn: " + bombsToSpawn);
+                        Debug.Log("[MultipleBombs]Bombs to spawn: " + currentBombCount);
 
                         redirectedInfos = new Dictionary<KMBombInfo, Bomb>();
                         activatedNeedies = new List<NeedyComponent>();
-                        BombInfoRedirection.SetBombCount(bombsToSpawn);
+                        BombInfoRedirection.SetBombCount(currentBombCount);
 
                         Bomb vanillaBomb = FindObjectOfType<Bomb>();
                         foreach (BombComponent component in vanillaBomb.BombComponents)
@@ -279,8 +280,8 @@ namespace MultipleBombsAssembly
                         {
                             freePlayExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultFreeplayPageMonitor>();
                         }
-                        freePlayDefusedPageMonitor.SetBombCount(bombsToSpawn);
-                        freePlayExplodedPageMonitor.SetBombCount(bombsToSpawn);
+                        freePlayDefusedPageMonitor.SetBombCount(currentBombCount);
+                        freePlayExplodedPageMonitor.SetBombCount(currentBombCount);
                         if (missionDefusedPageMonitor == null)
                         {
                             missionDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultDefusedPage.gameObject.AddComponent<ResultMissionPageMonitor>();
@@ -289,30 +290,36 @@ namespace MultipleBombsAssembly
                         {
                             missionExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultExplodedPage.gameObject.AddComponent<ResultMissionPageMonitor>();
                         }
-                        missionDefusedPageMonitor.SetBombCount(bombsToSpawn);
-                        missionExplodedPageMonitor.SetBombCount(bombsToSpawn);
+                        missionDefusedPageMonitor.SetBombCount(currentBombCount);
+                        missionExplodedPageMonitor.SetBombCount(currentBombCount);
                         Debug.Log("[MultipleBombs]Result screens initialized");
                     }
-                    foreach (NeedyComponent component in activatedNeedies)
+                    if (activatedNeedies != null && currentBombCount > 1)
                     {
-                        if ((NeedyStateEnum)needystateField.GetValue(component) == NeedyStateEnum.Cooldown)
+                        foreach (NeedyComponent component in activatedNeedies)
                         {
-                            component.StopAllCoroutines();
-                            component.StartCoroutine(resetAndStartNeedy(component));
-                            activatedNeedies.Remove(component);
+                            if ((NeedyStateEnum)needystateField.GetValue(component) == NeedyStateEnum.Cooldown)
+                            {
+                                component.StopAllCoroutines();
+                                component.StartCoroutine(resetAndStartNeedy(component));
+                                activatedNeedies.Remove(component);
+                            }
                         }
                     }
                 }
                 else if (gameplayInitialized)
                 {
-                    Debug.Log("[MultipleBombs]Cleaning up");
-                    StopAllCoroutines();
-                    foreach (Bomb bomb in FindObjectsOfType<Bomb>())
-                    {
-                        bomb.gameObject.SetActive(false);
-                    }
                     gameplayInitialized = false;
-                    activatedNeedies.Clear();
+                    if (currentBombCount > 1)
+                    {
+                        Debug.Log("[MultipleBombs]Cleaning up");
+                        StopAllCoroutines();
+                        foreach (Bomb bomb in FindObjectsOfType<Bomb>())
+                        {
+                            bomb.gameObject.SetActive(false);
+                        }
+                        activatedNeedies.Clear();
+                    }
                 }
             }
         }
