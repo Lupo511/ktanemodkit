@@ -31,9 +31,9 @@ public class EnglishTestModule : MonoBehaviour
         targetQuestions = 3;
 
         Module.OnActivate += OnActivate;
-        findChildGameObjectByName(gameObject, "Submit Button").GetComponent<KMSelectable>().OnInteract += OnSubmitInteract;
-        findChildGameObjectByName(gameObject, "Left Button").GetComponent<KMSelectable>().OnInteract += OnLeftInteract;
-        findChildGameObjectByName(gameObject, "Right Button").GetComponent<KMSelectable>().OnInteract += OnRightInteract;
+        findChildGameObjectByName(gameObject, "Submit Button").GetComponent<KMSelectable>().OnInteract += () => OnSubmitInteract(findChildGameObjectByName(gameObject, "Submit Button").GetComponent<KMSelectable>());
+        findChildGameObjectByName(gameObject, "Left Button").GetComponent<KMSelectable>().OnInteract += () => OnLeftInteract(findChildGameObjectByName(gameObject, "Left Button").GetComponent<KMSelectable>());
+        findChildGameObjectByName(gameObject, "Right Button").GetComponent<KMSelectable>().OnInteract += () => OnRightInteract(findChildGameObjectByName(gameObject, "Submit Button").GetComponent<KMSelectable>());
 
         questions = new List<Question>();
         string[] lines = EnglishTestCode.Properties.Resources.setnences.Split('\n', '\r');
@@ -82,9 +82,10 @@ public class EnglishTestModule : MonoBehaviour
         selectQuestion();
     }
 
-    private bool OnSubmitInteract()
+    private bool OnSubmitInteract(KMSelectable button)
     {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Submit Button").transform);
+        button.AddInteractionPunch(1);
         if (!activated)
             return false;
         if (currentQuestion == null)
@@ -94,9 +95,10 @@ public class EnglishTestModule : MonoBehaviour
         return false;
     }
 
-    private bool OnLeftInteract()
+    private bool OnLeftInteract(KMSelectable button)
     {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Left Button").transform);
+        button.AddInteractionPunch(0.5f);
         if (!activated)
             return false;
         if (currentQuestion == null)
@@ -110,9 +112,10 @@ public class EnglishTestModule : MonoBehaviour
         return false;
     }
 
-    private bool OnRightInteract()
+    private bool OnRightInteract(KMSelectable button)
     {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, findChildGameObjectByName(gameObject, "Right Button").transform);
+        button.AddInteractionPunch(0.5f);
         if (!activated)
             return false;
         if (currentQuestion == null)
