@@ -55,7 +55,7 @@ You [literally|!(not literally)] sported that outfit!
 After landing on an inconveniently placed chute, he was [!literally|(not literally)] sent back to square one.
 The Cubs [literally|!(not literally)] devoured The Dodgers this afternoon.
 After the body was chopped into bits, the victim was [!literally|(not literally)] all over the place.
-Falling in love [literally!|(not literally)] sucks.
+Falling in love [!literally|(not literally)] sucks.
 I hate it when someone [literally|!(not literally)] starts talking to me about my ex.
 Your eyes are [literally|!(not literally)] so pretty!
 Licorice is [literally|!(not literally)] the worst thing in the world.
@@ -198,7 +198,7 @@ Am I [aloud|!allowed] to wear sleeveless shirts?
 
 //altar alter
 We waited for him to stand behind the [!altar|alter].
-Can we [!alter|alter] the design of the steeple?
+Can we [altar|!alter] the design of the steeple?
 
 //arc ark
 The sequel ruins her entire character [!arc|ark]!
@@ -233,7 +233,7 @@ They're [ceiling|!sealing] the leak up there.
 //cent scent sent
 Abraham Lincoln's head is carved in the one-[!cent|scent|sent] coin.
 Can you smell the [cent|!scent|sent] of bacon?
-I [cent|scent|sent] you that email yesterday.
+I [cent|scent|!sent] you that email yesterday.
 
 //cereal serial
 I found this toy in a [!cereal|serial] box.
@@ -404,7 +404,7 @@ I'm sleeping for a [weak|!week].
 
 //everyday every day
 This is an [!everyday|every day] occurrence.
-This happens [everyday|every day].
+This happens [everyday|!every day].
 
 //perfect prefect
 The employee feared that when the [perfect|!prefect] became the CEO, he would have his pay cut.
