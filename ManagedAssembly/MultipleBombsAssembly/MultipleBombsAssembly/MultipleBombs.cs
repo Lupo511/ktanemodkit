@@ -62,11 +62,15 @@ namespace MultipleBombsAssembly
                 {
                     if (!setupRoomInitialized)
                     {
+                        Debug.Log("[MultipleBombs]Adding FreePlay option");
+                        setupRoomInitialized = true;
                         FreeplayDevice device = FindObjectOfType<FreeplayDevice>();
-                        if (device != null)
+                        if (device == null)
                         {
-                            Debug.Log("[MultipleBombs]Adding FreePlay option");
-                            setupRoomInitialized = true;
+                            Debug.Log("[MultipleBombs]Error: FreePlayDevice not found!");
+                        }
+                        else
+                        {
                             GameObject modulesObject = device.ModuleCountIncrement.transform.parent.gameObject;
                             GameObject bombsObject = (GameObject)Instantiate(modulesObject, modulesObject.transform.position, modulesObject.transform.rotation, modulesObject.transform.parent);
                             device.ObjectsToDisableOnLidClose.Add(bombsObject);
