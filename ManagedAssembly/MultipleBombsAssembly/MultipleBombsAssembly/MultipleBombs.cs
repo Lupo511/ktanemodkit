@@ -515,6 +515,8 @@ namespace MultipleBombsAssembly
                 }
             }
 
+            bomb.GetTimer().TimerTick = new TimerComponent.TimerTickEvent((elapsed, remaining) => SceneManager.Instance.GameplayState.GetPaceMaker().OnTimerTick(elapsed, remaining));
+
             Debug.Log("[MultipleBombs]Bomb generated");
 
             RedirectPresentBombInfos(bomb);
