@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: MultipleBombs
   title: Multiple Bombs
-  version: 1.11
+  version: 1.12
   outputFolder: build
