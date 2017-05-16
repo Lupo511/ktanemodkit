@@ -504,6 +504,7 @@ namespace MultipleBombsAssembly
             mainSelectable.Children = children.ToArray();
             mainSelectable.ChildRowLength++;
             bomb.GetComponent<Selectable>().Parent = mainSelectable;
+            KTInputManager.Instance.SelectableManager.ConfigureSelectableAreas(KTInputManager.Instance.RootSelectable);
             bomb.GetTimer().text.gameObject.SetActive(false);
             bomb.GetTimer().LightGlow.enabled = false;
             if (!bomb.HasDetonated)
