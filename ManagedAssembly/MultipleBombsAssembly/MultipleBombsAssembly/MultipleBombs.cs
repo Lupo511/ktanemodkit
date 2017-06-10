@@ -27,6 +27,7 @@ namespace MultipleBombsAssembly
         private const int maxBombCount = 2;
         private int bombsCount;
         private int currentBombCount;
+        private float? defaultMaxTime = null;
         private Dictionary<string, int> multipleBombsMissions;
         private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private List<NeedyComponent> activatedNeedies;
@@ -162,8 +163,9 @@ namespace MultipleBombsAssembly
                     device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                 });
 
-                //Dealing with the case where the user uses at_bash's mod selector to enable/disable bomb casings after the fact.
-                float newMaxTime = 600.0f * maxBombCount;
+                if (defaultMaxTime == null)
+                    defaultMaxTime = FreeplayDevice.MAX_SECONDS_TO_SOLVE;
+                float newMaxTime = defaultMaxTime.Value * maxBombCount;
                 if (ModManager.Instance.GetMaximumModules() > FreeplayDevice.MAX_MODULE_COUNT)
                 {
                     newMaxTime += (ModManager.Instance.GetMaximumModules() - FreeplayDevice.MAX_MODULE_COUNT) * 60 *

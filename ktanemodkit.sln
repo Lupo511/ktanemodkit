@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ktanemodkit.CSharp", "ktanemodkit.CSharp.csproj", "{E10A6F3E-BC5F-C348-4B49-31CB0BBFE2E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ktanemodkit.CSharp.Editor", "ktanemodkit.CSharp.Editor.csproj", "{F9C22D09-EFBE-78F1-D7B8-B22812B85C13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E10A6F3E-BC5F-C348-4B49-31CB0BBFE2E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E10A6F3E-BC5F-C348-4B49-31CB0BBFE2E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E10A6F3E-BC5F-C348-4B49-31CB0BBFE2E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E10A6F3E-BC5F-C348-4B49-31CB0BBFE2E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9C22D09-EFBE-78F1-D7B8-B22812B85C13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9C22D09-EFBE-78F1-D7B8-B22812B85C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9C22D09-EFBE-78F1-D7B8-B22812B85C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9C22D09-EFBE-78F1-D7B8-B22812B85C13}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
