@@ -50,17 +50,17 @@ Peter should [!lie|lay|laid] on the ground.
 Peter should [lie|!lay|laid] the box down there.
 Peter [lie|lay|!laid] the box down there.
 
-The earthquake [!literally|(not literally)] shook us up.
-You [literally|!(not literally)] sported that outfit!
-After landing on an inconveniently placed chute, he was [!literally|(not literally)] sent back to square one.
-The Cubs [literally|!(not literally)] devoured The Dodgers this afternoon.
-After the body was chopped into bits, the victim was [!literally|(not literally)] all over the place.
-Falling in love [!literally|(not literally)] sucks.
-I hate it when someone [literally|!(not literally)] starts talking to me about my ex.
-Your eyes are [literally|!(not literally)] so pretty!
-Licorice is [literally|!(not literally)] the worst thing in the world.
-Bertha's parents can [literally|!(not literally)] buy her anything.
-I asked him to juggle, but he [!literally|(not literally)] didn't have the balls.
+//The earthquake [!literally|(not literally)] shook us up.
+//You [literally|!(not literally)] sported that outfit!
+//After landing on an inconveniently placed chute, he was [!literally|(not literally)] sent back to square one.
+//The Cubs [literally|!(not literally)] devoured The Dodgers this afternoon.
+//After the body was chopped into bits, the victim was [!literally|(not literally)] all over the place.
+//Falling in love [!literally|(not literally)] sucks.
+//I hate it when someone [literally|!(not literally)] starts talking to me about my ex.
+//Your eyes are [literally|!(not literally)] so pretty!
+//Licorice is [literally|!(not literally)] the worst thing in the world.
+//Bertha's parents can [literally|!(not literally)] buy her anything.
+//I asked him to juggle, but he [!literally|(not literally)] didn't have the balls.
 
 You shouldn't [of|!have] ended the paragraph there.
 I just don't know what I should [of|!have] done to resolve the conflict.
@@ -311,7 +311,7 @@ The judge will [meat|meet|!mete] out the punishment if he is guilty.
 //oar or ore
 I'd row with you if I had an extra [!oar|or|ore].
 Either you're a genius, [oar|!or|ore] very bored.
-Don't hit the [oar|or|!ore] with your bare hands.
+//Don't hit the [oar|or|!ore] with your bare hands.
 
 //pail pale
 But all the water Simon had was in his mother's [!pail|pale]!
