@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Missions;
+using Assets.Scripts.Props;
 using Assets.Scripts.Records;
 using Events;
 using System;
@@ -24,11 +25,13 @@ namespace MultipleBombsAssembly
             BombComplete
         }
 
-        private const int maxBombCount = 2;
         private int bombsCount;
         private int currentBombCount;
         private float? defaultMaxTime = null;
+        private TextMeshPro currentBombsCountLabel;
         private Dictionary<string, int> multipleBombsMissions;
+        private Dictionary<GameplayRoom, int> multipleBombsRooms;
+        private bool usingRoomPrefabOverride;
         private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private List<NeedyComponent> activatedNeedies;
         private MethodInfo gameplaySetBombMethod = typeof(GameplayState).GetMethod("set_Bomb", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -49,6 +52,8 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Initializing");
             bombsCount = 1;
             multipleBombsMissions = new Dictionary<string, int>();
+            multipleBombsRooms = new Dictionary<GameplayRoom, int>();
+            usingRoomPrefabOverride = false;
             GameEvents.OnGameStateChange = (GameEvents.GameStateChangedEvent)Delegate.Combine(GameEvents.OnGameStateChange, new GameEvents.GameStateChangedEvent(onGameStateChanged));
             Debug.Log("[MultipleBombs]Initialized");
         }
@@ -70,6 +75,25 @@ namespace MultipleBombsAssembly
                                 activatedNeedies.Remove(component);
                             }
                         }
+                    }
+                }
+                if (SceneManager.Instance.CurrentState == SceneManager.State.Setup)
+                {
+                    int maxBombCount = GetCurrentMaximumBombCount();
+                    if (defaultMaxTime == null)
+                        defaultMaxTime = FreeplayDevice.MAX_SECONDS_TO_SOLVE;
+                    float newMaxTime = defaultMaxTime.Value * maxBombCount;
+                    if (ModManager.Instance.GetMaximumModules() > FreeplayDevice.MAX_MODULE_COUNT)
+                    {
+                        newMaxTime += (ModManager.Instance.GetMaximumModules() - FreeplayDevice.MAX_MODULE_COUNT) * 60 *
+                                      (maxBombCount - 1);
+                    }
+                    FreeplayDevice.MAX_SECONDS_TO_SOLVE = newMaxTime;
+
+                    if (bombsCount > maxBombCount)
+                    {
+                        bombsCount = maxBombCount;
+                        currentBombsCountLabel.text = bombsCount.ToString();
                     }
                 }
             }
@@ -97,12 +121,12 @@ namespace MultipleBombsAssembly
                 }
                 if (state == SceneManager.State.Setup)
                 {
-                    StartCoroutine(setupFreePlayDeviceNextFrame());
+                    StartCoroutine(setupSetupRoomNextFrame());
                 }
             }
         }
 
-        private IEnumerator setupFreePlayDeviceNextFrame()
+        private IEnumerator setupSetupRoomNextFrame()
         {
             yield return null;
             Debug.Log("[MultipleBombs]Adding FreePlay option");
@@ -118,16 +142,16 @@ namespace MultipleBombsAssembly
                 device.ObjectsToDisableOnLidClose.Add(bombsObject);
                 bombsObject.transform.localPosition = modulesObject.transform.localPosition + new Vector3(0, 0f, -0.025f);
                 bombsObject.transform.FindChild("ModuleCountLabel").GetComponent<TextMeshPro>().text = "Bombs";
-                TextMeshPro valueText = bombsObject.transform.FindChild("ModuleCountValue").GetComponent<TextMeshPro>();
-                valueText.text = bombsCount.ToString();
+                currentBombsCountLabel = bombsObject.transform.FindChild("ModuleCountValue").GetComponent<TextMeshPro>();
+                currentBombsCountLabel.text = bombsCount.ToString();
                 bombsObject.transform.FindChild("ModuleCountLED").gameObject.SetActive(false);
 
                 GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 background.GetComponent<Renderer>().material.color = Color.black;
                 background.transform.localScale = new Vector3(0.048f, 0.023f, 0.005f); //Accurate Y would be 0.025
                 background.transform.parent = bombsObject.transform;
-                background.transform.localPosition = valueText.gameObject.transform.localPosition + new Vector3(0.00025f, -0.0027f, 0);
-                background.transform.localEulerAngles = valueText.gameObject.transform.localEulerAngles;
+                background.transform.localPosition = currentBombsCountLabel.gameObject.transform.localPosition + new Vector3(0.00025f, -0.0027f, 0);
+                background.transform.localEulerAngles = currentBombsCountLabel.gameObject.transform.localEulerAngles;
 
                 GameObject incrementButton = bombsObject.transform.FindChild("Modules_INCR_btn").gameObject;
                 GameObject decrementButton = bombsObject.transform.FindChild("Modules_DECR_btn").gameObject;
@@ -139,17 +163,17 @@ namespace MultipleBombsAssembly
                 deviceSelectable.Init();
                 incrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
                 {
-                    if (bombsCount >= maxBombCount)
+                    if (bombsCount >= GetCurrentMaximumBombCount())
                         return;
                     bombsCount++;
-                    valueText.text = bombsCount.ToString();
+                    currentBombsCountLabel.text = bombsCount.ToString();
                 });
                 decrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
                 {
                     if (bombsCount <= 1)
                         return;
                     bombsCount--;
-                    valueText.text = bombsCount.ToString();
+                    currentBombsCountLabel.text = bombsCount.ToString();
                 });
                 //string textColor = "#" + valueText.color.r.ToString("x2") + valueText.color.g.ToString("x2") + valueText.color.b.ToString("x2");
                 incrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
@@ -163,16 +187,6 @@ namespace MultipleBombsAssembly
                     device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                 });
 
-                if (defaultMaxTime == null)
-                    defaultMaxTime = FreeplayDevice.MAX_SECONDS_TO_SOLVE;
-                float newMaxTime = defaultMaxTime.Value * maxBombCount;
-                if (ModManager.Instance.GetMaximumModules() > FreeplayDevice.MAX_MODULE_COUNT)
-                {
-                    newMaxTime += (ModManager.Instance.GetMaximumModules() - FreeplayDevice.MAX_MODULE_COUNT) * 60 *
-                                  (maxBombCount - 1);
-                }
-                FreeplayDevice.MAX_SECONDS_TO_SOLVE = newMaxTime;
-
                 modulesObject.transform.FindChild("Modules_INCR_btn").GetComponent<Selectable>().OnHighlight = new Action(() =>
                 {
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
@@ -182,6 +196,27 @@ namespace MultipleBombsAssembly
                 {
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
                     device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
+                });
+
+                device.StartButton.OnPush = new PushEvent(() =>
+                {
+                    if (bombsCount > 2)
+                    {
+                        if (GameplayState.GameplayRoomPrefabOverride == null)
+                        {
+                            List<GameplayRoom> rooms = new List<GameplayRoom>();
+                            foreach (KeyValuePair<GameplayRoom, int> room in multipleBombsRooms)
+                            {
+                                if (room.Value >= bombsCount)
+                                    rooms.Add(room.Key);
+                            }
+                            GameplayRoom selectedRoom = rooms[UnityEngine.Random.Range(0, rooms.Count)];
+                            GameplayState.GameplayRoomPrefabOverride = selectedRoom.gameObject;
+                            usingRoomPrefabOverride = true;
+                        }
+                    }
+                    device.GetType().GetMethod("StartGame", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(device, null);
+
                 });
 
                 incrementButton.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.015f, -0.015f, -0.015f);
@@ -208,12 +243,26 @@ namespace MultipleBombsAssembly
                         }
                         if (missionBombCount >= 2)
                         {
-                            if (missionBombCount > maxBombCount)
-                                missionBombCount = maxBombCount;
                             multipleBombsMissions.Add(mission.ID, missionBombCount);
                         }
                     }
                 }
+                Debug.Log("[MultipleBombs]Missions processed");
+
+                multipleBombsRooms = new Dictionary<GameplayRoom, int>();
+                foreach (GameplayRoom room in ModManager.Instance.GetGameplayRooms())
+                {
+                    for (int i = 2; i < int.MaxValue; i++)
+                    {
+                        if (!room.transform.FindRecursive("MultipleBombs_Spawn_" + i))
+                        {
+                            multipleBombsRooms.Add(room, i);
+                            break;
+                        }
+                    }
+                }
+                Debug.Log("[MultipleBombs]GamePlayRooms processed");
+
                 if (missionDetailPageMonitor == null)
                 {
                     missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
@@ -227,6 +276,18 @@ namespace MultipleBombsAssembly
         {
             yield return null;
             Debug.Log("[MultipleBombs]Initializing gameplay state");
+
+            if (usingRoomPrefabOverride)
+            {
+                ModGameplayRoom room = (ModGameplayRoom)SceneManager.Instance.GameplayState.Room;
+                room.CopySettingsFromProxy();
+                SceneManager.Instance.GameplayState.Bomb.GetComponent<FloatingHoldable>().HoldableTarget = room.BombSpawnPosition.HoldableTarget;
+                room.MainMenu.FloatingHoldable.HoldableTarget = room.DossierSpawn.HoldableTarget;
+                FindObjectOfType<AlarmClock>().GetComponent<FloatingHoldable>().HoldableTarget = room.AlarmClockSpawn.HoldableTarget;
+                GameplayState.GameplayRoomPrefabOverride = null;
+                usingRoomPrefabOverride = false;
+            }
+
             currentBombCount = 1;
             if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                 currentBombCount = bombsCount;
@@ -277,6 +338,15 @@ namespace MultipleBombsAssembly
             {
                 StartCoroutine(createNewBomb(FindObjectOfType<BombGenerator>(), SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
             }
+
+            for (int i = 2; i < currentBombCount; i++)
+            {
+                GameObject spawn = GameObject.Find("MultipleBombs_Spawn_" + i);
+                if (spawn == null)
+                    throw new Exception("Current gameplay room doesn't support " + (i + 1) + " bombs");
+                StartCoroutine(createNewBomb(FindObjectOfType<BombGenerator>(), spawn.transform.position, spawn.transform.eulerAngles));
+            }
+
             vanillaBomb.GetComponent<Selectable>().Parent.Init();
             Debug.Log("[MultipleBombs]All bombs generated");
 
@@ -502,7 +572,7 @@ namespace MultipleBombsAssembly
             GameObject roomGO = (GameObject)gameplayState.GetType().GetField("roomGO", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameplayState);
             Selectable mainSelectable = roomGO.GetComponent<Selectable>();
             List<Selectable> children = mainSelectable.Children.ToList();
-            children.Insert(2, bomb.GetComponent<Selectable>());
+            children.Insert(children.Count - 1, bomb.GetComponent<Selectable>());
             mainSelectable.Children = children.ToArray();
             mainSelectable.ChildRowLength++;
             bomb.GetComponent<Selectable>().Parent = mainSelectable;
@@ -552,6 +622,31 @@ namespace MultipleBombsAssembly
                 {
                     component.StartCoroutine(startNeedyAfter((NeedyComponent)component, ((NeedyComponent)component).SecondsBeforeForcedActivation));
                 }
+            }
+        }
+
+        public int GetCurrentMaximumBombCount()
+        {
+            if (GameplayState.GameplayRoomPrefabOverride != null)
+            {
+                if (GameplayState.GameplayRoomPrefabOverride.GetComponent<ElevatorRoom>() != null)
+                    return 1;
+                GameplayRoom room = GameplayState.GameplayRoomPrefabOverride.GetComponent<GameplayRoom>();
+                if (multipleBombsRooms.ContainsKey(room))
+                {
+                    return multipleBombsRooms[room];
+                }
+                return 2;
+            }
+            else
+            {
+                int max = 2;
+                foreach (int count in multipleBombsRooms.Values)
+                {
+                    if (count > max)
+                        max = count;
+                }
+                return max;
             }
         }
     }

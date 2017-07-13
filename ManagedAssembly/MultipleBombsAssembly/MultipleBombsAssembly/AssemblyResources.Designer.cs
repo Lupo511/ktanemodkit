@@ -61,8 +61,7 @@ namespace MultipleBombsAssembly {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to #The last selected number of bombs that will be used as default
-        ///BombsNumber=1.
+        ///   Looks up a localized string similar to .
         /// </summary>
         internal static string modSettings {
             get {

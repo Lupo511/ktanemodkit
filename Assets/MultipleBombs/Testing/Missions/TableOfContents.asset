@@ -18,3 +18,7 @@ MonoBehaviour:
     - multiple_bombs_01
     - multiple_bombs_02
     - multiple_bombs_03
+  - Title: MOAR BOMBS
+    MissionIDs:
+    - multiple_bombs_04
+    - multiple_bombs_05

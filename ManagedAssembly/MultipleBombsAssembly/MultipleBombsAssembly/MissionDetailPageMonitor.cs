@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -29,11 +30,16 @@ namespace MultipleBombsAssembly
             MissionDetailPage page = GetComponent<MissionDetailPage>();
             originalAlignment = page.TextStrikes.alignment;
             yield return null;
-            Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(page);
+            Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
             if (missionList.ContainsKey(currentMission.ID))
             {
                 page.TextStrikes.alignment = TMPro.AlignmentTypes.Right;
                 page.TextStrikes.text = missionList[currentMission.ID] + " Bombs\n" + page.TextStrikes.text + "\n ";
+                if (missionList[currentMission.ID] > 2)
+                {
+                    page.GetType().GetField("canStartMission", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(page, false);
+                    page.TextDescription.text = "A room that can support more bombs is required.\n\nCurrent rooms only support up to 2 bombs.";
+                }
             }
         }
 
