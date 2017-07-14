@@ -42,10 +42,10 @@ namespace MultipleBombsAssembly
         private FieldInfo needyactivationChanceAfterFirstChangeField = typeof(NeedyComponent).GetField("activationChanceAfterFirstChange", BindingFlags.Instance | BindingFlags.NonPublic);
         private MethodInfo needyStartRunningMethod = typeof(NeedyComponent).GetMethod("StartRunning", BindingFlags.Instance | BindingFlags.NonPublic);
         private MethodInfo needyResetAndStartMethod = typeof(NeedyComponent).GetMethod("ResetAndStart", BindingFlags.Instance | BindingFlags.NonPublic);
-        private ResultFreeplayPageMonitor freePlayDefusedPageMonitor;
-        private ResultFreeplayPageMonitor freePlayExplodedPageMonitor;
-        private ResultMissionPageMonitor missionDefusedPageMonitor;
-        private ResultMissionPageMonitor missionExplodedPageMonitor;
+        private ResultPageMonitor freePlayDefusedPageMonitor;
+        private ResultPageMonitor freePlayExplodedPageMonitor;
+        private ResultPageMonitor missionDefusedPageMonitor;
+        private ResultPageMonitor missionExplodedPageMonitor;
         private MissionDetailPageMonitor missionDetailPageMonitor;
 
         public void Awake()
@@ -201,21 +201,7 @@ namespace MultipleBombsAssembly
 
                 device.StartButton.OnPush = new PushEvent(() =>
                 {
-                    if (bombsCount > 2)
-                    {
-                        if (GameplayState.GameplayRoomPrefabOverride == null)
-                        {
-                            List<GameplayRoom> rooms = new List<GameplayRoom>();
-                            foreach (KeyValuePair<GameplayRoom, int> room in multipleBombsRooms)
-                            {
-                                if (room.Value >= bombsCount)
-                                    rooms.Add(room.Key);
-                            }
-                            GameplayRoom selectedRoom = rooms[UnityEngine.Random.Range(0, rooms.Count)];
-                            GameplayState.GameplayRoomPrefabOverride = selectedRoom.gameObject;
-                            usingRoomPrefabOverride = true;
-                        }
-                    }
+                    SetNextGameplayRoom(bombsCount);
                     device.GetType().GetMethod("StartGame", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(device, null);
 
                 });
@@ -388,21 +374,25 @@ namespace MultipleBombsAssembly
             //Setup results screen
             if (freePlayDefusedPageMonitor == null)
             {
-                freePlayDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayDefusedPage.gameObject.AddComponent<ResultFreeplayPageMonitor>();
+                freePlayDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayDefusedPage.gameObject.AddComponent<ResultPageMonitor>();
+                freePlayDefusedPageMonitor.MultipleBombs = this;
             }
             if (freePlayExplodedPageMonitor == null)
             {
-                freePlayExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultFreeplayPageMonitor>();
+                freePlayExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
+                freePlayExplodedPageMonitor.MultipleBombs = this;
             }
             freePlayDefusedPageMonitor.SetBombCount(currentBombCount);
             freePlayExplodedPageMonitor.SetBombCount(currentBombCount);
             if (missionDefusedPageMonitor == null)
             {
-                missionDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultDefusedPage.gameObject.AddComponent<ResultMissionPageMonitor>();
+                missionDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultDefusedPage.gameObject.AddComponent<ResultPageMonitor>();
+                missionDefusedPageMonitor.MultipleBombs = this;
             }
             if (missionExplodedPageMonitor == null)
             {
-                missionExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultExplodedPage.gameObject.AddComponent<ResultMissionPageMonitor>();
+                missionExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
+                missionExplodedPageMonitor.MultipleBombs = this;
             }
             missionDefusedPageMonitor.SetBombCount(currentBombCount);
             missionExplodedPageMonitor.SetBombCount(currentBombCount);
@@ -650,6 +640,25 @@ namespace MultipleBombsAssembly
                         max = count;
                 }
                 return max;
+            }
+        }
+
+        internal void SetNextGameplayRoom(int bombs)
+        {
+            if (bombs > 2)
+            {
+                if (GameplayState.GameplayRoomPrefabOverride == null)
+                {
+                    List<GameplayRoom> rooms = new List<GameplayRoom>();
+                    foreach (KeyValuePair<GameplayRoom, int> room in multipleBombsRooms)
+                    {
+                        if (room.Value >= bombs)
+                            rooms.Add(room.Key);
+                    }
+                    GameplayRoom selectedRoom = rooms[UnityEngine.Random.Range(0, rooms.Count)];
+                    GameplayState.GameplayRoomPrefabOverride = selectedRoom.gameObject;
+                    usingRoomPrefabOverride = true;
+                }
             }
         }
     }

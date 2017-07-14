@@ -66,8 +66,7 @@
     <Compile Include="MissionDetailPageMonitor.cs" />
     <Compile Include="MultipleBombs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResultMissionPageMonitor.cs" />
-    <Compile Include="ResultFreeplayPageMonitor.cs" />
+    <Compile Include="ResultPageMonitor.cs" />
     <Compile Include="TransformExtension.cs" />
   </ItemGroup>
   <ItemGroup>
