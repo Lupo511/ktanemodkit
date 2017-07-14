@@ -27,7 +27,6 @@ namespace MultipleBombsAssembly
             if (bombCount >= 2)
             {
                 StartCoroutine(changeTextNextFrame(bombCount));
-                bombCount = 1;
             }
         }
 
