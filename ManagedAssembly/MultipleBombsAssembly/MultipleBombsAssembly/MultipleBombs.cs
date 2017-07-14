@@ -255,6 +255,7 @@ namespace MultipleBombsAssembly
                 if (missionDetailPageMonitor == null)
                 {
                     missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
+                    missionDetailPageMonitor.MultipleBombs = this;
                 }
                 missionDetailPageMonitor.MissionList = multipleBombsMissions;
                 Debug.Log("[MultipleBombs]BombBinder info added");
