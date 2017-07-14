@@ -28,6 +28,7 @@ namespace MultipleBombsAssembly
         private int bombsCount;
         private int currentBombCount;
         private float? defaultMaxTime = null;
+        private int currentMaxModModules;
         private TextMeshPro currentBombsCountLabel;
         private Dictionary<string, int> multipleBombsMissions;
         private Dictionary<GameplayRoom, int> multipleBombsRooms;
@@ -83,7 +84,7 @@ namespace MultipleBombsAssembly
                     if (defaultMaxTime == null)
                         defaultMaxTime = FreeplayDevice.MAX_SECONDS_TO_SOLVE;
                     float newMaxTime = defaultMaxTime.Value * maxBombCount;
-                    if (ModManager.Instance.GetMaximumModules() > FreeplayDevice.MAX_MODULE_COUNT)
+                    if (currentMaxModModules > FreeplayDevice.MAX_MODULE_COUNT)
                     {
                         newMaxTime += (ModManager.Instance.GetMaximumModules() - FreeplayDevice.MAX_MODULE_COUNT) * 60 *
                                       (maxBombCount - 1);
@@ -226,6 +227,8 @@ namespace MultipleBombsAssembly
                 device.TimeIncrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.01f, -0.01f, -0.01f);
                 device.TimeDecrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.01f, -0.01f, -0.01f);
                 Debug.Log("[MultipleBombs]FreePlay option added");
+
+                currentMaxModModules = ModManager.Instance.GetMaximumModules();
 
                 foreach (ModMission mission in ModManager.Instance.ModMissions)
                 {
