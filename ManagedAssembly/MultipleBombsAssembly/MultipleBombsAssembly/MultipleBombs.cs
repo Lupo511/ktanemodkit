@@ -84,9 +84,15 @@ namespace MultipleBombsAssembly
                     if (defaultMaxTime == null)
                         defaultMaxTime = FreeplayDevice.MAX_SECONDS_TO_SOLVE;
                     float newMaxTime = defaultMaxTime.Value * maxBombCount;
-                    if (currentMaxModModules > FreeplayDevice.MAX_MODULE_COUNT)
+                    int maxModules = currentMaxModModules;
+                    if (GameplayState.GameplayRoomPrefabOverride != null && GameplayState.GameplayRoomPrefabOverride.GetComponent<GameplayRoom>().BombPrefabOverride != null)
                     {
-                        newMaxTime += (ModManager.Instance.GetMaximumModules() - FreeplayDevice.MAX_MODULE_COUNT) * 60 *
+                        maxModules = Math.Max(GameplayState.GameplayRoomPrefabOverride.GetComponent<GameplayRoom>().BombPrefabOverride.GetComponent<Bomb>().GetMaxModules(), FreeplayDevice.MAX_MODULE_COUNT);
+                        maxModules = Math.Max(currentMaxModModules, maxModules);
+                    }
+                    if (maxModules > FreeplayDevice.MAX_MODULE_COUNT)
+                    {
+                        newMaxTime += (maxModules - FreeplayDevice.MAX_MODULE_COUNT) * 60 *
                                       (maxBombCount - 1);
                     }
                     FreeplayDevice.MAX_SECONDS_TO_SOLVE = newMaxTime;
