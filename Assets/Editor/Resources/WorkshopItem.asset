@@ -41,8 +41,7 @@ MonoBehaviour:
     the number of extra bombs you want the mission to have (e.g. if you set the count
     to 1 the mission will have two bombs).\r\n If you create multiple component pools
     like that, the number of extra bombs the mission will have will be the sum of
-    all of them.\r\nIf you set the total bomb count to a number greater than the maximum
-    number of bombs allowed by the mod, it will be capped to the maximum allowed number."
+    all of them.\r"
   PreviewImage: {fileID: 2800000, guid: be95b037aca480441806d4efa6da4ce2, type: 3}
   Tags:
   - Other
