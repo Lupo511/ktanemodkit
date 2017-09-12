@@ -51,6 +51,7 @@ namespace MultipleBombsAssembly
         public void Awake()
         {
             Debug.Log("[MultipleBombs]Initializing");
+            DestroyImmediate(GetComponent<KMService>()); //Hide from Mod Selector
             bombsCount = 1;
             multipleBombsMissions = new Dictionary<string, int>();
             multipleBombsRooms = new Dictionary<GameplayRoom, int>();
