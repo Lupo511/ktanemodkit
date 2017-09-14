@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Missions;
+using Assets.Scripts.Pacing;
 using Assets.Scripts.Props;
 using Assets.Scripts.Records;
 using Events;
@@ -375,10 +376,9 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]All bombs generated");
 
             //Remove needies events (vanillaBomb is equal to SceneManager.Instance.GameplayState.Bomb)
-            vanillaBomb.GetTimer().TimerTick = new TimerComponent.TimerTickEvent((elapsed, remaining) => SceneManager.Instance.GameplayState.GetPaceMaker().OnTimerTick(elapsed, remaining));
+            vanillaBomb.GetTimer().TimerTick = null;
             BombComponentEvents.OnComponentPass = new BombComponentEvents.ComponentPassEvent((BombComponent component, bool finalPass) =>
             {
-                SceneManager.Instance.GameplayState.GetPaceMaker().OnComponentPass(component, finalPass);
                 foreach (BombComponent bombComponent in component.Bomb.BombComponents)
                 {
                     if (bombComponent is NeedyComponent)
@@ -392,7 +392,6 @@ namespace MultipleBombsAssembly
             });
             BombComponentEvents.OnComponentStrike = new BombComponentEvents.ComponentStrikeEvent((BombComponent component, bool finalStrike) =>
             {
-                SceneManager.Instance.GameplayState.GetPaceMaker().OnComponentStrike(component, finalStrike);
                 foreach (BombComponent bombComponent in component.Bomb.BombComponents)
                 {
                     if (bombComponent is NeedyComponent)
@@ -405,6 +404,15 @@ namespace MultipleBombsAssembly
                 }
             });
             Debug.Log("[MultipleBombs]Needy events redirected");
+
+            //PaceMaker
+            PaceMakerMonitor monitor = FindObjectOfType<PaceMaker>().gameObject.AddComponent<PaceMakerMonitor>();
+            foreach (Bomb bomb in FindObjectsOfType<Bomb>())
+            {
+                if (bomb != vanillaBomb) //The vanilla bomb is still handled by PaceMaker
+                    bomb.GetTimer().TimerTick = new TimerComponent.TimerTickEvent((elapsed, remaining) => monitor.OnBombTimerTick(bomb, elapsed, remaining));
+            }
+            Debug.Log("[MultipleBombs]Pacing events initalized");
         }
 
         private void RedirectPresentBombInfos(Bomb bomb)
