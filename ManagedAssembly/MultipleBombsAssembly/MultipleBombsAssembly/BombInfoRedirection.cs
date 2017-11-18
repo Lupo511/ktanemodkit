@@ -26,7 +26,7 @@ namespace MultipleBombsAssembly
         {
             if (bomb == null)
                 return "";
-            return TimerComponent.GetFormattedTime(bomb.GetTimer().TimeRemaining, true);
+            return bomb.GetTimer().GetFormattedTime(bomb.GetTimer().TimeRemaining, true);
         }
 
         internal static int GetStrikes(Bomb bomb)

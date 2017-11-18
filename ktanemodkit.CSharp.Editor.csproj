@@ -124,6 +124,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>Assets\Plugins\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Assets\Plugins\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="ktanemodkit.CSharp.csproj">
@@ -221,6 +224,7 @@
   <ItemGroup>
     <None Include="Assets\Plugins\Managed\KMFramework.XML" />
     <None Include="Assets\Plugins\Managed\Newtonsoft.Json_license.txt" />
+    <None Include="Assets\Plugins\Managed\UnityEngine.UI.xml" />
     <None Include="Assets\Plugins\Steamworks.NET\redist\steam_appid.txt" />
     <None Include="Assets\TestHarness\Examples\Assets\Shaders\BlendTwoTexturesLitAndUnlit.shader" />
     <None Include="Assets\TestHarness\Examples\Assets\Shaders\BlendTwoTexturesLitAndUnlitVertexColor.shader" />

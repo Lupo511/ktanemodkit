@@ -13,7 +13,7 @@ namespace MultipleBombsAssembly
     {
         private MultipleBombs multipleBombs;
         private Dictionary<string, int> missionList;
-        private TMPro.AlignmentTypes originalAlignment;
+        private TMPro.TextAlignmentOptions originalAlignment;
 
         private void Awake()
         {
@@ -51,7 +51,7 @@ namespace MultipleBombsAssembly
             Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
             if (missionList.ContainsKey(currentMission.ID))
             {
-                page.TextStrikes.alignment = TMPro.AlignmentTypes.Right;
+                page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.TextStrikes.text = missionList[currentMission.ID] + " Bombs\n" + page.TextStrikes.text + "\n ";
                 if (missionList[currentMission.ID] > MultipleBombs.GetCurrentMaximumBombCount())
                 {

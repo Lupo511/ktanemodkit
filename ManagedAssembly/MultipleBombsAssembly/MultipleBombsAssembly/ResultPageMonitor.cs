@@ -11,7 +11,7 @@ namespace MultipleBombsAssembly
     {
         private MultipleBombs multipleBombs;
         private int bombCount;
-        private TMPro.AlignmentTypes originalAllignment;
+        private TMPro.TextAlignmentOptions originalAllignment;
 
         protected virtual void Awake()
         {
@@ -58,7 +58,7 @@ namespace MultipleBombsAssembly
                 originalAllignment = page.NumStrikes.alignment;
                 yield return null;
                 //page.NumModules.text = "<size=0.1>" + bombCount + " x </size>" + page.NumModules.text;
-                page.NumStrikes.alignment = TMPro.AlignmentTypes.Right;
+                page.NumStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.NumStrikes.text = bombCount + " Bombs\n" + page.NumStrikes.text + "\n ";
             }
         }
