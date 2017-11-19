@@ -13,11 +13,13 @@ namespace MultipleBombsAssembly
     {
         private MultipleBombs multipleBombs;
         private Dictionary<string, int> missionList;
+        private MissionDetailPage page;
         private TMPro.TextAlignmentOptions originalAlignment;
+        private bool originalEnableAutoSizing;
 
         private void Awake()
         {
-            MissionDetailPage page = GetComponent<MissionDetailPage>();
+            page = GetComponent<MissionDetailPage>();
             page.StartButton.OnInteract = (Selectable.OnInteractHandler)Delegate.Combine(page.StartButton.OnInteract, new Selectable.OnInteractHandler(OnStart));
         }
 
@@ -29,12 +31,12 @@ namespace MultipleBombsAssembly
         private void OnDisable()
         {
             StopAllCoroutines();
-            GetComponent<MissionDetailPage>().TextStrikes.alignment = originalAlignment;
+            page.TextStrikes.alignment = originalAlignment;
+            page.TextStrikes.enableAutoSizing = originalEnableAutoSizing;
         }
 
         private bool OnStart()
         {
-            MissionDetailPage page = GetComponent<MissionDetailPage>();
             Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
             if (missionList.ContainsKey(currentMission.ID) && missionList[currentMission.ID] <= MultipleBombs.GetCurrentMaximumBombCount())
             {
@@ -45,13 +47,14 @@ namespace MultipleBombsAssembly
 
         private IEnumerator changeTextNextFrame()
         {
-            MissionDetailPage page = GetComponent<MissionDetailPage>();
             originalAlignment = page.TextStrikes.alignment;
+            originalEnableAutoSizing = page.TextStrikes.enableAutoSizing;
             yield return null;
             Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
             if (missionList.ContainsKey(currentMission.ID))
             {
                 page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
+                page.TextStrikes.enableAutoSizing = false;
                 page.TextStrikes.text = missionList[currentMission.ID] + " Bombs\n" + page.TextStrikes.text + "\n ";
                 if (missionList[currentMission.ID] > MultipleBombs.GetCurrentMaximumBombCount())
                 {
