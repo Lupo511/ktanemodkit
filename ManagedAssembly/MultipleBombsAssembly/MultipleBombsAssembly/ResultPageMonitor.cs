@@ -12,6 +12,7 @@ namespace MultipleBombsAssembly
         private MultipleBombs multipleBombs;
         private int bombCount;
         private TMPro.TextAlignmentOptions originalAllignment;
+        private bool originalEnableAutosizing;
 
         protected virtual void Awake()
         {
@@ -35,7 +36,10 @@ namespace MultipleBombsAssembly
             StopAllCoroutines();
             ResultMissionPage page = GetComponent<ResultMissionPage>();
             if (page != null)
+            {
                 page.NumStrikes.alignment = originalAllignment;
+                page.NumStrikes.enableAutoSizing = originalEnableAutosizing;
+            }
         }
 
         private bool OnRetry()
@@ -56,9 +60,11 @@ namespace MultipleBombsAssembly
             {
                 ResultMissionPage page = GetComponent<ResultMissionPage>();
                 originalAllignment = page.NumStrikes.alignment;
+                originalEnableAutosizing = page.NumStrikes.enableAutoSizing;
                 yield return null;
                 //page.NumModules.text = "<size=0.1>" + bombCount + " x </size>" + page.NumModules.text;
                 page.NumStrikes.alignment = TMPro.TextAlignmentOptions.Right;
+                page.NumStrikes.enableAutoSizing = false;
                 page.NumStrikes.text = bombCount + " Bombs\n" + page.NumStrikes.text + "\n ";
             }
         }

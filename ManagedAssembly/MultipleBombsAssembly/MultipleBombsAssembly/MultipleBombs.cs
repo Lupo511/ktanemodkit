@@ -206,16 +206,7 @@ namespace MultipleBombsAssembly
                 {
                     if (!multipleBombsMissions.ContainsKey(mission.ID))
                     {
-                        int missionBombCount = 1;
-                        for (int i = mission.GeneratorSetting.ComponentPools.Count - 1; i >= 0; i--)
-                        {
-                            ComponentPool pool = mission.GeneratorSetting.ComponentPools[i];
-                            if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
-                            {
-                                mission.GeneratorSetting.ComponentPools.RemoveAt(i);
-                                missionBombCount += pool.Count;
-                            }
-                        }
+                        int missionBombCount = ProcessMultipleBombsMission(mission);
                         if (missionBombCount >= 2)
                         {
                             multipleBombsMissions.Add(mission.ID, missionBombCount);
@@ -248,6 +239,21 @@ namespace MultipleBombsAssembly
             }
         }
 
+        private int ProcessMultipleBombsMission(Mission mission)
+        {
+            int count = 1;
+            for (int i = mission.GeneratorSetting.ComponentPools.Count - 1; i >= 0; i--)
+            {
+                ComponentPool pool = mission.GeneratorSetting.ComponentPools[i];
+                if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
+                {
+                    mission.GeneratorSetting.ComponentPools.RemoveAt(i);
+                    count += pool.Count;
+                }
+            }
+            return count;
+        }
+
         private IEnumerator setupGameplayStateNextFrame()
         {
             yield return null;
@@ -267,8 +273,10 @@ namespace MultipleBombsAssembly
             currentBombCount = 1;
             if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                 currentBombCount = bombsCount;
-            else
+            else if (multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
                 currentBombCount = multipleBombsMissions[GameplayState.MissionToLoad];
+            else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
+                currentBombCount = ProcessMultipleBombsMission(GameplayState.CustomMission);
             Debug.Log("[MultipleBombs]Bombs to spawn: " + currentBombCount);
 
             //Setup results screen
