@@ -106,6 +106,9 @@ namespace MultipleBombsAssembly
                     redirectedInfos = null;
                     bombComponentPassEvents = null;
                     bombComponentStrikeEvents = null;
+                    BombEvents.OnBombDetonated -= onBombDetonated;
+                    BombComponentEvents.OnComponentPass -= onComponentPassEvent;
+                    BombComponentEvents.OnComponentStrike -= onComponentStrikeEvent;
                 }
                 if (state == SceneManager.State.Setup)
                 {
@@ -506,6 +509,10 @@ namespace MultipleBombsAssembly
 
         private void onBombDetonated()
         {
+            foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
+            {
+                bomb.GetTimer().StopTimer();
+            }
             if (RecordManager.Instance.GetCurrentRecord().Result == GameResultEnum.ExplodedDueToStrikes)
             {
                 float timeElapsed = 0;
