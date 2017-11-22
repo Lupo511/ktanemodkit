@@ -13,5 +13,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: EnglishTest
   title: English Test
+  description: "[i]You've lived all your life writing however you wanted without giving
+    a second thought to who would be reading what you misspelled. But now, your life
+    depends on your grammar and orthography, and this bomb is very nitpicky. You should
+    of paid more attention in you're English class.\r\n\r\n...Oh, carp.[/i]\r\n\r\n[h1]Manual[/h1]\r\nThe
+    PDF manual is included in the download.\r\nThe HTML manual can be viewed from
+    the following pages:\r\n[list]\r\n[*]Module: [url=http://codepen.io/thefizzynator/full/ALzzjQ/]http://codepen.io/thefizzynator/full/ALzzjQ/[/url]\r\n[*]Grammar
+    Appendix: [url=http://codepen.io/thefizzynator/full/NRmkKZ/]http://codepen.io/thefizzynator/full/NRmkKZ/[/url]\r\n[/list]\r\n\r\n[h1]Module
+    Type Name[/h1]\r\nThe Module Type Name is EnglishTest."
   version: 1.04
   outputFolder: build
+  previewImage: {fileID: 2800000, guid: c6eaeaf190566c545844cefa7d2d3d6d, type: 3}
