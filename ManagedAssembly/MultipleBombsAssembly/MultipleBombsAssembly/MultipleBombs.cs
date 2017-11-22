@@ -16,16 +16,6 @@ namespace MultipleBombsAssembly
 {
     public class MultipleBombs : MonoBehaviour
     {
-        protected enum NeedyStateEnum
-        {
-            InitialSetup,
-            AwaitingActivation,
-            Running,
-            Cooldown,
-            Terminated,
-            BombComplete
-        }
-
         private int bombsCount;
         private int currentBombCount;
         private float? defaultMaxTime = null;
@@ -52,7 +42,7 @@ namespace MultipleBombsAssembly
             multipleBombsMissions = new Dictionary<string, int>();
             multipleBombsRooms = new Dictionary<GameplayRoom, int>();
             usingRoomPrefabOverride = false;
-            gameCommands = null;
+            gameCommands = GetComponent<KMGameCommands>();
             GameEvents.OnGameStateChange = (GameEvents.GameStateChangedEvent)Delegate.Combine(GameEvents.OnGameStateChange, new GameEvents.GameStateChangedEvent(onGameStateChanged));
             Debug.Log("[MultipleBombs]Initialized");
         }
@@ -87,6 +77,11 @@ namespace MultipleBombsAssembly
                     }
                 }
             }
+        }
+
+        public void OnDestroy()
+        {
+
         }
 
         private void onGameStateChanged(SceneManager.State state)
@@ -543,12 +538,22 @@ namespace MultipleBombsAssembly
             {
                 Mission freeplayMission = FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings);
                 MissionManager.Instance.MissionDB.AddMission(freeplayMission);
-                bomb = GameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
+                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
                 MissionManager.Instance.MissionDB.Missions.Remove(freeplayMission);
+            }
+            else if (missionId == ModMission.CUSTOM_MISSION_ID)
+            {
+                Mission customMission = gameplayState.Mission;
+                string oldName = customMission.name;
+                customMission.name = ModMission.CUSTOM_MISSION_ID;
+                MissionManager.Instance.MissionDB.AddMission(customMission);
+                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
+                MissionManager.Instance.MissionDB.Missions.Remove(customMission);
+                customMission.name = oldName;
             }
             else
             {
-                bomb = GameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
+                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
             }
 
             GameObject roomGO = (GameObject)gameplayState.GetType().GetField("roomGO", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameplayState);
@@ -616,16 +621,6 @@ namespace MultipleBombsAssembly
                     GameplayState.GameplayRoomPrefabOverride = selectedRoom.gameObject;
                     usingRoomPrefabOverride = true;
                 }
-            }
-        }
-
-        private KMGameCommands GameCommands
-        {
-            get
-            {
-                if (gameCommands == null)
-                    gameCommands = GetComponent<KMGameCommands>();
-                return gameCommands;
             }
         }
     }
