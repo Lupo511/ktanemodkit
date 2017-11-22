@@ -76,14 +76,14 @@
     <Reference Include="UnityEngine.HoloLens">
       <HintPath>Library\UnityAssemblies\UnityEngine.HoloLens.dll</HintPath>
     </Reference>
-    <Reference Include="EnglishTestCode">
-      <HintPath>Assets\Plugins\EnglishTestCode.dll</HintPath>
-    </Reference>
     <Reference Include="KMFramework">
       <HintPath>Assets\Plugins\Managed\KMFramework.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Assets\Plugins\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="EnglishTestCode">
+      <HintPath>Assets\Plugins\Managed\EnglishTestCode.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
