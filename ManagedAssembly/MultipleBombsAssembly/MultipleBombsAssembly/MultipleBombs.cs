@@ -43,7 +43,7 @@ namespace MultipleBombsAssembly
             multipleBombsRooms = new Dictionary<GameplayRoom, int>();
             usingRoomPrefabOverride = false;
             gameCommands = GetComponent<KMGameCommands>();
-            GameEvents.OnGameStateChange = (GameEvents.GameStateChangedEvent)Delegate.Combine(GameEvents.OnGameStateChange, new GameEvents.GameStateChangedEvent(onGameStateChanged));
+            GameEvents.OnGameStateChange += onGameStateChanged;
             Debug.Log("[MultipleBombs]Initialized");
         }
 
@@ -81,7 +81,41 @@ namespace MultipleBombsAssembly
 
         public void OnDestroy()
         {
-
+            if (SceneManager.Instance.CurrentState != SceneManager.State.ModManager)
+                throw new NotImplementedException();
+            Debug.Log("[MultipleBombs]Destroying");
+            foreach (Mission mission in ModManager.Instance.ModMissions)
+            {
+                if (multipleBombsMissions.ContainsKey(mission.ID))
+                {
+                    ComponentPool pool = new ComponentPool();
+                    pool.ModTypes = new List<string>() { "Multiple Bombs" };
+                    pool.Count = multipleBombsMissions[mission.ID] - 1;
+                    mission.GeneratorSetting.ComponentPools.Add(pool);
+                }
+            }
+            if (missionDetailPageMonitor != null)
+            {
+                Destroy(missionDetailPageMonitor);
+            }
+            if (freePlayDefusedPageMonitor != null)
+            {
+                Destroy(freePlayDefusedPageMonitor);
+            }
+            if (freePlayExplodedPageMonitor != null)
+            {
+                Destroy(freePlayDefusedPageMonitor);
+            }
+            if (missionDefusedPageMonitor != null)
+            {
+                Destroy(missionDefusedPageMonitor);
+            }
+            if (missionExplodedPageMonitor != null)
+            {
+                Destroy(missionDefusedPageMonitor);
+            }
+            GameEvents.OnGameStateChange -= onGameStateChanged;
+            Debug.Log("[MultipleBombs]Destroyed");
         }
 
         private void onGameStateChanged(SceneManager.State state)

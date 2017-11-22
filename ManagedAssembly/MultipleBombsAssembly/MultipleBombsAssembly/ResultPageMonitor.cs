@@ -19,7 +19,7 @@ namespace MultipleBombsAssembly
             ResultPage page = GetComponent<ResultPage>();
             if (page.RetryButton != null)
             {
-                page.RetryButton.OnInteract = (Selectable.OnInteractHandler)Delegate.Combine(page.RetryButton.OnInteract, new Selectable.OnInteractHandler(OnRetry));
+                page.RetryButton.OnInteract += OnRetry;
             }
         }
 
@@ -39,6 +39,15 @@ namespace MultipleBombsAssembly
             {
                 page.NumStrikes.alignment = originalAllignment;
                 page.NumStrikes.enableAutoSizing = originalEnableAutosizing;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            ResultPage page = GetComponent<ResultPage>();
+            if (page.RetryButton != null)
+            {
+                page.RetryButton.OnInteract -= OnRetry;
             }
         }
 

@@ -20,7 +20,7 @@ namespace MultipleBombsAssembly
         private void Awake()
         {
             page = GetComponent<MissionDetailPage>();
-            page.StartButton.OnInteract = (Selectable.OnInteractHandler)Delegate.Combine(page.StartButton.OnInteract, new Selectable.OnInteractHandler(OnStart));
+            page.StartButton.OnInteract += OnStart;
         }
 
         private void OnEnable()
@@ -33,6 +33,11 @@ namespace MultipleBombsAssembly
             StopAllCoroutines();
             page.TextStrikes.alignment = originalAlignment;
             page.TextStrikes.enableAutoSizing = originalEnableAutoSizing;
+        }
+
+        private void OnDestroy()
+        {
+            page.StartButton.OnInteract -= OnStart;
         }
 
         private bool OnStart()
