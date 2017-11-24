@@ -273,7 +273,14 @@ namespace MultipleBombsAssembly
 
         private int ProcessMultipleBombsMission(Mission mission)
         {
+            List<ComponentPool> pools;
+            return ProcessMultipleBombsMission(mission, out pools);
+        }
+
+        private int ProcessMultipleBombsMission(Mission mission, out List<ComponentPool> bombsPools)
+        {
             int count = 1;
+            bombsPools = new List<ComponentPool>();
             for (int i = mission.GeneratorSetting.ComponentPools.Count - 1; i >= 0; i--)
             {
                 ComponentPool pool = mission.GeneratorSetting.ComponentPools[i];
@@ -281,6 +288,7 @@ namespace MultipleBombsAssembly
                 {
                     mission.GeneratorSetting.ComponentPools.RemoveAt(i);
                     count += pool.Count;
+                    bombsPools.Add(pool);
                 }
             }
             return count;
@@ -303,12 +311,13 @@ namespace MultipleBombsAssembly
             }
 
             currentBombCount = 1;
+            List<ComponentPool> customMissionBombsPools = null;
             if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                 currentBombCount = bombsCount;
             else if (multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
                 currentBombCount = multipleBombsMissions[GameplayState.MissionToLoad];
             else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
-                currentBombCount = ProcessMultipleBombsMission(GameplayState.CustomMission);
+                currentBombCount = ProcessMultipleBombsMission(GameplayState.CustomMission, out customMissionBombsPools);
             Debug.Log("[MultipleBombs]Bombs to spawn: " + currentBombCount);
 
             //Setup results screen
@@ -338,7 +347,11 @@ namespace MultipleBombsAssembly
             missionExplodedPageMonitor.SetBombCount(currentBombCount);
             Debug.Log("[MultipleBombs]Result screens initialized");
             if (currentBombCount == 1)
+            {
+                if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
+                    GameplayState.CustomMission.GeneratorSetting.ComponentPools.AddRange(customMissionBombsPools);
                 yield break;
+            }
 
             redirectedInfos = new Dictionary<KMBombInfo, Bomb>();
             BombInfoRedirection.SetBombCount(currentBombCount);
@@ -379,6 +392,9 @@ namespace MultipleBombsAssembly
                     throw new Exception("Current gameplay room doesn't support " + (i + 1) + " bombs");
                 StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles));
             }
+
+            if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
+                GameplayState.CustomMission.GeneratorSetting.ComponentPools.AddRange(customMissionBombsPools);
 
             vanillaBomb.GetComponent<Selectable>().Parent.Init();
             Debug.Log("[MultipleBombs]All bombs generated");
