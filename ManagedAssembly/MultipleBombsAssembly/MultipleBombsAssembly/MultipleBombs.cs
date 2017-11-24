@@ -32,6 +32,7 @@ namespace MultipleBombsAssembly
         private ResultPageMonitor missionDefusedPageMonitor;
         private ResultPageMonitor missionExplodedPageMonitor;
         private MissionDetailPageMonitor missionDetailPageMonitor;
+        private KMGameInfo gameInfo;
         private KMGameCommands gameCommands;
 
         public void Awake()
@@ -42,8 +43,9 @@ namespace MultipleBombsAssembly
             multipleBombsMissions = new Dictionary<string, int>();
             multipleBombsRooms = new Dictionary<GameplayRoom, int>();
             usingRoomPrefabOverride = false;
+            gameInfo = GetComponent<KMGameInfo>();
             gameCommands = GetComponent<KMGameCommands>();
-            GameEvents.OnGameStateChange += onGameStateChanged;
+            gameInfo.OnStateChange += onGameStateChanged;
             Debug.Log("[MultipleBombs]Initialized");
         }
 
@@ -114,13 +116,13 @@ namespace MultipleBombsAssembly
             {
                 Destroy(missionDefusedPageMonitor);
             }
-            GameEvents.OnGameStateChange -= onGameStateChanged;
+            gameInfo.OnStateChange -= onGameStateChanged;
             Debug.Log("[MultipleBombs]Destroyed");
         }
 
-        private void onGameStateChanged(SceneManager.State state)
+        private void onGameStateChanged(KMGameInfo.State state)
         {
-            if (state == SceneManager.State.Gameplay)
+            if (state == KMGameInfo.State.Gameplay)
             {
                 if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
                     StartCoroutine(setupGameplayStateNextFrame());
@@ -139,7 +141,7 @@ namespace MultipleBombsAssembly
                     BombComponentEvents.OnComponentPass -= onComponentPassEvent;
                     BombComponentEvents.OnComponentStrike -= onComponentStrikeEvent;
                 }
-                if (state == SceneManager.State.Setup)
+                if (state == KMGameInfo.State.Setup)
                 {
                     StartCoroutine(setupSetupRoomNextFrame());
                 }
