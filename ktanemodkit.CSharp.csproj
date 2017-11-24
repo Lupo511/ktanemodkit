@@ -76,25 +76,17 @@
     <Reference Include="UnityEngine.HoloLens">
       <HintPath>Library\UnityAssemblies\UnityEngine.HoloLens.dll</HintPath>
     </Reference>
+    <Reference Include="EnglishTestCode">
+      <HintPath>Assets\Plugins\Managed\EnglishTestCode.dll</HintPath>
+    </Reference>
     <Reference Include="KMFramework">
       <HintPath>Assets\Plugins\Managed\KMFramework.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Assets\Plugins\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="EnglishTestCode">
-      <HintPath>Assets\Plugins\Managed\EnglishTestCode.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Examples\1.1 Module\ExampleModule.cs" />
-    <Compile Include="Assets\Examples\1.10 NeedyModule\ExampleNeedyModule.cs" />
-    <Compile Include="Assets\Examples\1.12 Holdable\BombCreatorExample.cs" />
-    <Compile Include="Assets\Examples\1.2 Module2\ExampleModule2.cs" />
-    <Compile Include="Assets\Examples\1.3 GameplayRoom\ExampleGameplayRoom.cs" />
-    <Compile Include="Assets\Examples\1.5 WebService\ExampleWebService.cs" />
-    <Compile Include="Assets\Examples\1.8 Button Masher Module\ButtonMasherModule.cs" />
-    <Compile Include="Assets\Examples\1.9 Widget\ExampleWidget.cs" />
     <Compile Include="Assets\TestHarness\TestHarness.cs" />
     <Compile Include="Assets\TestHarness\TestHighlightable.cs" />
     <Compile Include="Assets\TestHarness\TestSelectable.cs" />
