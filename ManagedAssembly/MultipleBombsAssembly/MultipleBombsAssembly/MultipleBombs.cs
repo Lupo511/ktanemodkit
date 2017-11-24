@@ -124,7 +124,7 @@ namespace MultipleBombsAssembly
         {
             if (state == KMGameInfo.State.Gameplay)
             {
-                if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
+                if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad) || GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
                     StartCoroutine(setupGameplayStateNextFrame());
             }
             else
