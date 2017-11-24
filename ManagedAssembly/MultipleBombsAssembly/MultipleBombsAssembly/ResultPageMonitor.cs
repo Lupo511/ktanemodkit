@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Assets.Scripts.Missions;
+using Assets.Scripts.Records;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,6 +66,11 @@ namespace MultipleBombsAssembly
                 yield return null;
                 ResultFreeplayPage page = GetComponent<ResultFreeplayPage>();
                 page.MissionName.Text = "Free Play - " + bombCount + " Bombs";
+                if (RecordManager.Instance.GetCurrentRecord().MissionID != FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+                {
+                    int moduleCount = RecordManager.Instance.GetCurrentRecord().FreeplaySettings.ModuleCount - bombCount + 1;
+                    page.FreeplayModules.text = moduleCount + (moduleCount == 1 ? " Module" : " Modules");
+                }
             }
             else
             {
