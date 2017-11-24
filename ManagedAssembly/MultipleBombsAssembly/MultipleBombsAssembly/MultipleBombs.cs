@@ -18,7 +18,6 @@ namespace MultipleBombsAssembly
     {
         private int bombsCount;
         private int currentBombCount;
-        private List<ComponentPool> customMissionBombsPools;
         private float? defaultMaxTime = null;
         private int currentMaxModModules;
         private TextMeshPro currentBombsCountLabel;
@@ -41,7 +40,6 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Initializing");
             DestroyImmediate(GetComponent<KMService>()); //Hide from Mod Selector
             bombsCount = 1;
-            customMissionBombsPools = null;
             multipleBombsMissions = new Dictionary<string, int>();
             multipleBombsRooms = new Dictionary<GameplayRoom, int>();
             usingRoomPrefabOverride = false;
@@ -301,6 +299,7 @@ namespace MultipleBombsAssembly
         private IEnumerator setupGameplayStateNextFrame()
         {
             currentBombCount = 1;
+            List<ComponentPool> customMissionBombsPools = null;
             if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                 currentBombCount = bombsCount;
             else if (multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
