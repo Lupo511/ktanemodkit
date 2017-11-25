@@ -305,7 +305,11 @@ namespace MultipleBombsAssembly
             else if (multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
                 currentBombCount = multipleBombsMissions[GameplayState.MissionToLoad];
             else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
+            {
                 currentBombCount = ProcessMultipleBombsMission(GameplayState.CustomMission, out customMissionBombsPools);
+                if (currentBombCount > 2)
+                    SetNextGameplayRoom(currentBombCount);
+            }
             yield return null;
             Debug.Log("[MultipleBombs]Initializing gameplay state");
 
@@ -391,7 +395,10 @@ namespace MultipleBombsAssembly
             {
                 GameObject spawn = GameObject.Find("MultipleBombs_Spawn_" + i);
                 if (spawn == null)
-                    throw new Exception("Current gameplay room doesn't support " + (i + 1) + " bombs");
+                {
+                    Debug.LogError("[MultipleBombs]The current gameplay room doesn't support " + (i + 1) + " bombs");
+                    break;
+                }
                 StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles));
             }
 
@@ -666,6 +673,11 @@ namespace MultipleBombsAssembly
                     {
                         if (room.Value >= bombs)
                             rooms.Add(room.Key);
+                    }
+                    if (rooms.Count == 0)
+                    {
+                        Debug.LogError("[MultipleBombs]No room found that supports " + bombs + " bombs");
+                        return;
                     }
                     GameplayRoom selectedRoom = rooms[UnityEngine.Random.Range(0, rooms.Count)];
                     GameplayState.GameplayRoomPrefabOverride = selectedRoom.gameObject;
