@@ -525,7 +525,7 @@ namespace MultipleBombsAssembly
                 Debug.Log("[MultipleBombs]A bomb was solved (A winner is you!!)");
                 source.Bomb.GetTimer().StopTimer();
                 source.Bomb.GetTimer().Blink(1.5f);
-                DarkTonic.MasterAudio.MasterAudio.PlaySound3DAtTransformAndForget("bomb_defused", base.transform, 1f, null, 0f, null);
+                DarkTonic.MasterAudio.MasterAudio.PlaySound3DAtTransformAndForget("bomb_defused", source.Bomb.transform, 1f, null, 0f, null);
                 if (BombEvents.OnBombSolved != null)
                     BombEvents.OnBombSolved();
                 foreach (KeyValuePair<KMBombInfo, Bomb> infos in redirectedInfos)
