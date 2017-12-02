@@ -47,6 +47,15 @@ namespace MultipleBombsAssembly
             gameInfo = GetComponent<KMGameInfo>();
             gameCommands = GetComponent<KMGameCommands>();
             gameInfo.OnStateChange += onGameStateChanged;
+
+            GameObject infoObject = new GameObject("MultipleBombs_Info");
+            KMGameInfo multipleBombsInfo = infoObject.AddComponent<KMGameInfo>();
+            multipleBombsInfo.OnGetMaximumBombModules = new KMGameInfo.KMGetMaximumBombModulesDelgate(() =>
+            {
+                return GetCurrentMaximumBombCount();
+            });
+            DontDestroyOnLoad(infoObject);
+
             Debug.Log("[MultipleBombs]Initialized");
         }
 
