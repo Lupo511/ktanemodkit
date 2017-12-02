@@ -25,6 +25,7 @@ namespace MultipleBombsAssembly
         private Dictionary<GameplayRoom, int> multipleBombsRooms;
         private bool usingRoomPrefabOverride;
         private Dictionary<KMBombInfo, Bomb> redirectedInfos;
+        private Dictionary<Bomb, BombEvents.BombSolvedEvent> bombSolvedEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentPassEvent> bombComponentPassEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent> bombComponentStrikeEvents;
         private ResultPageMonitor freePlayDefusedPageMonitor;
@@ -135,6 +136,7 @@ namespace MultipleBombsAssembly
                     StopAllCoroutines();
                     currentBombCount = 1;
                     redirectedInfos = null;
+                    bombSolvedEvents = null;
                     bombComponentPassEvents = null;
                     bombComponentStrikeEvents = null;
                     BombEvents.OnBombDetonated -= onBombDetonated;
@@ -361,6 +363,7 @@ namespace MultipleBombsAssembly
 
             redirectedInfos = new Dictionary<KMBombInfo, Bomb>();
             BombInfoRedirection.SetBombCount(currentBombCount);
+            bombSolvedEvents = new Dictionary<Bomb, BombEvents.BombSolvedEvent>();
             bombComponentPassEvents = new Dictionary<Bomb, BombComponentEvents.ComponentPassEvent>();
             bombComponentStrikeEvents = new Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent>();
 
@@ -444,56 +447,67 @@ namespace MultipleBombsAssembly
 
         private void ProcessBombEvents(Bomb bomb)
         {
-            Delegate[] bombSolvedDelegates = BombEvents.OnBombSolved.GetInvocationList();
-            foreach (Delegate bombSolvedDelegate in bombSolvedDelegates)
+            List<Delegate> bombSolvedDelegates = BombEvents.OnBombSolved.GetInvocationList().ToList();
+            for (int i = bombSolvedDelegates.Count - 1; i >= 0; i--)
             {
-                if (bombSolvedDelegate.Target == bomb.GetTimer())
+                BombEvents.BombSolvedEvent bombSolvedDelegate = (BombEvents.BombSolvedEvent)bombSolvedDelegates[i];
+                if (bombSolvedDelegate.Target != null && (ReferenceEquals(bombSolvedDelegate.Target, bomb.GetTimer()) || ReferenceEquals(bombSolvedDelegate.Target, bomb.StrikeIndicator)))
                 {
-                    BombEvents.OnBombSolved = (BombEvents.BombSolvedEvent)Delegate.Remove(BombEvents.OnBombSolved, bombSolvedDelegate);
-                    break;
+                    BombEvents.OnBombSolved -= bombSolvedDelegate;
+                    if (bombSolvedEvents.ContainsKey(bomb))
+                        bombSolvedEvents[bomb] += bombSolvedDelegate;
+                    else
+                        bombSolvedEvents.Add(bomb, bombSolvedDelegate);
+                    bombSolvedDelegates.RemoveAt(i);
                 }
             }
-            bombSolvedDelegates = BombEvents.OnBombSolved.GetInvocationList();
-            Delegate[] componentPassEvents = BombComponentEvents.OnComponentPass.GetInvocationList();
-            Delegate[] componentStrikeEvents = BombComponentEvents.OnComponentStrike.GetInvocationList();
+            List<Delegate> componentPassDelegates = BombComponentEvents.OnComponentPass.GetInvocationList().ToList();
+            List<Delegate> componentStrikeDelegates = BombComponentEvents.OnComponentStrike.GetInvocationList().ToList();
             foreach (BombComponent component in bomb.BombComponents)
             {
                 component.OnPass = onComponentPass;
                 if (component is NeedyComponent)
                 {
-                    foreach (Delegate bombSolvedDelegate in bombSolvedDelegates)
+                    for (int i = bombSolvedDelegates.Count - 1; i >= 0; i--)
                     {
-                        if (bombSolvedDelegate.Target == component)
-                            BombEvents.OnBombSolved = (BombEvents.BombSolvedEvent)Delegate.Remove(BombEvents.OnBombSolved, bombSolvedDelegate);
-                    }
-                    foreach (Delegate componentPassEvent in componentPassEvents)
-                    {
-                        if (componentPassEvent.Target == component)
+                        BombEvents.BombSolvedEvent bombSolvedDelegate = (BombEvents.BombSolvedEvent)bombSolvedDelegates[i];
+                        if (bombSolvedDelegate != null && ReferenceEquals(bombSolvedDelegate.Target, component))
                         {
-                            BombComponentEvents.OnComponentPass -= (BombComponentEvents.ComponentPassEvent)componentPassEvent;
-                            if (bombComponentPassEvents.ContainsKey(bomb))
-                            {
-                                bombComponentPassEvents[bomb] += (BombComponentEvents.ComponentPassEvent)componentPassEvent;
-                            }
+                            BombEvents.OnBombSolved -= bombSolvedDelegate;
+                            if (bombSolvedEvents.ContainsKey(bomb))
+                                bombSolvedEvents[bomb] += bombSolvedDelegate;
                             else
-                            {
-                                bombComponentPassEvents.Add(bomb, (BombComponentEvents.ComponentPassEvent)componentPassEvent);
-                            }
+                                bombSolvedEvents.Add(bomb, bombSolvedDelegate);
+                            bombSolvedDelegates.RemoveAt(i);
+                            break;
                         }
                     }
-                    foreach (Delegate componentStrikeEvent in componentStrikeEvents)
+                    for (int i = componentPassDelegates.Count - 1; i >= 0; i--)
                     {
-                        if (componentStrikeEvent.Target == component)
+                        BombComponentEvents.ComponentPassEvent componentPassEvent = (BombComponentEvents.ComponentPassEvent)componentPassDelegates[i];
+                        if (componentPassEvent.Target != null && ReferenceEquals(componentPassEvent.Target, component))
                         {
-                            BombComponentEvents.OnComponentStrike -= (BombComponentEvents.ComponentStrikeEvent)componentStrikeEvent;
-                            if (bombComponentStrikeEvents.ContainsKey(bomb))
-                            {
-                                bombComponentStrikeEvents[bomb] += (BombComponentEvents.ComponentStrikeEvent)componentStrikeEvent;
-                            }
+                            BombComponentEvents.OnComponentPass -= componentPassEvent;
+                            if (bombComponentPassEvents.ContainsKey(bomb))
+                                bombComponentPassEvents[bomb] += componentPassEvent;
                             else
-                            {
-                                bombComponentStrikeEvents.Add(bomb, (BombComponentEvents.ComponentStrikeEvent)componentStrikeEvent);
-                            }
+                                bombComponentPassEvents.Add(bomb, componentPassEvent);
+                            componentPassDelegates.RemoveAt(i);
+                            break;
+                        }
+                    }
+                    for (int i = componentStrikeDelegates.Count - 1; i >= 0; i--)
+                    {
+                        BombComponentEvents.ComponentStrikeEvent componentStrikeEvent = (BombComponentEvents.ComponentStrikeEvent)componentStrikeDelegates[i];
+                        if (componentStrikeEvent.Target != null && ReferenceEquals(componentStrikeEvent.Target, component))
+                        {
+                            BombComponentEvents.OnComponentStrike -= componentStrikeEvent;
+                            if (bombComponentStrikeEvents.ContainsKey(bomb))
+                                bombComponentStrikeEvents[bomb] += componentStrikeEvent;
+                            else
+                                bombComponentStrikeEvents.Add(bomb, componentStrikeEvent);
+                            componentStrikeDelegates.RemoveAt(i);
+                            break;
                         }
                     }
                 }
@@ -521,14 +535,8 @@ namespace MultipleBombsAssembly
                         infos.Key.OnBombSolved();
                     }
                 }
-                foreach (NeedyComponent component in FindObjectsOfType<NeedyComponent>())
-                {
-                    if (component.Bomb == source.Bomb)
-                    {
-                        component.TurnOff(true);
-                    }
-                }
-                source.Bomb.GetTimer().StrikeIndicator.StopAllCoroutines();
+                if (bombSolvedEvents.ContainsKey(source.Bomb) && bombSolvedEvents[source.Bomb] != null)
+                    bombSolvedEvents[source.Bomb].Invoke();
                 SceneManager.Instance.GameplayState.OnBombSolved();
                 foreach (Bomb bomb in FindObjectsOfType<Bomb>())
                     if (!bomb.IsSolved())
