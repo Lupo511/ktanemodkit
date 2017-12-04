@@ -35,6 +35,7 @@ namespace MultipleBombsAssembly
         private MissionDetailPageMonitor missionDetailPageMonitor;
         private KMGameInfo gameInfo;
         private KMGameCommands gameCommands;
+        private MultipleBombsProperties publicProperties;
 
         public void Awake()
         {
@@ -49,12 +50,9 @@ namespace MultipleBombsAssembly
             gameInfo.OnStateChange += onGameStateChanged;
 
             GameObject infoObject = new GameObject("MultipleBombs_Info");
-            KMGameInfo multipleBombsInfo = infoObject.AddComponent<KMGameInfo>();
-            multipleBombsInfo.OnGetMaximumBombModules = new KMGameInfo.KMGetMaximumBombModulesDelgate(() =>
-            {
-                return GetCurrentMaximumBombCount();
-            });
-            DontDestroyOnLoad(infoObject);
+            infoObject.transform.parent = gameObject.transform;
+            publicProperties = infoObject.AddComponent<MultipleBombsProperties>();
+            publicProperties.MultipleBombs = this;
 
             Debug.Log("[MultipleBombs]Initialized");
         }
