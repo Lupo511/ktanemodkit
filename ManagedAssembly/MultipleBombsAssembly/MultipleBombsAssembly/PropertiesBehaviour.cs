@@ -22,9 +22,12 @@ namespace MultipleBombsAssembly
                 setDelegate = set;
             }
 
-            public object Get()
+            public PropertyGetDelegate Get
             {
-                return getDelegate();
+                get
+                {
+                    return getDelegate;
+                }
             }
 
             public bool CanSet()
@@ -32,9 +35,12 @@ namespace MultipleBombsAssembly
                 return setDelegate != null;
             }
 
-            public void Set(object value)
+            public PropertySetDelegate Set
             {
-                setDelegate(value);
+                get
+                {
+                    return setDelegate;
+                }
             }
         }
 
@@ -48,6 +54,11 @@ namespace MultipleBombsAssembly
         public void AddProperty(string name, Property property)
         {
             properties.Add(name, property);
+        }
+
+        public void AddProperty(string name, Property.PropertyGetDelegate get, Property.PropertySetDelegate set)
+        {
+            properties.Add(name, new Property(get, set));
         }
 
         public object this[string key]

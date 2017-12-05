@@ -7,28 +7,12 @@ namespace MultipleBombsAssembly
 {
     public class MultipleBombsProperties : PropertiesBehaviour
     {
-        private MultipleBombs multipleBombs;
+        internal MultipleBombs MultipleBombs { get; set; }
 
         public MultipleBombsProperties()
         {
-            AddProperty("CurrentMaximumBombCount", new Property(CurrentMaximumBombCount_Get, null));
-        }
-
-        private object CurrentMaximumBombCount_Get()
-        {
-            return multipleBombs.GetCurrentMaximumBombCount();
-        }
-
-        internal MultipleBombs MultipleBombs
-        {
-            get
-            {
-                return multipleBombs;
-            }
-            set
-            {
-                multipleBombs = value;
-            }
+            AddProperty("CurrentMaximumBombCount", () => MultipleBombs.GetCurrentMaximumBombCount(), null);
+            AddProperty("CurrentFreePlayBombCount", () => { return MultipleBombs.CurrentFreePlayBombCount; }, (object value) => { MultipleBombs.CurrentFreePlayBombCount = (int)value; });
         }
     }
 }
