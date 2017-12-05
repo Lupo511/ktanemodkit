@@ -39,9 +39,28 @@ MonoBehaviour:
     pool to your mission with nothing but the following mod type:\r\n[code]Multiple
     Bombs[/code]\r\n(space included). Then set the count of this component pool to
     the number of extra bombs you want the mission to have (e.g. if you set the count
-    to 1 the mission will have two bombs).\r\n If you create multiple component pools
+    to 1 the mission will have two bombs).\r\nIf you create multiple component pools
     like that, the number of extra bombs the mission will have will be the sum of
-    all of them.\r"
+    all of them.\r\n\n[u]Mod API[/u]\nThe mod exposes a public API that can be used
+    by other mods to interoperate with it.\nThe API is exposed through a GameObject
+    named [i]MultipleBombs_Info[/i] that has an [i]IDicionary<string, object>[/i]
+    component. This IDictionary contains keys and values (in this text also called
+    properties) that allow for interoperation with the mod. The full set of keys is
+    described in the table below.\nIf the GameObject does not exist it means that
+    the Multiple Bombs mod is not installed.\nPlease note that the IDictionary is
+    delcared with a generic value type of [i]object[/i] to allow each property to
+    have their own return types. The return type of each property is detailed in the
+    properties table. Make sure to cast the values to the right type and to pass objects
+    of the right type when setting properties.\nAvailable properties:\n[table]\n[tr][th]Key[/th][th]Type[/th][th]Can
+    Set[/th][th]Description[/th][/tr]\n[tr][td]CurrentMaximumBombCount[/td][td]int[/td][td]False[/td][td]Gets
+    the maximum bomb count allowed by the currently installed Gameplay Rooms.[/td][/tr]\n[tr][td]CurrentFreePlayBombCount[/td][td]int[/td][td]True[/td][td]Gets
+    or sets the current bomb count in the Free Play settings.\nNote: This can only
+    be set while in the Setup state.[/td][/tr]\n[/table]\n\nAPI usage example:\n[code]\n//Example
+    method that uses the API to get the current maximum number of bombs\npublic int
+    GetCurrentMaximumBombs()\n{\n\tGameObject multipleBombsAPIGameObject = GameObject.Find(\"MultipleBombs_Info\");\n\tif(multipleBombsAPIGameObject
+    == null) //If the Multiple Bombs mod is not installed\n\t\treturn 1;\n\tIDictionary<string,
+    object> multipleBombsAPI = multipleBombsAPIGameObject.GetComponent<IDictionary<string,
+    object>>();\n\treturn (int)multipleBombsAPI[\"CurrentMaximumBombCount\"];\n}\n[/code]"
   version: 1.2.2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: be95b037aca480441806d4efa6da4ce2, type: 3}
