@@ -137,7 +137,7 @@ namespace MultipleBombsAssembly
 
         public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
         {
-            throw new NotImplementedException("The Contains method is not supported in this Dictionary.");
+            throw new NotImplementedException("The CopyTo method is not supported in this Dictionary.");
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
@@ -157,7 +157,16 @@ namespace MultipleBombsAssembly
 
         public bool TryGetValue(string key, out object value)
         {
-            throw new NotImplementedException("The TryGetValue method is not supported in this Dictionary.");
+            try
+            {
+                value = properties[key].Get();
+                return true;
+            }
+            catch (Exception)
+            {
+                value = null;
+                return false;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
