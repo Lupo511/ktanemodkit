@@ -175,7 +175,12 @@ namespace MultipleBombsAssembly
                 bombsObject.transform.Find("ModuleCountLabel").GetComponent<TextMeshPro>().text = "Bombs";
                 currentFreePlayBombCountLabel = bombsObject.transform.Find("ModuleCountValue").GetComponent<TextMeshPro>();
                 currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
-                bombsObject.transform.Find("ModuleCountLED").gameObject.SetActive(false);
+
+                GameObject moduleLEDShellObject = device.transform.Find("Model").Find("Bot").Find("LEDs").Find("Modules_LED_shell").gameObject;
+                GameObject bombsLEDShellObject = (GameObject)Instantiate(moduleLEDShellObject, moduleLEDShellObject.transform.position, moduleLEDShellObject.transform.rotation, moduleLEDShellObject.transform.parent);
+                bombsLEDShellObject.transform.localPosition = bombsLEDShellObject.transform.localPosition + new Vector3(0, 0f, -0.025f);
+                LED bombsLED = bombsObject.transform.GetComponentInChildren<LED>();
+                bombsLED.SetState(false);
 
                 GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 background.GetComponent<Renderer>().material.color = Color.black;
@@ -209,24 +214,58 @@ namespace MultipleBombsAssembly
                 //string textColor = "#" + valueText.color.r.ToString("x2") + valueText.color.g.ToString("x2") + valueText.color.b.ToString("x2");
                 incrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
                 {
+                    bombsLED.SetState(true);
                     device.Screen.CurrentState = FreeplayScreen.State.Start;
                     device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                 });
                 decrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
                 {
+                    bombsLED.SetState(true);
                     device.Screen.CurrentState = FreeplayScreen.State.Start;
                     device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                 });
 
                 modulesObject.transform.Find("Modules_INCR_btn").GetComponent<Selectable>().OnHighlight = new Action(() =>
                 {
+                    bombsLED.SetState(false);
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
                     device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
                 });
                 modulesObject.transform.Find("Modules_DECR_btn").GetComponent<Selectable>().OnHighlight = new Action(() =>
                 {
+                    bombsLED.SetState(false);
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
                     device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
+                });
+
+                device.TimeDecrement.GetComponent<Selectable>().OnHighlight = new Action(() =>
+                {
+                    bombsLED.SetState(false);
+                    device.Screen.CurrentState = FreeplayScreen.State.Time;
+                });
+
+                device.TimeIncrement.GetComponent<Selectable>().OnHighlight = new Action(() =>
+                {
+                    bombsLED.SetState(false);
+                    device.Screen.CurrentState = FreeplayScreen.State.Time;
+                });
+
+                device.StartButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
+                {
+                    bombsLED.SetState(false);
+                    device.Screen.CurrentState = FreeplayScreen.State.Start;
+                });
+
+                device.NeedyToggle.GetComponent<Selectable>().OnHighlight = new Action(() =>
+                {
+                    bombsLED.SetState(false);
+                    device.Screen.CurrentState = FreeplayScreen.State.Needy;
+                });
+
+                device.HardcoreToggle.GetComponent<Selectable>().OnHighlight = new Action(() =>
+                {
+                    bombsLED.SetState(false);
+                    device.Screen.CurrentState = FreeplayScreen.State.Hardcore;
                 });
 
                 device.StartButton.OnPush = new PushEvent(() =>
