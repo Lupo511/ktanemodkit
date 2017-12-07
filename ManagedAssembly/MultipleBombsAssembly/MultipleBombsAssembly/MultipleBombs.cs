@@ -169,15 +169,28 @@ namespace MultipleBombsAssembly
             else
             {
                 GameObject modulesObject = device.ModuleCountIncrement.transform.parent.gameObject;
-                GameObject bombsObject = (GameObject)Instantiate(modulesObject, modulesObject.transform.position, modulesObject.transform.rotation, modulesObject.transform.parent);
+                GameObject bombsObject = Instantiate(modulesObject, modulesObject.transform.position, modulesObject.transform.rotation, modulesObject.transform.parent);
                 device.ObjectsToDisableOnLidClose.Add(bombsObject);
-                bombsObject.transform.localPosition = modulesObject.transform.localPosition + new Vector3(0, 0f, -0.025f);
+                bombsObject.name = "BombCountSettings";
+                bombsObject.transform.localPosition += new Vector3(0, 0f, -0.025f);
                 bombsObject.transform.Find("ModuleCountLabel").GetComponent<TextMeshPro>().text = "Bombs";
                 currentFreePlayBombCountLabel = bombsObject.transform.Find("ModuleCountValue").GetComponent<TextMeshPro>();
+                currentFreePlayBombCountLabel.gameObject.name = "BombCountLabel";
                 currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
-                bombsObject.transform.Find("ModuleCountLED").gameObject.SetActive(false);
+                GameObject modulesLedShell = modulesObject.transform.parent.Find("LEDs/Modules_LED_shell").gameObject;
+                GameObject bombsLedShell = Instantiate(modulesLedShell, modulesLedShell.transform.position, modulesLedShell.transform.rotation, modulesLedShell.transform.parent);
+                bombsLedShell.name = "Bombs_LED_shell";
+                bombsLedShell.transform.localPosition += new Vector3(0, 0, -0.028f);
+                LED bombsLed = bombsObject.transform.Find("ModuleCountLED").GetComponent<LED>();
+                bombsLed.gameObject.name = "BombCountLed";
+                bombsLed.transform.localPosition += new Vector3(0, 0, 0.003f);
+                bombsLed.transform.Find("Modules_LED_On").gameObject.name = "Bombs_LED_On";
+                bombsLed.transform.Find("Modules_LED_Off").gameObject.name = "Bombs_LED_Off";
+                bombsObject.transform.Find("Modules_INCR_btn_highlight").name = "Bombs_INCR_btn_highlight";
+                bombsObject.transform.Find("Modules_DECR_btn_highlight").name = "Bombs_DECR_btn_highlight";
 
                 GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                background.name = "BombCountBackground";
                 background.GetComponent<Renderer>().material.color = Color.black;
                 background.transform.localScale = new Vector3(0.048f, 0.023f, 0.005f); //Accurate Y would be 0.025
                 background.transform.parent = bombsObject.transform;
@@ -185,7 +198,9 @@ namespace MultipleBombsAssembly
                 background.transform.localEulerAngles = currentFreePlayBombCountLabel.gameObject.transform.localEulerAngles;
 
                 GameObject incrementButton = bombsObject.transform.Find("Modules_INCR_btn").gameObject;
+                incrementButton.name = "Bombs_INCR_btn";
                 GameObject decrementButton = bombsObject.transform.Find("Modules_DECR_btn").gameObject;
+                decrementButton.name = "Bombs_DECR_btn";
                 Selectable deviceSelectable = device.GetComponent<Selectable>();
                 List<Selectable> children = deviceSelectable.Children.ToList();
                 children.Insert(2, incrementButton.GetComponent<Selectable>());
@@ -210,24 +225,33 @@ namespace MultipleBombsAssembly
                 incrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
                 {
                     device.Screen.CurrentState = FreeplayScreen.State.Start;
+                    bombsLed.SetState(true);
                     device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                 });
                 decrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
                 {
                     device.Screen.CurrentState = FreeplayScreen.State.Start;
+                    bombsLed.SetState(true);
                     device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                 });
 
-                modulesObject.transform.Find("Modules_INCR_btn").GetComponent<Selectable>().OnHighlight = new Action(() =>
+                Action disableBomsLed = new Action(() => bombsLed.SetState(false));
+                device.ModuleCountIncrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
                 {
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
                     device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
-                });
-                modulesObject.transform.Find("Modules_DECR_btn").GetComponent<Selectable>().OnHighlight = new Action(() =>
+                }), disableBomsLed);
+                device.ModuleCountIncrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
                 {
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
                     device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
-                });
+                }), disableBomsLed);
+                device.TimeDecrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+                device.TimeIncrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+                device.NeedyToggle.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+                device.HardcoreToggle.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+                device.ModsOnly.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+                device.StartButton.GetComponent<Selectable>().OnHighlight += disableBomsLed;
 
                 device.StartButton.OnPush = new PushEvent(() =>
                 {
