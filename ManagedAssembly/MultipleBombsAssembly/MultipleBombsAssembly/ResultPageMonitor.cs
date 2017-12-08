@@ -16,15 +16,6 @@ namespace MultipleBombsAssembly
         private TMPro.TextAlignmentOptions originalAllignment;
         private bool originalEnableAutosizing;
 
-        protected virtual void Awake()
-        {
-            ResultPage page = GetComponent<ResultPage>();
-            if (page.RetryButton != null)
-            {
-                page.RetryButton.OnInteract += OnRetry;
-            }
-        }
-
         protected virtual void OnEnable()
         {
             if (bombCount >= 2)
@@ -42,21 +33,6 @@ namespace MultipleBombsAssembly
                 page.NumStrikes.alignment = originalAllignment;
                 page.NumStrikes.enableAutoSizing = originalEnableAutosizing;
             }
-        }
-
-        private void OnDestroy()
-        {
-            ResultPage page = GetComponent<ResultPage>();
-            if (page.RetryButton != null)
-            {
-                page.RetryButton.OnInteract -= OnRetry;
-            }
-        }
-
-        private bool OnRetry()
-        {
-            MultipleBombs.SetNextGameplayRoom(bombCount);
-            return false;
         }
 
         private IEnumerator changeTextNextFrame(int bombCount)

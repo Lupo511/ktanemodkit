@@ -20,7 +20,6 @@ namespace MultipleBombsAssembly
         private void Awake()
         {
             page = GetComponent<MissionDetailPage>();
-            page.StartButton.OnInteract += OnStart;
         }
 
         private void OnEnable()
@@ -33,21 +32,6 @@ namespace MultipleBombsAssembly
             StopAllCoroutines();
             page.TextStrikes.alignment = originalAlignment;
             page.TextStrikes.enableAutoSizing = originalEnableAutoSizing;
-        }
-
-        private void OnDestroy()
-        {
-            page.StartButton.OnInteract -= OnStart;
-        }
-
-        private bool OnStart()
-        {
-            Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
-            if (missionList.ContainsKey(currentMission.ID) && missionList[currentMission.ID] <= MultipleBombs.GetCurrentMaximumBombCount())
-            {
-                MultipleBombs.SetNextGameplayRoom(missionList[currentMission.ID]);
-            }
-            return false;
         }
 
         private IEnumerator changeTextNextFrame()

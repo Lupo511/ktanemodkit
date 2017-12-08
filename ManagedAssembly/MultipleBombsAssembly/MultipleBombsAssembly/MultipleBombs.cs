@@ -59,6 +59,21 @@ namespace MultipleBombsAssembly
 
         public void Update()
         {
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                KMMission mission = ScriptableObject.CreateInstance<KMMission>();
+                mission.GeneratorSetting = new KMGeneratorSetting();
+                mission.GeneratorSetting.ComponentPools = new List<KMComponentPool>();
+                KMComponentPool pool = new KMComponentPool();
+                pool.SpecialComponentType = KMComponentPool.SpecialComponentTypeEnum.ALL_SOLVABLE;
+                pool.Count = 11;
+                mission.GeneratorSetting.ComponentPools.Add(pool);
+                KMComponentPool bombsPool = new KMComponentPool();
+                bombsPool.ModTypes = new List<string>() { "Multiple Bombs" };
+                bombsPool.Count = 3;
+                mission.GeneratorSetting.ComponentPools.Add(bombsPool);
+                gameCommands.StartMission(mission, "-1");
+            }
             if (SceneManager.Instance != null)
             {
                 if (SceneManager.Instance.CurrentState == SceneManager.State.Setup)
@@ -253,12 +268,6 @@ namespace MultipleBombsAssembly
                 device.ModsOnly.GetComponent<Selectable>().OnHighlight += disableBomsLed;
                 device.StartButton.GetComponent<Selectable>().OnHighlight += disableBomsLed;
 
-                device.StartButton.OnPush = new PushEvent(() =>
-                {
-                    SetNextGameplayRoom(currentFreePlayBombCount);
-                    device.GetType().GetMethod("StartGame", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(device, null);
-                });
-
                 incrementButton.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.015f, -0.015f, -0.015f);
                 decrementButton.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.015f, -0.015f, -0.015f);
                 device.ModuleCountIncrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.012f, -0.012f, -0.012f);
@@ -329,6 +338,18 @@ namespace MultipleBombsAssembly
             return count;
         }
 
+        private void SceneManager_activeSceneChanged(UnityEngine.SceneManagement.Scene previousScene, UnityEngine.SceneManagement.Scene currentScene)
+        {
+            Debug.Log("[MultipleBombs]Loading new scene");
+            if (currentScene.name == "gameplayScene")
+            {
+                Debug.Log("[MultipleBombs]Initializing gameplay scene");
+
+                Debug.Log("Count: " + currentBombCount);
+                Debug.Log(GameplayState.GameplayRoomPrefabOverride);
+            }
+        }
+
         private IEnumerator setupGameplayStateNextFrame()
         {
             currentBombCount = 1;
@@ -338,11 +359,7 @@ namespace MultipleBombsAssembly
             else if (multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
                 currentBombCount = multipleBombsMissions[GameplayState.MissionToLoad];
             else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
-            {
                 currentBombCount = ProcessMultipleBombsMission(GameplayState.CustomMission, out customMissionBombsPools);
-                if (currentBombCount > 2)
-                    SetNextGameplayRoom(currentBombCount);
-            }
             yield return null;
             Debug.Log("[MultipleBombs]Initializing gameplay state");
 
@@ -358,6 +375,17 @@ namespace MultipleBombsAssembly
             }
 
             Debug.Log("[MultipleBombs]Bombs to spawn: " + currentBombCount);
+
+            if (currentBombCount > 2)
+            {
+                GameplayRoom roomPrefab = GetRandomReplacementGameplayRoom(currentBombCount);
+                if (roomPrefab != null)
+                {
+                    Destroy(SceneManager.Instance.GameplayState.Room.gameObject);
+                    GameObject room = Instantiate(roomPrefab.gameObject, Vector3.zero, Quaternion.identity);
+                    Debug.Log("[MultipleBombs]Room initialized");
+                }
+            }
 
             //Setup results screen
             if (freePlayDefusedPageMonitor == null)
@@ -701,7 +729,7 @@ namespace MultipleBombsAssembly
             }
         }
 
-        internal void SetNextGameplayRoom(int bombs)
+        private GameplayRoom GetRandomReplacementGameplayRoom(int bombs)
         {
             if (bombs > 2)
             {
@@ -716,13 +744,13 @@ namespace MultipleBombsAssembly
                     if (rooms.Count == 0)
                     {
                         Debug.LogError("[MultipleBombs]No room found that supports " + bombs + " bombs");
-                        return;
+                        return null;
                     }
-                    GameplayRoom selectedRoom = rooms[UnityEngine.Random.Range(0, rooms.Count)];
-                    GameplayState.GameplayRoomPrefabOverride = selectedRoom.gameObject;
-                    usingRoomPrefabOverride = true;
+                    return rooms[UnityEngine.Random.Range(0, rooms.Count)];
                 }
+                return null;
             }
+            return null;
         }
 
         public int CurrentFreePlayBombCount
