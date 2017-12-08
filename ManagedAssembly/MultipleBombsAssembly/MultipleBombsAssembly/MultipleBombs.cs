@@ -243,7 +243,7 @@ namespace MultipleBombsAssembly
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
                     device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
                 }), disableBomsLed);
-                device.ModuleCountIncrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
+                device.ModuleCountDecrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
                 {
                     device.Screen.CurrentState = FreeplayScreen.State.Modules;
                     device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
