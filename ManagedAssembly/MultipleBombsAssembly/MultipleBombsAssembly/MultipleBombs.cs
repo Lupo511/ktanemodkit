@@ -418,23 +418,20 @@ namespace MultipleBombsAssembly
             ProcessBombEvents(vanillaBomb);
             Debug.Log("[MultipleBombs]Default bomb initialized");
 
-            GameObject spawn1 = GameObject.Find("MultipleBombs_Spawn_1");
-            if (spawn1 != null)
-            {
-                StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn1.transform.position, spawn1.transform.eulerAngles));
-            }
-            else
-            {
-                StartCoroutine(createNewBomb(GameplayState.MissionToLoad, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
-            }
-
-            for (int i = 2; i < currentBombCount; i++)
+            for (int i = currentBombCount - 1; i >= 1; i--)
             {
                 GameObject spawn = GameObject.Find("MultipleBombs_Spawn_" + i);
                 if (spawn == null)
                 {
-                    Debug.LogError("[MultipleBombs]The current gameplay room doesn't support " + (i + 1) + " bombs");
-                    break;
+                    if (i == 1)
+                    {
+                        StartCoroutine(createNewBomb(GameplayState.MissionToLoad, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
+                    }
+                    else
+                    {
+                        Debug.LogError("[MultipleBombs]The current gameplay room doesn't support " + (i + 1) + " bombs");
+                        break;
+                    }
                 }
                 StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles));
             }
@@ -655,12 +652,23 @@ namespace MultipleBombsAssembly
                 bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
             }
 
-            GameObject roomGO = (GameObject)gameplayState.GetType().GetField("roomGO", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameplayState);
+            GameObject roomGO = (GameObject)gameplayStateRoomGOField.GetValue(gameplayState);
             Selectable mainSelectable = gameplayState.Room.GetComponent<Selectable>();
             List<Selectable> children = mainSelectable.Children.ToList();
-            children.Insert(children.Count - 1, bomb.GetComponent<Selectable>());
-            mainSelectable.Children = children.ToArray();
+            int row = 0;
+            for (int i = mainSelectable.ChildRowLength; i <= children.Count; i += mainSelectable.ChildRowLength)
+            {
+                if (row != gameplayState.Room.BombSpawnPosition.SelectableIndexY)
+                {
+                    children.Insert(i, null);
+                    i++;
+                }
+                row++;
+            }
             mainSelectable.ChildRowLength++;
+            mainSelectable.DefaultSelectableIndex = gameplayState.Room.BombSpawnPosition.SelectableIndexY * mainSelectable.ChildRowLength + gameplayState.Room.BombSpawnPosition.SelectableIndexX;
+            children.Insert(mainSelectable.DefaultSelectableIndex + 1, bomb.GetComponent<Selectable>());
+            mainSelectable.Children = children.ToArray();
             bomb.GetComponent<Selectable>().Parent = mainSelectable;
             KTInputManager.Instance.SelectableManager.ConfigureSelectableAreas(KTInputManager.Instance.RootSelectable);
 
