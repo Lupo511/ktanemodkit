@@ -23,7 +23,8 @@ namespace MultipleBombsAssembly
         private TextMeshPro currentFreePlayBombCountLabel;
         private Dictionary<string, int> multipleBombsMissions;
         private Dictionary<GameplayRoom, int> multipleBombsRooms;
-        private bool usingRoomPrefabOverride;
+        private FieldInfo gameplayStateRoomGOField;
+        private FieldInfo gameplayStateLightBulbField;
         private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private Dictionary<Bomb, BombEvents.BombSolvedEvent> bombSolvedEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentPassEvent> bombComponentPassEvents;
@@ -44,7 +45,8 @@ namespace MultipleBombsAssembly
             currentFreePlayBombCount = 1;
             multipleBombsMissions = new Dictionary<string, int>();
             multipleBombsRooms = new Dictionary<GameplayRoom, int>();
-            usingRoomPrefabOverride = false;
+            gameplayStateRoomGOField = typeof(GameplayState).GetField("roomGO", BindingFlags.Instance | BindingFlags.NonPublic);
+            gameplayStateLightBulbField = typeof(GameplayState).GetField("lightBulb", BindingFlags.Instance | BindingFlags.NonPublic);
             gameInfo = GetComponent<KMGameInfo>();
             gameCommands = GetComponent<KMGameCommands>();
             gameInfo.OnStateChange += onGameStateChanged;
@@ -59,21 +61,6 @@ namespace MultipleBombsAssembly
 
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                KMMission mission = ScriptableObject.CreateInstance<KMMission>();
-                mission.GeneratorSetting = new KMGeneratorSetting();
-                mission.GeneratorSetting.ComponentPools = new List<KMComponentPool>();
-                KMComponentPool pool = new KMComponentPool();
-                pool.SpecialComponentType = KMComponentPool.SpecialComponentTypeEnum.ALL_SOLVABLE;
-                pool.Count = 11;
-                mission.GeneratorSetting.ComponentPools.Add(pool);
-                KMComponentPool bombsPool = new KMComponentPool();
-                bombsPool.ModTypes = new List<string>() { "Multiple Bombs" };
-                bombsPool.Count = 3;
-                mission.GeneratorSetting.ComponentPools.Add(bombsPool);
-                gameCommands.StartMission(mission, "-1");
-            }
             if (SceneManager.Instance != null)
             {
                 if (SceneManager.Instance.CurrentState == SceneManager.State.Setup)
@@ -338,18 +325,6 @@ namespace MultipleBombsAssembly
             return count;
         }
 
-        private void SceneManager_activeSceneChanged(UnityEngine.SceneManagement.Scene previousScene, UnityEngine.SceneManagement.Scene currentScene)
-        {
-            Debug.Log("[MultipleBombs]Loading new scene");
-            if (currentScene.name == "gameplayScene")
-            {
-                Debug.Log("[MultipleBombs]Initializing gameplay scene");
-
-                Debug.Log("Count: " + currentBombCount);
-                Debug.Log(GameplayState.GameplayRoomPrefabOverride);
-            }
-        }
-
         private IEnumerator setupGameplayStateNextFrame()
         {
             currentBombCount = 1;
@@ -360,32 +335,32 @@ namespace MultipleBombsAssembly
                 currentBombCount = multipleBombsMissions[GameplayState.MissionToLoad];
             else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
                 currentBombCount = ProcessMultipleBombsMission(GameplayState.CustomMission, out customMissionBombsPools);
+
+            if (currentBombCount > 2 && GameplayState.GameplayRoomPrefabOverride == null)
+            {
+                Debug.Log("[MultipleBombs]Initializing room");
+                GameplayRoom roomPrefab = GetRandomGameplayRoom(currentBombCount);
+                if (roomPrefab != null)
+                {
+                    Destroy((GameObject)gameplayStateRoomGOField.GetValue(SceneManager.Instance.GameplayState));
+                    GameObject room = Instantiate(roomPrefab.gameObject, Vector3.zero, Quaternion.identity);
+                    room.transform.parent = SceneManager.Instance.GameplayState.transform;
+                    room.transform.localScale = Vector3.one;
+                    gameplayStateRoomGOField.SetValue(SceneManager.Instance.GameplayState, room);
+                    gameplayStateLightBulbField.SetValue(SceneManager.Instance.GameplayState, GameObject.Find("LightBulb"));
+                    room.SetActive(false);
+                    FindObjectOfType<BombGenerator>().BombPrefabOverride = room.GetComponent<GameplayRoom>().BombPrefabOverride;
+                    Debug.Log("[MultipleBombs]Room initialized");
+                }
+                else
+                {
+                    Debug.Log("[MultipleBombs]No room found that supports " + currentBombCount + " bombs");
+                }
+            }
             yield return null;
             Debug.Log("[MultipleBombs]Initializing gameplay state");
 
-            if (usingRoomPrefabOverride)
-            {
-                ModGameplayRoom room = (ModGameplayRoom)SceneManager.Instance.GameplayState.Room;
-                room.CopySettingsFromProxy();
-                SceneManager.Instance.GameplayState.Bomb.GetComponent<FloatingHoldable>().HoldableTarget = room.BombSpawnPosition.HoldableTarget;
-                room.MainMenu.FloatingHoldable.HoldableTarget = room.DossierSpawn.HoldableTarget;
-                FindObjectOfType<AlarmClock>().GetComponent<FloatingHoldable>().HoldableTarget = room.AlarmClockSpawn.HoldableTarget;
-                GameplayState.GameplayRoomPrefabOverride = null;
-                usingRoomPrefabOverride = false;
-            }
-
             Debug.Log("[MultipleBombs]Bombs to spawn: " + currentBombCount);
-
-            if (currentBombCount > 2)
-            {
-                GameplayRoom roomPrefab = GetRandomReplacementGameplayRoom(currentBombCount);
-                if (roomPrefab != null)
-                {
-                    Destroy(SceneManager.Instance.GameplayState.Room.gameObject);
-                    GameObject room = Instantiate(roomPrefab.gameObject, Vector3.zero, Quaternion.identity);
-                    Debug.Log("[MultipleBombs]Room initialized");
-                }
-            }
 
             //Setup results screen
             if (freePlayDefusedPageMonitor == null)
@@ -729,26 +704,19 @@ namespace MultipleBombsAssembly
             }
         }
 
-        private GameplayRoom GetRandomReplacementGameplayRoom(int bombs)
+        private GameplayRoom GetRandomGameplayRoom(int bombs)
         {
             if (bombs > 2)
             {
-                if (GameplayState.GameplayRoomPrefabOverride == null)
+                List<GameplayRoom> rooms = new List<GameplayRoom>();
+                foreach (KeyValuePair<GameplayRoom, int> room in multipleBombsRooms)
                 {
-                    List<GameplayRoom> rooms = new List<GameplayRoom>();
-                    foreach (KeyValuePair<GameplayRoom, int> room in multipleBombsRooms)
-                    {
-                        if (room.Value >= bombs)
-                            rooms.Add(room.Key);
-                    }
-                    if (rooms.Count == 0)
-                    {
-                        Debug.LogError("[MultipleBombs]No room found that supports " + bombs + " bombs");
-                        return null;
-                    }
-                    return rooms[UnityEngine.Random.Range(0, rooms.Count)];
+                    if (room.Value >= bombs)
+                        rooms.Add(room.Key);
                 }
-                return null;
+                if (rooms.Count == 0)
+                    return null;
+                return rooms[UnityEngine.Random.Range(0, rooms.Count)];
             }
             return null;
         }
