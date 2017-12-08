@@ -49,9 +49,9 @@ MonoBehaviour:
     described in the table below.\nIf the GameObject does not exist it means that
     the Multiple Bombs mod is not installed.\nPlease note that the IDictionary is
     delcared with a generic value type of [i]object[/i] to allow each property to
-    have their own return types. The return type of each property is detailed in the
-    properties table. Make sure to cast the values to the right type and to pass objects
-    of the right type when setting properties.\nAvailable properties:\n[table]\n[tr][th]Key[/th][th]Type[/th][th]Can
+    have their own types. The type of each property is detailed in the properties
+    table. Make sure to cast the values to the right type and to pass objects of the
+    right type when setting properties.\nAvailable properties:\n[table]\n[tr][th]Key[/th][th]Type[/th][th]Can
     Set[/th][th]Description[/th][/tr]\n[tr][td]CurrentMaximumBombCount[/td][td]int[/td][td]False[/td][td]Gets
     the maximum bomb count allowed by the currently installed Gameplay Rooms.[/td][/tr]\n[tr][td]CurrentFreePlayBombCount[/td][td]int[/td][td]True[/td][td]Gets
     or sets the current bomb count in the Free Play settings.\nNote: This can only
