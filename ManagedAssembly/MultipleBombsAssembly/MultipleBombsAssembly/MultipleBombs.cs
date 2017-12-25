@@ -433,7 +433,10 @@ namespace MultipleBombsAssembly
                         break;
                     }
                 }
-                StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles));
+                else
+                {
+                    StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles));
+                }
             }
 
             if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
@@ -473,7 +476,6 @@ namespace MultipleBombsAssembly
                     redirectedInfos.Add(info, bomb);
                 }
             }
-            Debug.Log("[MultipleBombs]KMBombInfos redirected");
         }
 
         private void ProcessBombEvents(Bomb bomb)
@@ -563,7 +565,8 @@ namespace MultipleBombsAssembly
                 {
                     if (infos.Value == source.Bomb)
                     {
-                        infos.Key.OnBombSolved();
+                        if (infos.Key.OnBombSolved != null)
+                            infos.Key.OnBombSolved();
                     }
                 }
                 if (bombSolvedEvents.ContainsKey(source.Bomb) && bombSolvedEvents[source.Bomb] != null)
@@ -676,6 +679,7 @@ namespace MultipleBombsAssembly
             bomb.GetTimer().LightGlow.enabled = false;
 
             RedirectPresentBombInfos(bomb);
+            Debug.Log("[MultipleBombs]KMBombInfos redirected");
             ProcessBombEvents(bomb);
 
             Debug.Log("[MultipleBombs]Bomb generated");
