@@ -514,14 +514,18 @@ namespace MultipleBombsAssembly
             }
             if (RecordManager.Instance.GetCurrentRecord().Result == GameResultEnum.ExplodedDueToStrikes)
             {
-                float timeElapsed = 0;
+                float timeElapsed = -1;
                 foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
                 {
-                    float bombTime = bomb.GetTimer().TimeElapsed;
-                    if (bombTime > timeElapsed)
-                        timeElapsed = bombTime;
+                    if (!bomb.IsSolved())
+                    {
+                        float bombTime = bomb.GetTimer().TimeElapsed;
+                        if (bombTime > timeElapsed)
+                            timeElapsed = bombTime;
+                    }
                 }
-                RecordManager.Instance.SetResult(GameResultEnum.ExplodedDueToStrikes, timeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
+                if (timeElapsed != -1)
+                    RecordManager.Instance.SetResult(GameResultEnum.ExplodedDueToStrikes, timeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
             }
         }
 
