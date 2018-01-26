@@ -25,7 +25,6 @@ namespace MultipleBombsAssembly
         private Dictionary<GameplayRoom, int> multipleBombsRooms;
         private FieldInfo gameplayStateRoomGOField;
         private FieldInfo gameplayStateLightBulbField;
-        private Dictionary<KMBombInfo, Bomb> redirectedInfos;
         private Dictionary<Bomb, BombEvents.BombSolvedEvent> bombSolvedEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentPassEvent> bombComponentPassEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent> bombComponentStrikeEvents;
@@ -135,31 +134,27 @@ namespace MultipleBombsAssembly
             if (state == KMGameInfo.State.Gameplay)
             {
                 if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad) || GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
-                    StartCoroutine(setupGameplayStateNextFrame());
+                    StartCoroutine(setupGameplayState());
             }
             else
             {
-                if (currentBombCount > 1)
-                {
-                    Debug.Log("[MultipleBombs]Cleaning up");
-                    StopAllCoroutines();
-                    currentBombCount = 1;
-                    redirectedInfos = null;
-                    bombSolvedEvents = null;
-                    bombComponentPassEvents = null;
-                    bombComponentStrikeEvents = null;
-                    BombEvents.OnBombDetonated -= onBombDetonated;
-                    BombComponentEvents.OnComponentPass -= onComponentPassEvent;
-                    BombComponentEvents.OnComponentStrike -= onComponentStrikeEvent;
-                }
+                Debug.Log("[MultipleBombs]Cleaning up");
+                StopAllCoroutines();
+                currentBombCount = 1;
+                bombSolvedEvents = null;
+                bombComponentPassEvents = null;
+                bombComponentStrikeEvents = null;
+                BombEvents.OnBombDetonated -= onBombDetonated;
+                BombComponentEvents.OnComponentPass -= onComponentPassEvent;
+                BombComponentEvents.OnComponentStrike -= onComponentStrikeEvent;
                 if (state == KMGameInfo.State.Setup)
                 {
-                    StartCoroutine(setupSetupRoomNextFrame());
+                    StartCoroutine(setupSetupRoom());
                 }
             }
         }
 
-        private IEnumerator setupSetupRoomNextFrame()
+        private IEnumerator setupSetupRoom()
         {
             yield return null;
             Debug.Log("[MultipleBombs]Adding FreePlay option");
@@ -325,7 +320,7 @@ namespace MultipleBombsAssembly
             return count;
         }
 
-        private IEnumerator setupGameplayStateNextFrame()
+        private IEnumerator setupGameplayState()
         {
             currentBombCount = 1;
             List<ComponentPool> customMissionBombsPools = null;
@@ -357,10 +352,19 @@ namespace MultipleBombsAssembly
                     Debug.Log("[MultipleBombs]No room found that supports " + currentBombCount + " bombs");
                 }
             }
-            yield return null;
-            Debug.Log("[MultipleBombs]Initializing gameplay state");
 
-            Debug.Log("[MultipleBombs]Bombs to spawn: " + currentBombCount);
+            BombInfoRedirection.SetBombCount(currentBombCount);
+            if (bombSolvedEvents == null)
+                bombSolvedEvents = new Dictionary<Bomb, BombEvents.BombSolvedEvent>();
+            if (bombComponentPassEvents == null)
+                bombComponentPassEvents = new Dictionary<Bomb, BombComponentEvents.ComponentPassEvent>();
+            if (bombComponentStrikeEvents == null)
+                bombComponentStrikeEvents = new Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent>();
+
+            BombEvents.OnBombDetonated += onBombDetonated;
+            BombComponentEvents.OnComponentPass += onComponentPassEvent;
+            BombComponentEvents.OnComponentStrike += onComponentStrikeEvent;
+            Debug.Log("[MultipleBombs]Events initialized");
 
             //Setup results screen
             if (freePlayDefusedPageMonitor == null)
@@ -388,6 +392,11 @@ namespace MultipleBombsAssembly
             missionDefusedPageMonitor.SetBombCount(currentBombCount);
             missionExplodedPageMonitor.SetBombCount(currentBombCount);
             Debug.Log("[MultipleBombs]Result screens initialized");
+            yield return null;
+            Debug.Log("[MultipleBombs]Initializing gameplay state");
+
+            Debug.Log("[MultipleBombs]Bombs to spawn: " + currentBombCount);
+
             if (currentBombCount == 1)
             {
                 if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
@@ -395,11 +404,7 @@ namespace MultipleBombsAssembly
                 yield break;
             }
 
-            redirectedInfos = new Dictionary<KMBombInfo, Bomb>();
-            BombInfoRedirection.SetBombCount(currentBombCount);
-            bombSolvedEvents = new Dictionary<Bomb, BombEvents.BombSolvedEvent>();
-            bombComponentPassEvents = new Dictionary<Bomb, BombComponentEvents.ComponentPassEvent>();
-            bombComponentStrikeEvents = new Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent>();
+            List<KMBombInfo> redirectedBombInfos = new List<KMBombInfo>();
 
             Bomb vanillaBomb = FindObjectOfType<Bomb>();
             GameObject spawn0 = GameObject.Find("MultipleBombs_Spawn_0");
@@ -414,8 +419,8 @@ namespace MultipleBombsAssembly
                 vanillaBomb.gameObject.transform.eulerAngles += new Vector3(0, -30, 0);
             }
             vanillaBomb.GetComponent<FloatingHoldable>().Initialize();
-            RedirectPresentBombInfos(vanillaBomb);
-            ProcessBombEvents(vanillaBomb);
+            redirectPresentBombInfos(vanillaBomb, redirectedBombInfos);
+            processBombEvents(vanillaBomb);
             Debug.Log("[MultipleBombs]Default bomb initialized");
 
             for (int i = currentBombCount - 1; i >= 1; i--)
@@ -425,7 +430,7 @@ namespace MultipleBombsAssembly
                 {
                     if (i == 1)
                     {
-                        StartCoroutine(createNewBomb(GameplayState.MissionToLoad, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0)));
+                        StartCoroutine(createNewBomb(GameplayState.MissionToLoad, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0), redirectedBombInfos));
                     }
                     else
                     {
@@ -435,7 +440,7 @@ namespace MultipleBombsAssembly
                 }
                 else
                 {
-                    StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles));
+                    StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles, redirectedBombInfos));
                 }
             }
 
@@ -453,17 +458,179 @@ namespace MultipleBombsAssembly
                     bomb.GetTimer().TimerTick = (TimerComponent.TimerTickEvent)Delegate.Combine(bomb.GetTimer().TimerTick, new TimerComponent.TimerTickEvent((elapsed, remaining) => monitor.OnBombTimerTick(bomb, elapsed, remaining)));
             }
             Debug.Log("[MultipleBombs]Pacing events initalized");
-
-            BombEvents.OnBombDetonated += onBombDetonated;
-            BombComponentEvents.OnComponentPass += onComponentPassEvent;
-            BombComponentEvents.OnComponentStrike += onComponentStrikeEvent;
         }
 
-        private void RedirectPresentBombInfos(Bomb bomb)
+        private bool onComponentPass(BombComponent source)
         {
+            Debug.Log("[MultipleBombs]A component was solved");
+            if (source.Bomb.HasDetonated)
+                return false;
+            RecordManager.Instance.RecordModulePass();
+            if (source.Bomb.IsSolved())
+            {
+                Debug.Log("[MultipleBombs]A bomb was solved (A winner is you!!)");
+                source.Bomb.GetTimer().StopTimer();
+                source.Bomb.GetTimer().Blink(1.5f);
+                DarkTonic.MasterAudio.MasterAudio.PlaySound3DAtTransformAndForget("bomb_defused", source.Bomb.transform, 1f, null, 0f, null);
+                if (BombEvents.OnBombSolved != null)
+                    BombEvents.OnBombSolved();
+                if (bombSolvedEvents.ContainsKey(source.Bomb) && bombSolvedEvents[source.Bomb] != null)
+                    bombSolvedEvents[source.Bomb].Invoke();
+                SceneManager.Instance.GameplayState.OnBombSolved();
+                foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
+                    if (!bomb.IsSolved())
+                        return true;
+                Debug.Log("[MultipleBombs]All bombs solved, what a winner!");
+                RecordManager.Instance.SetResult(GameResultEnum.Defused, source.Bomb.GetTimer().TimeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
+                return true;
+            }
+            return false;
+        }
+
+        private void onComponentPassEvent(BombComponent component, bool finalPass)
+        {
+            if (bombComponentPassEvents.ContainsKey(component.Bomb) && bombComponentPassEvents[component.Bomb] != null)
+                bombComponentPassEvents[component.Bomb].Invoke(component, finalPass);
+        }
+
+        private void onComponentStrikeEvent(BombComponent component, bool finalStrike)
+        {
+            GameRecord currentRecord = RecordManager.Instance.GetCurrentRecord();
+            if (!finalStrike && currentRecord.GetStrikeCount() == currentRecord.Strikes.Length)
+            {
+                List<StrikeSource> strikes = currentRecord.Strikes.ToList();
+                strikes.Add(null);
+                currentRecord.Strikes = strikes.ToArray();
+            }
+            if (bombComponentStrikeEvents.ContainsKey(component.Bomb) && bombComponentStrikeEvents[component.Bomb] != null)
+                bombComponentStrikeEvents[component.Bomb].Invoke(component, finalStrike);
+        }
+
+        private void onBombDetonated()
+        {
+            foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
+            {
+                bomb.GetTimer().StopTimer();
+            }
+            if (RecordManager.Instance.GetCurrentRecord().Result == GameResultEnum.ExplodedDueToStrikes)
+            {
+                float timeElapsed = 0;
+                foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
+                {
+                    float bombTime = bomb.GetTimer().TimeElapsed;
+                    if (bombTime > timeElapsed)
+                        timeElapsed = bombTime;
+                }
+                RecordManager.Instance.SetResult(GameResultEnum.ExplodedDueToStrikes, timeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
+            }
+        }
+
+        private IEnumerator createNewBomb(string missionId, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> redirectedBombInfos)
+        {
+            Debug.Log("[MultipleBombs]Generating new bomb");
+
+            GameplayState gameplayState = SceneManager.Instance.GameplayState;
+
+            Bomb bomb = createBomb(missionId, position, eulerAngles, redirectedBombInfos);
+
+            GameObject roomGO = (GameObject)gameplayStateRoomGOField.GetValue(gameplayState);
+            Selectable mainSelectable = gameplayState.Room.GetComponent<Selectable>();
+            List<Selectable> children = mainSelectable.Children.ToList();
+            int row = 0;
+            for (int i = mainSelectable.ChildRowLength; i <= children.Count; i += mainSelectable.ChildRowLength)
+            {
+                if (row != gameplayState.Room.BombSpawnPosition.SelectableIndexY)
+                {
+                    children.Insert(i, null);
+                    i++;
+                }
+                row++;
+            }
+            mainSelectable.ChildRowLength++;
+            mainSelectable.DefaultSelectableIndex = gameplayState.Room.BombSpawnPosition.SelectableIndexY * mainSelectable.ChildRowLength + gameplayState.Room.BombSpawnPosition.SelectableIndexX;
+            children.Insert(mainSelectable.DefaultSelectableIndex + 1, bomb.GetComponent<Selectable>());
+            mainSelectable.Children = children.ToArray();
+            bomb.GetComponent<Selectable>().Parent = mainSelectable;
+            KTInputManager.Instance.SelectableManager.ConfigureSelectableAreas(KTInputManager.Instance.RootSelectable);
+
+            Debug.Log("[MultipleBombs]Bomb generated");
+            yield return new WaitForSeconds(2f);
+
+            Debug.Log("[MultipleBombs]Activating custom bomb timer");
+            bomb.GetTimer().text.gameObject.SetActive(true);
+            bomb.GetTimer().LightGlow.enabled = true;
+            Debug.Log("[MultipleBombs]Custom bomb timer activated");
+        }
+
+        private Bomb createBomb(string missionId, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> knownBombInfos)
+        {
+            if (bombSolvedEvents == null)
+                bombSolvedEvents = new Dictionary<Bomb, BombEvents.BombSolvedEvent>();
+            if (bombComponentPassEvents == null)
+                bombComponentPassEvents = new Dictionary<Bomb, BombComponentEvents.ComponentPassEvent>();
+            if (bombComponentStrikeEvents == null)
+                bombComponentStrikeEvents = new Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent>();
+
+            Debug.Log("[MultipleBombs]Creating new bomb");
+
+            if (knownBombInfos == null)
+            {
+                knownBombInfos = new List<KMBombInfo>();
+                foreach (KMBombInfo info in FindObjectsOfType<KMBombInfo>())
+                {
+                    knownBombInfos.Add(info);
+                }
+            }
+
+            GameObject spawnPointGO = new GameObject("CustomBombSpawnPoint");
+            spawnPointGO.transform.position = position;
+            spawnPointGO.transform.eulerAngles = eulerAngles;
+            HoldableSpawnPoint spawnPoint = spawnPointGO.AddComponent<HoldableSpawnPoint>();
+            spawnPoint.HoldableTarget = SceneManager.Instance.GameplayState.Room.BombSpawnPosition.HoldableTarget;
+
+            Bomb bomb = null;
+            if (missionId == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+            {
+                Mission freeplayMission = FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings);
+                MissionManager.Instance.MissionDB.AddMission(freeplayMission);
+                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
+                MissionManager.Instance.MissionDB.Missions.Remove(freeplayMission);
+            }
+            else if (missionId == ModMission.CUSTOM_MISSION_ID)
+            {
+                Mission customMission = SceneManager.Instance.GameplayState.Mission;
+                string oldName = customMission.name;
+                customMission.name = ModMission.CUSTOM_MISSION_ID;
+                MissionManager.Instance.MissionDB.AddMission(customMission);
+                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
+                MissionManager.Instance.MissionDB.Missions.Remove(customMission);
+                customMission.name = oldName;
+            }
+            else
+            {
+                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
+            }
+            Debug.Log("[MultipleBombs]Bomb spawned");
+
+            bomb.GetTimer().text.gameObject.SetActive(false);
+            bomb.GetTimer().LightGlow.enabled = false;
+            Debug.Log("[MultipleBombs]Timer deactivated");
+
+            redirectPresentBombInfos(bomb, knownBombInfos);
+            Debug.Log("[MultipleBombs]KMBombInfos redirected");
+
+            processBombEvents(bomb);
+            Debug.Log("[MultipleBombs]Bomb created");
+            return bomb;
+        }
+
+        private void redirectPresentBombInfos(Bomb bomb, List<KMBombInfo> knownBombInfos)
+        {
+            if (knownBombInfos == null)
+                knownBombInfos = new List<KMBombInfo>();
             foreach (KMBombInfo info in FindObjectsOfType<KMBombInfo>())
             {
-                if (!redirectedInfos.ContainsKey(info))
+                if (!knownBombInfos.Contains(info))
                 {
                     info.TimeHandler = new KMBombInfo.GetTimeHandler(() => BombInfoRedirection.GetTime(bomb));
                     info.FormattedTimeHandler = new KMBombInfo.GetFormattedTimeHandler(() => BombInfoRedirection.GetFormattedTime(bomb));
@@ -473,12 +640,24 @@ namespace MultipleBombsAssembly
                     info.SolvedModuleNamesHandler = new KMBombInfo.GetSolvedModuleNamesHandler(() => BombInfoRedirection.GetSolvedModuleNames(bomb));
                     info.WidgetQueryResponsesHandler = new KMBombInfo.GetWidgetQueryResponsesHandler((string queryKey, string queryInfo) => BombInfoRedirection.GetWidgetQueryResponses(bomb, queryKey, queryInfo));
                     info.IsBombPresentHandler = new KMBombInfo.KMIsBombPresent(() => BombInfoRedirection.IsBombPresent(bomb));
-                    redirectedInfos.Add(info, bomb);
+                    ModBombInfo modInfo = info.GetComponent<ModBombInfo>();
+                    foreach (BombEvents.BombSolvedEvent bombSolvedDelegate in BombEvents.OnBombSolved.GetInvocationList())
+                    {
+                        if (bombSolvedDelegate.Target != null && ReferenceEquals(bombSolvedDelegate.Target, modInfo))
+                        {
+                            if (bombSolvedEvents.ContainsKey(bomb))
+                                bombSolvedEvents[bomb] += bombSolvedDelegate;
+                            else
+                                bombSolvedEvents.Add(bomb, bombSolvedDelegate);
+                            break;
+                        }
+                    }
+                    knownBombInfos.Add(info);
                 }
             }
         }
 
-        private void ProcessBombEvents(Bomb bomb)
+        private void processBombEvents(Bomb bomb)
         {
             List<Delegate> bombSolvedDelegates = BombEvents.OnBombSolved.GetInvocationList().ToList();
             for (int i = bombSolvedDelegates.Count - 1; i >= 0; i--)
@@ -545,150 +724,6 @@ namespace MultipleBombsAssembly
                     }
                 }
             }
-        }
-
-        private bool onComponentPass(BombComponent source)
-        {
-            Debug.Log("[MultipleBombs]A component was solved");
-            if (source.Bomb.HasDetonated)
-                return false;
-            RecordManager.Instance.RecordModulePass();
-            if (source.Bomb.IsSolved())
-            {
-                Debug.Log("[MultipleBombs]A bomb was solved (A winner is you!!)");
-                source.Bomb.GetTimer().StopTimer();
-                source.Bomb.GetTimer().Blink(1.5f);
-                DarkTonic.MasterAudio.MasterAudio.PlaySound3DAtTransformAndForget("bomb_defused", source.Bomb.transform, 1f, null, 0f, null);
-                if (BombEvents.OnBombSolved != null)
-                    BombEvents.OnBombSolved();
-                foreach (KeyValuePair<KMBombInfo, Bomb> infos in redirectedInfos)
-                {
-                    if (infos.Value == source.Bomb)
-                    {
-                        if (infos.Key.OnBombSolved != null)
-                            infos.Key.OnBombSolved();
-                    }
-                }
-                if (bombSolvedEvents.ContainsKey(source.Bomb) && bombSolvedEvents[source.Bomb] != null)
-                    bombSolvedEvents[source.Bomb].Invoke();
-                SceneManager.Instance.GameplayState.OnBombSolved();
-                foreach (Bomb bomb in FindObjectsOfType<Bomb>())
-                    if (!bomb.IsSolved())
-                        return true;
-                Debug.Log("[MultipleBombs]All bombs solved, what a winner!");
-                RecordManager.Instance.SetResult(GameResultEnum.Defused, source.Bomb.GetTimer().TimeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
-                return true;
-            }
-            return false;
-        }
-
-        private void onComponentPassEvent(BombComponent component, bool finalPass)
-        {
-            if (bombComponentPassEvents.ContainsKey(component.Bomb) && bombComponentPassEvents[component.Bomb] != null)
-                bombComponentPassEvents[component.Bomb].Invoke(component, finalPass);
-        }
-
-        private void onComponentStrikeEvent(BombComponent component, bool finalStrike)
-        {
-            GameRecord currentRecord = RecordManager.Instance.GetCurrentRecord();
-            if (!finalStrike && currentRecord.GetStrikeCount() == currentRecord.Strikes.Length)
-            {
-                List<StrikeSource> strikes = currentRecord.Strikes.ToList();
-                strikes.Add(null);
-                currentRecord.Strikes = strikes.ToArray();
-            }
-            if (bombComponentStrikeEvents.ContainsKey(component.Bomb) && bombComponentStrikeEvents[component.Bomb] != null)
-                bombComponentStrikeEvents[component.Bomb].Invoke(component, finalStrike);
-        }
-
-        private void onBombDetonated()
-        {
-            foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
-            {
-                bomb.GetTimer().StopTimer();
-            }
-            if (RecordManager.Instance.GetCurrentRecord().Result == GameResultEnum.ExplodedDueToStrikes)
-            {
-                float timeElapsed = 0;
-                foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
-                {
-                    float bombTime = bomb.GetTimer().TimeElapsed;
-                    if (bombTime > timeElapsed)
-                        timeElapsed = bombTime;
-                }
-                RecordManager.Instance.SetResult(GameResultEnum.ExplodedDueToStrikes, timeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
-            }
-        }
-
-        private IEnumerator createNewBomb(string missionId, Vector3 position, Vector3 eulerAngles)
-        {
-            Debug.Log("[MultipleBombs]Generating new bomb");
-
-            GameplayState gameplayState = SceneManager.Instance.GameplayState;
-
-            GameObject spawnPointGO = new GameObject("CustomBombSpawnPoint");
-            spawnPointGO.transform.position = position;
-            spawnPointGO.transform.eulerAngles = eulerAngles;
-            HoldableSpawnPoint spawnPoint = spawnPointGO.AddComponent<HoldableSpawnPoint>();
-            spawnPoint.HoldableTarget = gameplayState.Room.BombSpawnPosition.HoldableTarget;
-
-            Bomb bomb = null;
-            if (missionId == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
-            {
-                Mission freeplayMission = FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings);
-                MissionManager.Instance.MissionDB.AddMission(freeplayMission);
-                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
-                MissionManager.Instance.MissionDB.Missions.Remove(freeplayMission);
-            }
-            else if (missionId == ModMission.CUSTOM_MISSION_ID)
-            {
-                Mission customMission = gameplayState.Mission;
-                string oldName = customMission.name;
-                customMission.name = ModMission.CUSTOM_MISSION_ID;
-                MissionManager.Instance.MissionDB.AddMission(customMission);
-                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
-                MissionManager.Instance.MissionDB.Missions.Remove(customMission);
-                customMission.name = oldName;
-            }
-            else
-            {
-                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
-            }
-
-            GameObject roomGO = (GameObject)gameplayStateRoomGOField.GetValue(gameplayState);
-            Selectable mainSelectable = gameplayState.Room.GetComponent<Selectable>();
-            List<Selectable> children = mainSelectable.Children.ToList();
-            int row = 0;
-            for (int i = mainSelectable.ChildRowLength; i <= children.Count; i += mainSelectable.ChildRowLength)
-            {
-                if (row != gameplayState.Room.BombSpawnPosition.SelectableIndexY)
-                {
-                    children.Insert(i, null);
-                    i++;
-                }
-                row++;
-            }
-            mainSelectable.ChildRowLength++;
-            mainSelectable.DefaultSelectableIndex = gameplayState.Room.BombSpawnPosition.SelectableIndexY * mainSelectable.ChildRowLength + gameplayState.Room.BombSpawnPosition.SelectableIndexX;
-            children.Insert(mainSelectable.DefaultSelectableIndex + 1, bomb.GetComponent<Selectable>());
-            mainSelectable.Children = children.ToArray();
-            bomb.GetComponent<Selectable>().Parent = mainSelectable;
-            KTInputManager.Instance.SelectableManager.ConfigureSelectableAreas(KTInputManager.Instance.RootSelectable);
-
-            bomb.GetTimer().text.gameObject.SetActive(false);
-            bomb.GetTimer().LightGlow.enabled = false;
-
-            RedirectPresentBombInfos(bomb);
-            Debug.Log("[MultipleBombs]KMBombInfos redirected");
-            ProcessBombEvents(bomb);
-
-            Debug.Log("[MultipleBombs]Bomb generated");
-            yield return new WaitForSeconds(2f);
-
-            Debug.Log("[MultipleBombs]Activating custom bomb timer");
-            bomb.GetTimer().text.gameObject.SetActive(true);
-            bomb.GetTimer().LightGlow.enabled = true;
-            Debug.Log("[MultipleBombs]Custom bomb timer activated");
         }
 
         public int GetCurrentMaximumBombCount()
