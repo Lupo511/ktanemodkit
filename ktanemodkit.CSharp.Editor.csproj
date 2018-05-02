@@ -115,14 +115,14 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>Library\UnityAssemblies\SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="EnglishTestCode">
+      <HintPath>Assets\Plugins\Managed\EnglishTestCode.dll</HintPath>
+    </Reference>
     <Reference Include="KMFramework">
       <HintPath>Assets\Plugins\Managed\KMFramework.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Assets\Plugins\Managed\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="EnglishTestCode">
-      <HintPath>Assets\Plugins\Managed\EnglishTestCode.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -219,7 +219,6 @@
     <Compile Include="Assets\Editor\Steamworks.NET\types\SteamUserStats\SteamLeaderboardEntries_t.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\EnglishTest\Unlit.shader" />
     <None Include="Assets\Examples\Assets\Shaders\BlendTwoTexturesLitAndUnlit.shader" />
     <None Include="Assets\Examples\Assets\Shaders\BlendTwoTexturesLitAndUnlitVertexColor.shader" />
     <None Include="Assets\Examples\Assets\Shaders\BlendTwoTexturesUnlit.shader" />

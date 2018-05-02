@@ -93,7 +93,6 @@
     <Compile Include="Assets\TestHarness\TestSelectableArea.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\EnglishTest\Unlit.shader" />
     <None Include="Assets\Examples\Assets\Shaders\BlendTwoTexturesLitAndUnlit.shader" />
     <None Include="Assets\Examples\Assets\Shaders\BlendTwoTexturesLitAndUnlitVertexColor.shader" />
     <None Include="Assets\Examples\Assets\Shaders\BlendTwoTexturesUnlit.shader" />
