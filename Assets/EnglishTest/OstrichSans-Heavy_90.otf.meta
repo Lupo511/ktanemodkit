@@ -4,17 +4,18 @@ timeCreated: 1464546457
 licenseType: Pro
 TrueTypeFontImporter:
   serializedVersion: 4
-  fontSize: 1
-  forceTextureCase: -2
+  fontSize: 60
+  forceTextureCase: 3
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
+  fontName: Ostrich Sans
   fontNames:
   - Ostrich Sans
   fallbackFontReferences: []
-  customCharacters: 
+  customCharacters: SUBMIT
   fontRenderingMode: 0
   ascentCalculationMode: 1
   userData: 
-  assetBundleName: mod.bundle
+  assetBundleName: 
   assetBundleVariant: 
