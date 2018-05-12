@@ -21,6 +21,6 @@ MonoBehaviour:
     the following pages:\r\n[list]\r\n[*]Module: [url=http://codepen.io/thefizzynator/full/ALzzjQ/]http://codepen.io/thefizzynator/full/ALzzjQ/[/url]\r\n[*]Grammar
     Appendix: [url=http://codepen.io/thefizzynator/full/NRmkKZ/]http://codepen.io/thefizzynator/full/NRmkKZ/[/url]\r\n[/list]\r\n\r\n[h1]Module
     Type Name[/h1]\r\nThe Module Type Name is EnglishTest."
-  version: 1.06
+  version: 1.07
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 9bb22c930a17c794d9c52b914d5a8ddd, type: 3}
