@@ -355,4 +355,42 @@ public class EnglishTestModule : MonoBehaviour
             return optionsText;
         }
     }
+
+#pragma warning disable 414
+	private string TwitchHelpMessage = "Answer the displayed question with !{0} submit 2 or !{0} answer 2. (Answers are numbered from 1-4 starting from left to right.)";
+#pragma warning restore 414
+
+	private IEnumerator ProcessTwitchCommand(string command)
+	{
+		string[] split = command.ToLowerInvariant().Trim().Split(' ');
+		if (split.Length != 2 || !(split[0] == "submit" || split[0] == "answer"))
+		{
+			yield break;
+		}
+
+		if (!int.TryParse(split[1], out int desiredIndex) || desiredIndex < 1)
+		{
+			yield break;
+		}
+		desiredIndex--;
+		yield return null;
+		KMSelectable LeftButton = findChildGameObjectByName(gameObject, "Left Button").GetComponent<KMSelectable>();
+		KMSelectable SubmitButton = findChildGameObjectByName(gameObject, "Submit Button").GetComponent<KMSelectable>();
+		int StartIndex = selectedAnswerIndex;
+
+		while (selectedAnswerIndex != desiredIndex)
+		{
+			yield return LeftButton;
+			yield return null;
+			yield return LeftButton;
+			if (selectedAnswerIndex == StartIndex)
+			{
+				yield return string.Format("sendtochaterror I can't select answer #{0} because that answer doesn't exist.", desiredIndex + 1);
+				yield break;
+			}
+		}
+		yield return SubmitButton;
+		yield return null;
+		yield return SubmitButton;
+	}
 }
