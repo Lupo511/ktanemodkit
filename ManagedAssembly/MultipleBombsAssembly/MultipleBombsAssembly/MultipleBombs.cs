@@ -534,8 +534,24 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Generating new bomb");
 
             GameplayState gameplayState = SceneManager.Instance.GameplayState;
+            KMGeneratorSetting generatorSetting = null;
+            if (missionId == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+            {
+                generatorSetting = createModFromGeneratorSetting(FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings).GeneratorSetting);
+            }
+            else if (missionId == ModMission.CUSTOM_MISSION_ID)
+            {
+                generatorSetting = createModFromGeneratorSetting(SceneManager.Instance.GameplayState.Mission.GeneratorSetting);
+            }
+            else
+            {
+                generatorSetting = createModFromGeneratorSetting(MissionManager.Instance.GetMission(missionId).GeneratorSetting);
+            }
+            Bomb bomb = createBomb(generatorSetting, position, eulerAngles, redirectedBombInfos);
 
-            Bomb bomb = createBomb(missionId, position, eulerAngles, redirectedBombInfos);
+            bomb.GetTimer().text.gameObject.SetActive(false);
+            bomb.GetTimer().LightGlow.enabled = false;
+            Debug.Log("[MultipleBombs]Custom bomb timer deactivated");
 
             GameObject roomGO = (GameObject)gameplayStateRoomGOField.GetValue(gameplayState);
             Selectable mainSelectable = gameplayState.Room.GetComponent<Selectable>();
@@ -566,7 +582,12 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Custom bomb timer activated");
         }
 
-        private Bomb createBomb(string missionId, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> knownBombInfos)
+        private Bomb createBomb(GeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> knownBombInfos)
+        {
+            return createBomb(createModFromGeneratorSetting(generatorSetting), position, eulerAngles, knownBombInfos);
+        }
+
+        private Bomb createBomb(KMGeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> knownBombInfos)
         {
             if (bombSolvedEvents == null)
                 bombSolvedEvents = new Dictionary<Bomb, BombEvents.BombSolvedEvent>();
@@ -589,36 +610,8 @@ namespace MultipleBombsAssembly
             GameObject spawnPointGO = new GameObject("CustomBombSpawnPoint");
             spawnPointGO.transform.position = position;
             spawnPointGO.transform.eulerAngles = eulerAngles;
-            HoldableSpawnPoint spawnPoint = spawnPointGO.AddComponent<HoldableSpawnPoint>();
-            spawnPoint.HoldableTarget = SceneManager.Instance.GameplayState.Room.BombSpawnPosition.HoldableTarget;
-
-            Bomb bomb = null;
-            if (missionId == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
-            {
-                Mission freeplayMission = FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings);
-                MissionManager.Instance.MissionDB.AddMission(freeplayMission);
-                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
-                MissionManager.Instance.MissionDB.Missions.Remove(freeplayMission);
-            }
-            else if (missionId == ModMission.CUSTOM_MISSION_ID)
-            {
-                Mission customMission = SceneManager.Instance.GameplayState.Mission;
-                string oldName = customMission.name;
-                customMission.name = ModMission.CUSTOM_MISSION_ID;
-                MissionManager.Instance.MissionDB.AddMission(customMission);
-                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
-                MissionManager.Instance.MissionDB.Missions.Remove(customMission);
-                customMission.name = oldName;
-            }
-            else
-            {
-                bomb = gameCommands.CreateBomb(missionId, null, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
-            }
+            Bomb bomb = gameCommands.CreateBomb(null, generatorSetting, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
             Debug.Log("[MultipleBombs]Bomb spawned");
-
-            bomb.GetTimer().text.gameObject.SetActive(false);
-            bomb.GetTimer().LightGlow.enabled = false;
-            Debug.Log("[MultipleBombs]Timer deactivated");
 
             redirectPresentBombInfos(bomb, knownBombInfos);
             Debug.Log("[MultipleBombs]KMBombInfos redirected");
@@ -626,6 +619,37 @@ namespace MultipleBombsAssembly
             processBombEvents(bomb);
             Debug.Log("[MultipleBombs]Bomb created");
             return bomb;
+        }
+
+        private KMGeneratorSetting createModFromGeneratorSetting(GeneratorSetting generatorSetting)
+        {
+            KMGeneratorSetting modSetting = new KMGeneratorSetting();
+            modSetting.FrontFaceOnly = generatorSetting.FrontFaceOnly;
+            modSetting.NumStrikes = generatorSetting.NumStrikes;
+            modSetting.TimeBeforeNeedyActivation = generatorSetting.TimeBeforeNeedyActivation;
+            modSetting.TimeLimit = generatorSetting.TimeLimit;
+            modSetting.OptionalWidgetCount = generatorSetting.OptionalWidgetCount;
+            modSetting.ComponentPools = new List<KMComponentPool>();
+            foreach (ComponentPool pool in generatorSetting.ComponentPools)
+            {
+                KMComponentPool modPool = new KMComponentPool();
+                modPool.Count = pool.Count;
+                modPool.SpecialComponentType = (KMComponentPool.SpecialComponentTypeEnum)pool.SpecialComponentType;
+                modPool.AllowedSources = (KMComponentPool.ComponentSource)pool.AllowedSources;
+                modPool.ComponentTypes = new List<KMComponentPool.ComponentTypeEnum>();
+                if (pool.ComponentTypes != null)
+                {
+                    foreach (ComponentTypeEnum componentType in pool.ComponentTypes)
+                    {
+                        modPool.ComponentTypes.Add((KMComponentPool.ComponentTypeEnum)componentType);
+                    }
+                }
+                modPool.ModTypes = new List<string>();
+                if (pool.ModTypes != null)
+                    modPool.ModTypes.AddRange(pool.ModTypes);
+                modSetting.ComponentPools.Add(modPool);
+            }
+            return modSetting;
         }
 
         private void redirectPresentBombInfos(Bomb bomb, List<KMBombInfo> knownBombInfos)
