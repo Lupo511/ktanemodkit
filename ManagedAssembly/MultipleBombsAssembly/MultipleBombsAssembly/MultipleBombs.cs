@@ -423,6 +423,12 @@ namespace MultipleBombsAssembly
             processBombEvents(vanillaBomb);
             Debug.Log("[MultipleBombs]Default bomb initialized");
 
+            System.Random random = null;
+            if (GameplayState.BombSeedToUse == -1)
+                random = new System.Random();
+            else
+                random = new System.Random(GameplayState.BombSeedToUse);
+
             for (int i = currentBombCount - 1; i >= 1; i--)
             {
                 GameObject spawn = GameObject.Find("MultipleBombs_Spawn_" + i);
@@ -430,7 +436,7 @@ namespace MultipleBombsAssembly
                 {
                     if (i == 1)
                     {
-                        StartCoroutine(createNewBomb(GameplayState.MissionToLoad, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0), redirectedBombInfos));
+                        StartCoroutine(createNewBomb(GameplayState.MissionToLoad, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0), random.Next(), redirectedBombInfos));
                     }
                     else
                     {
@@ -440,7 +446,7 @@ namespace MultipleBombsAssembly
                 }
                 else
                 {
-                    StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles, redirectedBombInfos));
+                    StartCoroutine(createNewBomb(GameplayState.MissionToLoad, spawn.transform.position, spawn.transform.eulerAngles, random.Next(), redirectedBombInfos));
                 }
             }
 
@@ -529,7 +535,7 @@ namespace MultipleBombsAssembly
             }
         }
 
-        private IEnumerator createNewBomb(string missionId, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> redirectedBombInfos)
+        private IEnumerator createNewBomb(string missionId, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> redirectedBombInfos)
         {
             Debug.Log("[MultipleBombs]Generating new bomb");
 
@@ -547,7 +553,7 @@ namespace MultipleBombsAssembly
             {
                 generatorSetting = createModFromGeneratorSetting(MissionManager.Instance.GetMission(missionId).GeneratorSetting);
             }
-            Bomb bomb = createBomb(generatorSetting, position, eulerAngles, redirectedBombInfos);
+            Bomb bomb = createBomb(generatorSetting, position, eulerAngles, seed, redirectedBombInfos);
 
             bomb.GetTimer().text.gameObject.SetActive(false);
             bomb.GetTimer().LightGlow.enabled = false;
@@ -582,12 +588,12 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Custom bomb timer activated");
         }
 
-        private Bomb createBomb(GeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> knownBombInfos)
+        private Bomb createBomb(GeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> knownBombInfos)
         {
-            return createBomb(createModFromGeneratorSetting(generatorSetting), position, eulerAngles, knownBombInfos);
+            return createBomb(createModFromGeneratorSetting(generatorSetting), position, eulerAngles, seed, knownBombInfos);
         }
 
-        private Bomb createBomb(KMGeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, List<KMBombInfo> knownBombInfos)
+        private Bomb createBomb(KMGeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> knownBombInfos)
         {
             if (bombSolvedEvents == null)
                 bombSolvedEvents = new Dictionary<Bomb, BombEvents.BombSolvedEvent>();
@@ -610,7 +616,7 @@ namespace MultipleBombsAssembly
             GameObject spawnPointGO = new GameObject("CustomBombSpawnPoint");
             spawnPointGO.transform.position = position;
             spawnPointGO.transform.eulerAngles = eulerAngles;
-            Bomb bomb = gameCommands.CreateBomb(null, generatorSetting, spawnPointGO, new System.Random().Next().ToString()).GetComponent<Bomb>();
+            Bomb bomb = gameCommands.CreateBomb(null, generatorSetting, spawnPointGO, seed.ToString()).GetComponent<Bomb>();
             Debug.Log("[MultipleBombs]Bomb spawned");
 
             redirectPresentBombInfos(bomb, knownBombInfos);
