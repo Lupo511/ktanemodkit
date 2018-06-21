@@ -350,6 +350,8 @@ namespace MultipleBombsAssembly
                 else
                 {
                     Debug.Log("[MultipleBombs]No room found that supports " + currentBombCount + " bombs");
+                    SceneManager.Instance.ReturnToSetupState();
+                    yield break;
                 }
             }
 
