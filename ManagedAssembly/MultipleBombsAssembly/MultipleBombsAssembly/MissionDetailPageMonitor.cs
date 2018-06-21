@@ -11,8 +11,7 @@ namespace MultipleBombsAssembly
 {
     public class MissionDetailPageMonitor : MonoBehaviour
     {
-        private MultipleBombs multipleBombs;
-        private Dictionary<string, int> missionList;
+        public MultipleBombs MultipleBombs { get; set; }
         private MissionDetailPage page;
         private TMPro.TextAlignmentOptions originalAlignment;
         private bool originalEnableAutoSizing;
@@ -40,42 +39,20 @@ namespace MultipleBombsAssembly
             originalEnableAutoSizing = page.TextStrikes.enableAutoSizing;
             yield return null;
             Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
-            if (missionList.ContainsKey(currentMission.ID))
+            List<ComponentPool> bombPools;
+            int bombCount = MultipleBombs.ProcessMultipleBombsMission(currentMission, out bombPools);
+            if (bombCount > 1)
             {
+                page.SetMission(currentMission, page.BombBinder.MissionTableOfContentsPageManager.GetMissionEntry(currentMission.ID).Selectable, page.BombBinder.MissionTableOfContentsPageManager.GetCurrentToCIndex(), page.BombBinder.MissionTableOfContentsPageManager.GetCurrentPage());
+                currentMission.GeneratorSetting.ComponentPools.AddRange(bombPools); //Null checking left out as this code is temporary
                 page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.TextStrikes.enableAutoSizing = false;
-                page.TextStrikes.text = missionList[currentMission.ID] + " Bombs\n" + page.TextStrikes.text + "\n ";
-                if (missionList[currentMission.ID] > MultipleBombs.GetCurrentMaximumBombCount())
+                page.TextStrikes.text = bombCount + " Bombs\n" + page.TextStrikes.text + "\n ";
+                if (bombCount > MultipleBombs.GetCurrentMaximumBombCount())
                 {
                     page.GetType().GetField("canStartMission", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(page, false);
                     page.TextDescription.text = "A room that can support more bombs is required.\n\nCurrent rooms only support up to " + MultipleBombs.GetCurrentMaximumBombCount() + " bombs.";
                 }
-            }
-        }
-
-        public MultipleBombs MultipleBombs
-        {
-            get
-            {
-                return multipleBombs;
-            }
-
-            set
-            {
-                multipleBombs = value;
-            }
-        }
-
-        public Dictionary<string, int> MissionList
-        {
-            get
-            {
-                return missionList;
-            }
-
-            set
-            {
-                missionList = value;
             }
         }
     }

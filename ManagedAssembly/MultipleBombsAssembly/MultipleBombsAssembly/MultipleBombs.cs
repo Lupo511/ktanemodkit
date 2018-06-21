@@ -21,7 +21,6 @@ namespace MultipleBombsAssembly
         private float? defaultMaxTime = null;
         private int currentMaxModModules;
         private TextMeshPro currentFreePlayBombCountLabel;
-        private Dictionary<string, int> multipleBombsMissions;
         private Dictionary<GameplayRoom, int> multipleBombsRooms;
         private FieldInfo gameplayStateRoomGOField;
         private FieldInfo gameplayStateLightBulbField;
@@ -42,7 +41,6 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Initializing");
             DestroyImmediate(GetComponent<KMService>()); //Hide from Mod Selector
             currentFreePlayBombCount = 1;
-            multipleBombsMissions = new Dictionary<string, int>();
             multipleBombsRooms = new Dictionary<GameplayRoom, int>();
             gameplayStateRoomGOField = typeof(GameplayState).GetField("roomGO", BindingFlags.Instance | BindingFlags.NonPublic);
             gameplayStateLightBulbField = typeof(GameplayState).GetField("lightBulb", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -95,16 +93,6 @@ namespace MultipleBombsAssembly
             if (SceneManager.Instance.CurrentState != SceneManager.State.ModManager)
                 throw new NotImplementedException();
             Debug.Log("[MultipleBombs]Destroying");
-            foreach (Mission mission in ModManager.Instance.ModMissions)
-            {
-                if (multipleBombsMissions.ContainsKey(mission.ID))
-                {
-                    ComponentPool pool = new ComponentPool();
-                    pool.ModTypes = new List<string>() { "Multiple Bombs" };
-                    pool.Count = multipleBombsMissions[mission.ID] - 1;
-                    mission.GeneratorSetting.ComponentPools.Add(pool);
-                }
-            }
             if (missionDetailPageMonitor != null)
             {
                 Destroy(missionDetailPageMonitor);
@@ -133,8 +121,7 @@ namespace MultipleBombsAssembly
         {
             if (state == KMGameInfo.State.Gameplay)
             {
-                if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID || GameplayState.MissionToLoad != null && multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad) || GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
-                    StartCoroutine(setupGameplayState());
+                StartCoroutine(setupGameplayState());
             }
             else
             {
@@ -260,19 +247,6 @@ namespace MultipleBombsAssembly
 
                 currentMaxModModules = ModManager.Instance.GetMaximumModules();
 
-                foreach (ModMission mission in ModManager.Instance.ModMissions)
-                {
-                    if (!multipleBombsMissions.ContainsKey(mission.ID))
-                    {
-                        int missionBombCount = ProcessMultipleBombsMission(mission);
-                        if (missionBombCount >= 2)
-                        {
-                            multipleBombsMissions.Add(mission.ID, missionBombCount);
-                        }
-                    }
-                }
-                Debug.Log("[MultipleBombs]Missions processed");
-
                 multipleBombsRooms = new Dictionary<GameplayRoom, int>();
                 foreach (GameplayRoom room in ModManager.Instance.GetGameplayRooms())
                 {
@@ -292,29 +266,31 @@ namespace MultipleBombsAssembly
                     missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
                     missionDetailPageMonitor.MultipleBombs = this;
                 }
-                missionDetailPageMonitor.MissionList = multipleBombsMissions;
                 Debug.Log("[MultipleBombs]BombBinder info added");
             }
         }
 
-        private int ProcessMultipleBombsMission(Mission mission)
+        public int ProcessMultipleBombsMission(Mission mission)
         {
             List<ComponentPool> pools;
             return ProcessMultipleBombsMission(mission, out pools);
         }
 
-        private int ProcessMultipleBombsMission(Mission mission, out List<ComponentPool> bombsPools)
+        public int ProcessMultipleBombsMission(Mission mission, out List<ComponentPool> bombsPools)
         {
             int count = 1;
             bombsPools = new List<ComponentPool>();
-            for (int i = mission.GeneratorSetting.ComponentPools.Count - 1; i >= 0; i--)
+            if (mission.GeneratorSetting != null && mission.GeneratorSetting.ComponentPools != null)
             {
-                ComponentPool pool = mission.GeneratorSetting.ComponentPools[i];
-                if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
+                for (int i = mission.GeneratorSetting.ComponentPools.Count - 1; i >= 0; i--)
                 {
-                    mission.GeneratorSetting.ComponentPools.RemoveAt(i);
-                    count += pool.Count;
-                    bombsPools.Add(pool);
+                    ComponentPool pool = mission.GeneratorSetting.ComponentPools[i];
+                    if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
+                    {
+                        mission.GeneratorSetting.ComponentPools.RemoveAt(i);
+                        count += pool.Count;
+                        bombsPools.Add(pool);
+                    }
                 }
             }
             return count;
@@ -326,10 +302,10 @@ namespace MultipleBombsAssembly
             List<ComponentPool> customMissionBombsPools = null;
             if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
                 currentBombCount = currentFreePlayBombCount;
-            else if (multipleBombsMissions.ContainsKey(GameplayState.MissionToLoad))
-                currentBombCount = multipleBombsMissions[GameplayState.MissionToLoad];
             else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
                 currentBombCount = ProcessMultipleBombsMission(GameplayState.CustomMission, out customMissionBombsPools);
+            else
+                currentBombCount = ProcessMultipleBombsMission(MissionManager.Instance.GetMission(GameplayState.MissionToLoad), out customMissionBombsPools);
 
             if (currentBombCount > 2 && GameplayState.GameplayRoomPrefabOverride == null)
             {
@@ -401,8 +377,11 @@ namespace MultipleBombsAssembly
 
             if (currentBombCount == 1)
             {
+                //Null checking left out as this code is temporary
                 if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
                     GameplayState.CustomMission.GeneratorSetting.ComponentPools.AddRange(customMissionBombsPools);
+                else if (GameplayState.MissionToLoad != FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+                    MissionManager.Instance.GetMission(GameplayState.MissionToLoad).GeneratorSetting.ComponentPools.AddRange(customMissionBombsPools);
                 yield break;
             }
 
@@ -452,8 +431,11 @@ namespace MultipleBombsAssembly
                 }
             }
 
+            //Null checking left out as this code is temporary
             if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
                 GameplayState.CustomMission.GeneratorSetting.ComponentPools.AddRange(customMissionBombsPools);
+            else if (GameplayState.MissionToLoad != FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+                MissionManager.Instance.GetMission(GameplayState.MissionToLoad).GeneratorSetting.ComponentPools.AddRange(customMissionBombsPools);
 
             vanillaBomb.GetComponent<Selectable>().Parent.Init();
             Debug.Log("[MultipleBombs]All bombs generated");
