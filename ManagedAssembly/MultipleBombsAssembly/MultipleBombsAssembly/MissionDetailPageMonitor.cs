@@ -13,6 +13,7 @@ namespace MultipleBombsAssembly
     {
         public MultipleBombs MultipleBombs { get; set; }
         private MissionDetailPage page;
+        private FieldInfo canStartField = typeof(MissionDetailPage).GetField("canStartMission", BindingFlags.Instance | BindingFlags.NonPublic);
         private TMPro.TextAlignmentOptions originalAlignment;
         private bool originalEnableAutoSizing;
 
@@ -23,7 +24,7 @@ namespace MultipleBombsAssembly
 
         private void OnEnable()
         {
-            StartCoroutine(changeTextNextFrame());
+            StartCoroutine(setupPage());
         }
 
         private void OnDisable()
@@ -33,24 +34,33 @@ namespace MultipleBombsAssembly
             page.TextStrikes.enableAutoSizing = originalEnableAutoSizing;
         }
 
-        private IEnumerator changeTextNextFrame()
+        private IEnumerator setupPage()
         {
             originalAlignment = page.TextStrikes.alignment;
             originalEnableAutoSizing = page.TextStrikes.enableAutoSizing;
+            page.TextDescription.gameObject.SetActive(false);
+            page.TextModuleCount.gameObject.SetActive(false);
+            page.TextStrikes.gameObject.SetActive(false);
             yield return null;
+            page.TextDescription.gameObject.SetActive(true);
+            page.TextModuleCount.gameObject.SetActive(true);
+            page.TextStrikes.gameObject.SetActive(true);
+
             Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
-            List<ComponentPool> bombPools;
-            int bombCount = MultipleBombs.ProcessMultipleBombsMission(currentMission, out bombPools);
-            if (bombCount > 1)
+            MultipleBombsMissionDetails missionDetails = MultipleBombsMissionDetails.ReadMission(currentMission);
+            if (missionDetails.BombCount > 1)
             {
+                GeneratorSetting originalGeneratorSetting = currentMission.GeneratorSetting;
+                currentMission.GeneratorSetting = missionDetails.GeneratorSettings[0];
                 page.SetMission(currentMission, page.BombBinder.MissionTableOfContentsPageManager.GetMissionEntry(currentMission.ID).Selectable, page.BombBinder.MissionTableOfContentsPageManager.GetCurrentToCIndex(), page.BombBinder.MissionTableOfContentsPageManager.GetCurrentPage());
-                currentMission.GeneratorSetting.ComponentPools.AddRange(bombPools); //Null checking left out as this code is temporary
+                currentMission.GeneratorSetting = originalGeneratorSetting;
+
                 page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.TextStrikes.enableAutoSizing = false;
-                page.TextStrikes.text = bombCount + " Bombs\n" + page.TextStrikes.text + "\n ";
-                if (bombCount > MultipleBombs.GetCurrentMaximumBombCount())
+                page.TextStrikes.text = missionDetails.BombCount + " Bombs\n" + page.TextStrikes.text + "\n ";
+                if ((bool)canStartField.GetValue(page) && missionDetails.BombCount > MultipleBombs.GetCurrentMaximumBombCount())
                 {
-                    page.GetType().GetField("canStartMission", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(page, false);
+                    canStartField.SetValue(page, false);
                     page.TextDescription.text = "A room that can support more bombs is required.\n\nCurrent rooms only support up to " + MultipleBombs.GetCurrentMaximumBombCount() + " bombs.";
                 }
             }
