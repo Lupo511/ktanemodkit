@@ -248,14 +248,7 @@ namespace MultipleBombsAssembly
                 multipleBombsRooms = new Dictionary<GameplayRoom, int>();
                 foreach (GameplayRoom room in ModManager.Instance.GetGameplayRooms())
                 {
-                    for (int i = 2; i < int.MaxValue; i++)
-                    {
-                        if (!room.transform.FindRecursive("MultipleBombs_Spawn_" + i))
-                        {
-                            multipleBombsRooms.Add(room, i);
-                            break;
-                        }
-                    }
+                    multipleBombsRooms.Add(room, getRoomSupportedBombCount(room));
                 }
                 Debug.Log("[MultipleBombs]GamePlayRooms processed");
 
@@ -266,32 +259,6 @@ namespace MultipleBombsAssembly
                 }
                 Debug.Log("[MultipleBombs]BombBinder info added");
             }
-        }
-
-        public int ProcessMultipleBombsMission(Mission mission)
-        {
-            List<ComponentPool> pools;
-            return ProcessMultipleBombsMission(mission, out pools);
-        }
-
-        public int ProcessMultipleBombsMission(Mission mission, out List<ComponentPool> bombsPools)
-        {
-            int count = 1;
-            bombsPools = new List<ComponentPool>();
-            if (mission.GeneratorSetting != null && mission.GeneratorSetting.ComponentPools != null)
-            {
-                for (int i = mission.GeneratorSetting.ComponentPools.Count - 1; i >= 0; i--)
-                {
-                    ComponentPool pool = mission.GeneratorSetting.ComponentPools[i];
-                    if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
-                    {
-                        mission.GeneratorSetting.ComponentPools.RemoveAt(i);
-                        count += pool.Count;
-                        bombsPools.Add(pool);
-                    }
-                }
-            }
-            return count;
         }
 
         private IEnumerator setupGameplayState()
@@ -316,12 +283,33 @@ namespace MultipleBombsAssembly
                 mission.GeneratorSetting = missionDetails.GeneratorSettings[0];
             }
 
-            if (missionDetails.BombCount > 2 && GameplayState.GameplayRoomPrefabOverride == null)
+            int maximumBombCount = GetCurrentMaximumBombCount();
+            if (missionDetails.BombCount > maximumBombCount)
+            {
+                Debug.Log("[MultipleBombs]Bomb count greater than the maximum bomb count (" + missionDetails.BombCount + " bombs, " + maximumBombCount + " maximum)");
+                SceneManager.Instance.ReturnToSetupState();
+                yield break;
+            }
+            else if (missionDetails.BombCount > 1 && GameplayState.GameplayRoomPrefabOverride == null)
             {
                 Debug.Log("[MultipleBombs]Initializing room");
-                GameplayRoom roomPrefab = GetRandomGameplayRoom(missionDetails.BombCount);
-                if (roomPrefab != null)
+                List<GameplayRoom> rooms = new List<GameplayRoom>();
+                if (missionDetails.BombCount <= 2)
+                    rooms.Add(SceneManager.Instance.GameplayState.GameplayRoomPool.Default.GetComponent<GameplayRoom>());
+                foreach (KeyValuePair<GameplayRoom, int> room in multipleBombsRooms)
                 {
+                    if (room.Value >= missionDetails.BombCount)
+                        rooms.Add(room.Key);
+                }
+                if (rooms.Count == 0)
+                {
+                    Debug.Log("[MultipleBombs]No room found that supports " + missionDetails.BombCount + " bombs");
+                    SceneManager.Instance.ReturnToSetupState();
+                    yield break;
+                }
+                else
+                {
+                    GameplayRoom roomPrefab = rooms[UnityEngine.Random.Range(0, rooms.Count)];
                     Destroy((GameObject)gameplayStateRoomGOField.GetValue(SceneManager.Instance.GameplayState));
                     GameObject room = Instantiate(roomPrefab.gameObject, Vector3.zero, Quaternion.identity);
                     room.transform.parent = SceneManager.Instance.GameplayState.transform;
@@ -331,12 +319,6 @@ namespace MultipleBombsAssembly
                     room.SetActive(false);
                     FindObjectOfType<BombGenerator>().BombPrefabOverride = room.GetComponent<GameplayRoom>().BombPrefabOverride;
                     Debug.Log("[MultipleBombs]Room initialized");
-                }
-                else
-                {
-                    Debug.Log("[MultipleBombs]No room found that supports " + missionDetails.BombCount + " bombs");
-                    SceneManager.Instance.ReturnToSetupState();
-                    yield break;
                 }
             }
 
@@ -389,6 +371,7 @@ namespace MultipleBombsAssembly
             {
                 MissionManager.Instance.GetMission(GameplayState.MissionToLoad).GeneratorSetting = originalGeneratorSetting;
             }
+
             Debug.Log("[MultipleBombs]Initializing gameplay state");
 
             Debug.Log("[MultipleBombs]Bombs to spawn: " + missionDetails.BombCount);
@@ -743,18 +726,25 @@ namespace MultipleBombsAssembly
             }
         }
 
+        private int getRoomSupportedBombCount(GameplayRoom gameplayRoom)
+        {
+            if (gameplayRoom.GetComponent<ElevatorRoom>() != null)
+                return 1;
+            for (int i = 2; i < int.MaxValue; i++)
+            {
+                if (!gameplayRoom.transform.FindRecursive("MultipleBombs_Spawn_" + i))
+                {
+                    return i;
+                }
+            }
+            return int.MaxValue;
+        }
+
         public int GetCurrentMaximumBombCount()
         {
             if (GameplayState.GameplayRoomPrefabOverride != null)
             {
-                if (GameplayState.GameplayRoomPrefabOverride.GetComponent<ElevatorRoom>() != null)
-                    return 1;
-                GameplayRoom room = GameplayState.GameplayRoomPrefabOverride.GetComponent<GameplayRoom>();
-                if (multipleBombsRooms.ContainsKey(room))
-                {
-                    return multipleBombsRooms[room];
-                }
-                return 2;
+                return getRoomSupportedBombCount(GameplayState.GameplayRoomPrefabOverride.GetComponent<GameplayRoom>());
             }
             else
             {
@@ -766,23 +756,6 @@ namespace MultipleBombsAssembly
                 }
                 return max;
             }
-        }
-
-        private GameplayRoom GetRandomGameplayRoom(int bombs)
-        {
-            if (bombs > 2)
-            {
-                List<GameplayRoom> rooms = new List<GameplayRoom>();
-                foreach (KeyValuePair<GameplayRoom, int> room in multipleBombsRooms)
-                {
-                    if (room.Value >= bombs)
-                        rooms.Add(room.Key);
-                }
-                if (rooms.Count == 0)
-                    return null;
-                return rooms[UnityEngine.Random.Range(0, rooms.Count)];
-            }
-            return null;
         }
 
         public int CurrentFreePlayBombCount
