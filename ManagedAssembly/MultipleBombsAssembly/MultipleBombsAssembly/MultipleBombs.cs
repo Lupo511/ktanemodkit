@@ -554,6 +554,24 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Custom bomb timer activated");
         }
 
+        private Bomb createBomb(Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> knownBombInfos)
+        {
+            MultipleBombsMissionDetails missionDetails = null;
+            if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+            {
+                missionDetails = new MultipleBombsMissionDetails(currentFreePlayBombCount, FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings).GeneratorSetting);
+            }
+            else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
+            {
+                missionDetails = MultipleBombsMissionDetails.ReadMission(GameplayState.CustomMission);
+            }
+            else
+            {
+                missionDetails = MultipleBombsMissionDetails.ReadMission(MissionManager.Instance.GetMission(GameplayState.MissionToLoad));
+            }
+            return createBomb(missionDetails.GeneratorSettings[0], position, eulerAngles, seed, knownBombInfos);
+        }
+
         private Bomb createBomb(GeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> knownBombInfos)
         {
             return createBomb(createModFromGeneratorSetting(generatorSetting), position, eulerAngles, seed, knownBombInfos);
