@@ -55,9 +55,31 @@ namespace MultipleBombsAssembly
                 page.SetMission(currentMission, page.BombBinder.MissionTableOfContentsPageManager.GetMissionEntry(currentMission.ID).Selectable, page.BombBinder.MissionTableOfContentsPageManager.GetCurrentToCIndex(), page.BombBinder.MissionTableOfContentsPageManager.GetCurrentPage());
                 currentMission.GeneratorSetting = originalGeneratorSetting;
 
+                float time = missionDetails.GeneratorSettings[0].TimeLimit;
+                int modules = missionDetails.GeneratorSettings[0].GetComponentCount();
+                int strikes = missionDetails.GeneratorSettings[0].NumStrikes;
+                for (int i = 1; i < missionDetails.BombCount; i++)
+                {
+                    GeneratorSetting generatorSetting;
+                    if (missionDetails.GeneratorSettings.TryGetValue(i, out generatorSetting))
+                    {
+                        if (generatorSetting.TimeLimit > time)
+                            time = generatorSetting.TimeLimit;
+                        modules += generatorSetting.GetComponentCount();
+                        strikes += generatorSetting.NumStrikes;
+                    }
+                    else
+                    {
+                        modules += missionDetails.GeneratorSettings[0].GetComponentCount();
+                        strikes += missionDetails.GeneratorSettings[0].NumStrikes;
+                    }
+                }
+                page.TextTime.text = string.Format("{0}:{1:00}", (int)time / 60, time % 60);
+                page.TextModuleCount.text = modules + (modules == 1 ? " Module" : " Modules");
                 page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.TextStrikes.enableAutoSizing = false;
-                page.TextStrikes.text = missionDetails.BombCount + " Bombs\n" + page.TextStrikes.text + "\n ";
+                page.TextStrikes.text = missionDetails.BombCount + " Bombs\n" + strikes + (strikes == 1 ? " Strike" : " Strikes") + "\n ";
+
                 if ((bool)canStartField.GetValue(page) && missionDetails.BombCount > MultipleBombs.GetCurrentMaximumBombCount())
                 {
                     canStartField.SetValue(page, false);

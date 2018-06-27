@@ -346,8 +346,8 @@ namespace MultipleBombsAssembly
                 freePlayExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
                 freePlayExplodedPageMonitor.MultipleBombs = this;
             }
-            freePlayDefusedPageMonitor.SetBombCount(missionDetails.BombCount);
-            freePlayExplodedPageMonitor.SetBombCount(missionDetails.BombCount);
+            freePlayDefusedPageMonitor.SetCurrentMission(missionDetails);
+            freePlayExplodedPageMonitor.SetCurrentMission(missionDetails);
             if (missionDefusedPageMonitor == null)
             {
                 missionDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultDefusedPage.gameObject.AddComponent<ResultPageMonitor>();
@@ -358,8 +358,8 @@ namespace MultipleBombsAssembly
                 missionExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
                 missionExplodedPageMonitor.MultipleBombs = this;
             }
-            missionDefusedPageMonitor.SetBombCount(missionDetails.BombCount);
-            missionExplodedPageMonitor.SetBombCount(missionDetails.BombCount);
+            missionDefusedPageMonitor.SetCurrentMission(missionDetails);
+            missionExplodedPageMonitor.SetCurrentMission(missionDetails);
             Debug.Log("[MultipleBombs]Result screens initialized");
             yield return null;
 
