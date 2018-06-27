@@ -556,6 +556,11 @@ namespace MultipleBombsAssembly
 
         private Bomb createBomb(Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> knownBombInfos)
         {
+            return createBomb(0, position, eulerAngles, seed, knownBombInfos);
+        }
+
+        private Bomb createBomb(int generatorSettingsIndex, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> knownBombInfos)
+        {
             MultipleBombsMissionDetails missionDetails = null;
             if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
             {
