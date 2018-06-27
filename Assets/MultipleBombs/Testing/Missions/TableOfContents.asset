@@ -23,3 +23,6 @@ MonoBehaviour:
     - multiple_bombs_04
     - multiple_bombs_05
     - multiple_bombs_06
+  - Title: '...'
+    MissionIDs:
+    - multiple_bombs_07

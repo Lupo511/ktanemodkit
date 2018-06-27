@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Missions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,10 +36,31 @@ namespace MultipleBombsAssembly
                     for (int i = generatorSetting.ComponentPools.Count - 1; i >= 0; i--)
                     {
                         ComponentPool pool = generatorSetting.ComponentPools[i];
-                        if (pool.ModTypes != null && pool.ModTypes.Count == 1 && pool.ModTypes[0] == "Multiple Bombs")
+                        if (pool.ModTypes != null && pool.ModTypes.Count == 1)
                         {
-                            missionDetails.BombCount += pool.Count;
-                            generatorSetting.ComponentPools.RemoveAt(i);
+                            if (pool.ModTypes[0] == "Multiple Bombs")
+                            {
+                                missionDetails.BombCount += pool.Count;
+                                generatorSetting.ComponentPools.RemoveAt(i);
+                            }
+                            else if (pool.ModTypes[0].StartsWith("Multiple Bombs:"))
+                            {
+                                if (missionDetails.GeneratorSettings.ContainsKey(pool.Count))
+                                {
+                                    continue;
+                                }
+                                GeneratorSetting bombGeneratorSetting = null;
+                                try
+                                {
+                                    bombGeneratorSetting = ModMission.CreateGeneratorSettingsFromMod(JsonConvert.DeserializeObject<KMGeneratorSetting>(pool.ModTypes[0].Substring(15)));
+                                }
+                                catch (Exception)
+                                {
+                                    continue;
+                                }
+                                missionDetails.GeneratorSettings.Add(pool.Count, bombGeneratorSetting);
+                                generatorSetting.ComponentPools.RemoveAt(i);
+                            }
                         }
                     }
                 }
