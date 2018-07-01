@@ -35,12 +35,14 @@ public class CustomKMMissionEditor : Editor
     private int activeGeneratorSetting;
     private int activeComponentPool;
     private int currentAddGeneratorSettingIndex;
+    private Vector2 scrollPosition;
 
     public void OnEnable()
     {
         activeGeneratorSetting = 0;
         activeComponentPool = -1;
         currentAddGeneratorSettingIndex = 1;
+        scrollPosition = Vector2.zero;
         if (target != null)
             readCurrentMission();
         Undo.undoRedoPerformed += onUndoRedoPerformed;
@@ -175,12 +177,22 @@ public class CustomKMMissionEditor : Editor
                 currentTab = 0;
             }
             List<string> tabs = new List<string>();
-            for (int i = 0; i < tabMap.Count; i++)
+            tabs.Add(tabMap[0].Value);
+            float minWidth = new GUIStyle("ButtonLeft").CalcSize(new GUIContent(tabMap[0].Value)).x;
+            for (int i = 1; i < tabMap.Count; i++)
             {
                 tabs.Add(tabMap[i].Value);
+                float width = new GUIStyle("Button").CalcSize(new GUIContent(tabMap[i].Value)).x;
+                if (width > minWidth)
+                    minWidth = width;
             }
             tabs.Add("+");
+            bool fits = Screen.width / tabs.Count > minWidth; //Screen.width is not an accurate measure of the available width but having the bar space always visible was too ugly
+            if (!fits)
+                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.MaxHeight(40));
             int newTab = GUILayout.Toolbar(currentTab, tabs.ToArray());
+            if (!fits)
+                EditorGUILayout.EndScrollView();
             if (newTab != currentTab)
             {
                 if (newTab == tabs.Count - 1)
