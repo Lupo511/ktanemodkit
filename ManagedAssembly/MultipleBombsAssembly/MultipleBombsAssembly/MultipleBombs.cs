@@ -466,7 +466,9 @@ namespace MultipleBombsAssembly
                     if (!bomb.IsSolved())
                         return true;
                 Debug.Log("[MultipleBombs]All bombs solved, what a winner!");
-                RecordManager.Instance.SetResult(GameResultEnum.Defused, source.Bomb.GetTimer().TimeElapsed, SceneManager.Instance.GameplayState.GetElapsedRealTime());
+                GameRecord currentRecord = RecordManager.Instance.GetCurrentRecord();
+                float maxTime = currentRecord.FreeplaySettings != null ? currentRecord.FreeplaySettings.Time : MissionManager.Instance.GetMission(currentRecord.MissionID).GeneratorSetting.TimeLimit;
+                RecordManager.Instance.SetResult(GameResultEnum.Defused, maxTime - source.Bomb.GetTimer().TimeRemaining, SceneManager.Instance.GameplayState.GetElapsedRealTime());
                 return true;
             }
             return false;
