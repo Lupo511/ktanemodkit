@@ -39,10 +39,12 @@ namespace MultipleBombsAssembly
             originalAlignment = page.TextStrikes.alignment;
             originalEnableAutoSizing = page.TextStrikes.enableAutoSizing;
             page.TextDescription.gameObject.SetActive(false);
+            page.TextTime.gameObject.SetActive(false);
             page.TextModuleCount.gameObject.SetActive(false);
             page.TextStrikes.gameObject.SetActive(false);
             yield return null;
             page.TextDescription.gameObject.SetActive(true);
+            page.TextTime.gameObject.SetActive(true);
             page.TextModuleCount.gameObject.SetActive(true);
             page.TextStrikes.gameObject.SetActive(true);
 
