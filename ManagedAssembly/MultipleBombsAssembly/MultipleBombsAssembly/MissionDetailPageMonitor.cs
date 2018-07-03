@@ -52,10 +52,57 @@ namespace MultipleBombsAssembly
             MultipleBombsMissionDetails missionDetails = MultipleBombsMissionDetails.ReadMission(currentMission);
             if (missionDetails.BombCount > 1)
             {
-                GeneratorSetting originalGeneratorSetting = currentMission.GeneratorSetting;
-                currentMission.GeneratorSetting = missionDetails.GeneratorSettings[0];
-                page.SetMission(currentMission, page.BombBinder.MissionTableOfContentsPageManager.GetMissionEntry(currentMission.ID).Selectable, page.BombBinder.MissionTableOfContentsPageManager.GetCurrentToCIndex(), page.BombBinder.MissionTableOfContentsPageManager.GetCurrentPage());
-                currentMission.GeneratorSetting = originalGeneratorSetting;
+                List<string> missingModTypes = new List<string>();
+                int maxModuleCount = Math.Max(11, ModManager.Instance.GetMaximumModules());
+                int maxFrontFaceModuleCount = Math.Max(5, ModManager.Instance.GetMaximumModulesFrontFace());
+                int requiredModuleCount = 0;
+                int requiredFrontFaceModuleCount = 0;
+                foreach (GeneratorSetting generatorSetting in missionDetails.GeneratorSettings.Values)
+                {
+                    if (generatorSetting.ComponentPools != null)
+                    {
+                        foreach (ComponentPool pool in generatorSetting.ComponentPools)
+                        {
+                            foreach (string modType in pool.ModTypes)
+                            {
+                                if (!ModManager.Instance.HasBombComponent(modType))
+                                {
+                                    missingModTypes.Add(modType);
+                                }
+                            }
+                        }
+                    }
+                    int moduleCount = generatorSetting.GetComponentCount();
+                    if (generatorSetting.FrontFaceOnly)
+                        requiredFrontFaceModuleCount = Math.Max(requiredFrontFaceModuleCount, moduleCount);
+                    else
+                        requiredModuleCount = Math.Max(requiredModuleCount, moduleCount);
+                }
+                if (missingModTypes.Count > 0)
+                {
+                    canStartField.SetValue(page, false);
+                    page.TextDescription.text = "Missing mods:\n" + string.Join("\n", missingModTypes.ToArray());
+                }
+                else if (requiredModuleCount > maxModuleCount)
+                {
+                    canStartField.SetValue(page, false);
+                    page.TextDescription.text = "A bomb that can support more modules is required.\n\nCurrent bombs only support up to " + maxModuleCount + " modules.";
+                }
+                else if (requiredFrontFaceModuleCount > maxFrontFaceModuleCount)
+                {
+                    canStartField.SetValue(page, false);
+                    page.TextDescription.text = "A bomb that can support more modules is required.\n\nCurrent bombs only support up to " + maxFrontFaceModuleCount + " modules.";
+                }
+                else if (missionDetails.BombCount > MultipleBombs.GetCurrentMaximumBombCount())
+                {
+                    canStartField.SetValue(page, false);
+                    page.TextDescription.text = "A room that can support more bombs is required.\n\nCurrent rooms only support up to " + MultipleBombs.GetCurrentMaximumBombCount() + " bombs.";
+                }
+                else
+                {
+                    canStartField.SetValue(page, true);
+                    page.TextDescription.text = currentMission.Description;
+                }
 
                 float time = missionDetails.GeneratorSettings[0].TimeLimit;
                 int modules = missionDetails.GeneratorSettings[0].GetComponentCount();
@@ -81,12 +128,6 @@ namespace MultipleBombsAssembly
                 page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.TextStrikes.enableAutoSizing = false;
                 page.TextStrikes.text = missionDetails.BombCount + " Bombs\n" + strikes + (strikes == 1 ? " Strike" : " Strikes") + "\n ";
-
-                if ((bool)canStartField.GetValue(page) && missionDetails.BombCount > MultipleBombs.GetCurrentMaximumBombCount())
-                {
-                    canStartField.SetValue(page, false);
-                    page.TextDescription.text = "A room that can support more bombs is required.\n\nCurrent rooms only support up to " + MultipleBombs.GetCurrentMaximumBombCount() + " bombs.";
-                }
             }
         }
     }
