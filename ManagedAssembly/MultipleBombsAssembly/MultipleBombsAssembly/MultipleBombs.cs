@@ -2,6 +2,7 @@
 using Assets.Scripts.Pacing;
 using Assets.Scripts.Props;
 using Assets.Scripts.Records;
+using Assets.Scripts.Tournaments;
 using Events;
 using System;
 using System.Collections;
@@ -30,7 +31,9 @@ namespace MultipleBombsAssembly
         private ResultPageMonitor freePlayExplodedPageMonitor;
         private ResultPageMonitor missionDefusedPageMonitor;
         private ResultPageMonitor missionExplodedPageMonitor;
+        private ResultPageMonitor tournamentPageMonitor;
         private MissionDetailPageMonitor missionDetailPageMonitor;
+        private TournamentDetailPageMonitor tournamentDetailPageMonitor;
         private KMGameInfo gameInfo;
         private KMGameCommands gameCommands;
         private MultipleBombsProperties publicProperties;
@@ -96,6 +99,10 @@ namespace MultipleBombsAssembly
             {
                 Destroy(missionDetailPageMonitor);
             }
+            if (tournamentDetailPageMonitor != null)
+            {
+                Destroy(tournamentDetailPageMonitor);
+            }
             if (freePlayDefusedPageMonitor != null)
             {
                 Destroy(freePlayDefusedPageMonitor);
@@ -111,6 +118,10 @@ namespace MultipleBombsAssembly
             if (missionExplodedPageMonitor != null)
             {
                 Destroy(missionDefusedPageMonitor);
+            }
+            if (tournamentPageMonitor != null)
+            {
+                Destroy(tournamentPageMonitor);
             }
             gameInfo.OnStateChange -= onGameStateChanged;
             Debug.Log("[MultipleBombs]Destroyed");
@@ -143,122 +154,120 @@ namespace MultipleBombsAssembly
         {
             yield return null;
             Debug.Log("[MultipleBombs]Adding FreePlay option");
-            FreeplayDevice device = FindObjectOfType<FreeplayDevice>();
-            if (device == null)
+            FreeplayDevice device = FindObjectOfType<SetupRoom>().FreeplayDevice;
+            GameObject modulesObject = device.ModuleCountIncrement.transform.parent.gameObject;
+            GameObject bombsObject = Instantiate(modulesObject, modulesObject.transform.position, modulesObject.transform.rotation, modulesObject.transform.parent);
+            device.ObjectsToDisableOnLidClose.Add(bombsObject);
+            bombsObject.name = "BombCountSettings";
+            bombsObject.transform.localPosition += new Vector3(0, 0f, -0.025f);
+            bombsObject.transform.Find("ModuleCountLabel").GetComponent<TextMeshPro>().text = "Bombs";
+            currentFreePlayBombCountLabel = bombsObject.transform.Find("ModuleCountValue").GetComponent<TextMeshPro>();
+            currentFreePlayBombCountLabel.gameObject.name = "BombCountLabel";
+            currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
+            GameObject modulesLedShell = modulesObject.transform.parent.Find("LEDs/Modules_LED_shell").gameObject;
+            GameObject bombsLedShell = Instantiate(modulesLedShell, modulesLedShell.transform.position, modulesLedShell.transform.rotation, modulesLedShell.transform.parent);
+            bombsLedShell.name = "Bombs_LED_shell";
+            bombsLedShell.transform.localPosition += new Vector3(0, 0, -0.028f);
+            LED bombsLed = bombsObject.transform.Find("ModuleCountLED").GetComponent<LED>();
+            bombsLed.gameObject.name = "BombCountLed";
+            bombsLed.transform.localPosition += new Vector3(0, 0, 0.003f);
+            bombsLed.transform.Find("Modules_LED_On").gameObject.name = "Bombs_LED_On";
+            bombsLed.transform.Find("Modules_LED_Off").gameObject.name = "Bombs_LED_Off";
+            bombsObject.transform.Find("Modules_INCR_btn_highlight").name = "Bombs_INCR_btn_highlight";
+            bombsObject.transform.Find("Modules_DECR_btn_highlight").name = "Bombs_DECR_btn_highlight";
+
+            GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            background.name = "BombCountBackground";
+            background.GetComponent<Renderer>().material.color = Color.black;
+            background.transform.localScale = new Vector3(0.048f, 0.023f, 0.005f); //Accurate Y would be 0.025
+            background.transform.parent = bombsObject.transform;
+            background.transform.localPosition = currentFreePlayBombCountLabel.gameObject.transform.localPosition + new Vector3(0.00025f, -0.0027f, 0);
+            background.transform.localEulerAngles = currentFreePlayBombCountLabel.gameObject.transform.localEulerAngles;
+
+            GameObject incrementButton = bombsObject.transform.Find("Modules_INCR_btn").gameObject;
+            incrementButton.name = "Bombs_INCR_btn";
+            GameObject decrementButton = bombsObject.transform.Find("Modules_DECR_btn").gameObject;
+            decrementButton.name = "Bombs_DECR_btn";
+            Selectable deviceSelectable = device.GetComponent<Selectable>();
+            List<Selectable> children = deviceSelectable.Children.ToList();
+            children.Insert(2, incrementButton.GetComponent<Selectable>());
+            children.Insert(2, decrementButton.GetComponent<Selectable>());
+            deviceSelectable.Children = children.ToArray();
+            deviceSelectable.Init();
+            incrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
             {
-                Debug.Log("[MultipleBombs]Error: FreePlayDevice not found!");
-            }
-            else
-            {
-                GameObject modulesObject = device.ModuleCountIncrement.transform.parent.gameObject;
-                GameObject bombsObject = Instantiate(modulesObject, modulesObject.transform.position, modulesObject.transform.rotation, modulesObject.transform.parent);
-                device.ObjectsToDisableOnLidClose.Add(bombsObject);
-                bombsObject.name = "BombCountSettings";
-                bombsObject.transform.localPosition += new Vector3(0, 0f, -0.025f);
-                bombsObject.transform.Find("ModuleCountLabel").GetComponent<TextMeshPro>().text = "Bombs";
-                currentFreePlayBombCountLabel = bombsObject.transform.Find("ModuleCountValue").GetComponent<TextMeshPro>();
-                currentFreePlayBombCountLabel.gameObject.name = "BombCountLabel";
+                if (currentFreePlayBombCount >= GetCurrentMaximumBombCount())
+                    return;
+                currentFreePlayBombCount++;
                 currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
-                GameObject modulesLedShell = modulesObject.transform.parent.Find("LEDs/Modules_LED_shell").gameObject;
-                GameObject bombsLedShell = Instantiate(modulesLedShell, modulesLedShell.transform.position, modulesLedShell.transform.rotation, modulesLedShell.transform.parent);
-                bombsLedShell.name = "Bombs_LED_shell";
-                bombsLedShell.transform.localPosition += new Vector3(0, 0, -0.028f);
-                LED bombsLed = bombsObject.transform.Find("ModuleCountLED").GetComponent<LED>();
-                bombsLed.gameObject.name = "BombCountLed";
-                bombsLed.transform.localPosition += new Vector3(0, 0, 0.003f);
-                bombsLed.transform.Find("Modules_LED_On").gameObject.name = "Bombs_LED_On";
-                bombsLed.transform.Find("Modules_LED_Off").gameObject.name = "Bombs_LED_Off";
-                bombsObject.transform.Find("Modules_INCR_btn_highlight").name = "Bombs_INCR_btn_highlight";
-                bombsObject.transform.Find("Modules_DECR_btn_highlight").name = "Bombs_DECR_btn_highlight";
+            });
+            decrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
+            {
+                if (currentFreePlayBombCount <= 1)
+                    return;
+                currentFreePlayBombCount--;
+                currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
+            });
+            //string textColor = "#" + valueText.color.r.ToString("x2") + valueText.color.g.ToString("x2") + valueText.color.b.ToString("x2");
+            incrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
+            {
+                device.Screen.CurrentState = FreeplayScreen.State.Start;
+                bombsLed.SetState(true);
+                device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
+            });
+            decrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
+            {
+                device.Screen.CurrentState = FreeplayScreen.State.Start;
+                bombsLed.SetState(true);
+                device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
+            });
 
-                GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                background.name = "BombCountBackground";
-                background.GetComponent<Renderer>().material.color = Color.black;
-                background.transform.localScale = new Vector3(0.048f, 0.023f, 0.005f); //Accurate Y would be 0.025
-                background.transform.parent = bombsObject.transform;
-                background.transform.localPosition = currentFreePlayBombCountLabel.gameObject.transform.localPosition + new Vector3(0.00025f, -0.0027f, 0);
-                background.transform.localEulerAngles = currentFreePlayBombCountLabel.gameObject.transform.localEulerAngles;
+            Action disableBomsLed = new Action(() => bombsLed.SetState(false));
+            device.ModuleCountIncrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
+            {
+                device.Screen.CurrentState = FreeplayScreen.State.Modules;
+                device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
+            }), disableBomsLed);
+            device.ModuleCountDecrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
+            {
+                device.Screen.CurrentState = FreeplayScreen.State.Modules;
+                device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
+            }), disableBomsLed);
+            device.TimeDecrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+            device.TimeIncrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+            device.NeedyToggle.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+            device.HardcoreToggle.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+            device.ModsOnly.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+            device.StartButton.GetComponent<Selectable>().OnHighlight += disableBomsLed;
 
-                GameObject incrementButton = bombsObject.transform.Find("Modules_INCR_btn").gameObject;
-                incrementButton.name = "Bombs_INCR_btn";
-                GameObject decrementButton = bombsObject.transform.Find("Modules_DECR_btn").gameObject;
-                decrementButton.name = "Bombs_DECR_btn";
-                Selectable deviceSelectable = device.GetComponent<Selectable>();
-                List<Selectable> children = deviceSelectable.Children.ToList();
-                children.Insert(2, incrementButton.GetComponent<Selectable>());
-                children.Insert(2, decrementButton.GetComponent<Selectable>());
-                deviceSelectable.Children = children.ToArray();
-                deviceSelectable.Init();
-                incrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
-                {
-                    if (currentFreePlayBombCount >= GetCurrentMaximumBombCount())
-                        return;
-                    currentFreePlayBombCount++;
-                    currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
-                });
-                decrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
-                {
-                    if (currentFreePlayBombCount <= 1)
-                        return;
-                    currentFreePlayBombCount--;
-                    currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
-                });
-                //string textColor = "#" + valueText.color.r.ToString("x2") + valueText.color.g.ToString("x2") + valueText.color.b.ToString("x2");
-                incrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
-                {
-                    device.Screen.CurrentState = FreeplayScreen.State.Start;
-                    bombsLed.SetState(true);
-                    device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
-                });
-                decrementButton.GetComponent<Selectable>().OnHighlight = new Action(() =>
-                {
-                    device.Screen.CurrentState = FreeplayScreen.State.Start;
-                    bombsLed.SetState(true);
-                    device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
-                });
+            incrementButton.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.015f, -0.015f, -0.015f);
+            decrementButton.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.015f, -0.015f, -0.015f);
+            device.ModuleCountIncrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.012f, -0.012f, -0.012f);
+            device.ModuleCountDecrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.012f, -0.012f, -0.012f);
+            device.TimeIncrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.01f, -0.01f, -0.01f);
+            device.TimeDecrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.01f, -0.01f, -0.01f);
+            Debug.Log("[MultipleBombs]FreePlay option added");
 
-                Action disableBomsLed = new Action(() => bombsLed.SetState(false));
-                device.ModuleCountIncrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
-                {
-                    device.Screen.CurrentState = FreeplayScreen.State.Modules;
-                    device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
-                }), disableBomsLed);
-                device.ModuleCountDecrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
-                {
-                    device.Screen.CurrentState = FreeplayScreen.State.Modules;
-                    device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
-                }), disableBomsLed);
-                device.TimeDecrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
-                device.TimeIncrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
-                device.NeedyToggle.GetComponent<Selectable>().OnHighlight += disableBomsLed;
-                device.HardcoreToggle.GetComponent<Selectable>().OnHighlight += disableBomsLed;
-                device.ModsOnly.GetComponent<Selectable>().OnHighlight += disableBomsLed;
-                device.StartButton.GetComponent<Selectable>().OnHighlight += disableBomsLed;
+            currentMaxModModules = ModManager.Instance.GetMaximumModules();
 
-                incrementButton.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.015f, -0.015f, -0.015f);
-                decrementButton.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.015f, -0.015f, -0.015f);
-                device.ModuleCountIncrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.012f, -0.012f, -0.012f);
-                device.ModuleCountDecrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.012f, -0.012f, -0.012f);
-                device.TimeIncrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.01f, -0.01f, -0.01f);
-                device.TimeDecrement.GetComponent<Selectable>().SelectableArea.GetComponent<BoxCollider>().size += new Vector3(-0.01f, -0.01f, -0.01f);
-                Debug.Log("[MultipleBombs]FreePlay option added");
-
-                currentMaxModModules = ModManager.Instance.GetMaximumModules();
-
-                multipleBombsRooms = new Dictionary<GameplayRoom, int>();
-                foreach (GameplayRoom room in ModManager.Instance.GetGameplayRooms())
-                {
-                    multipleBombsRooms.Add(room, getRoomSupportedBombCount(room));
-                }
-                Debug.Log("[MultipleBombs]GamePlayRooms processed");
-
-                if (missionDetailPageMonitor == null)
-                {
-                    missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
-                    missionDetailPageMonitor.MultipleBombs = this;
-                }
-                Debug.Log("[MultipleBombs]BombBinder info added");
+            multipleBombsRooms = new Dictionary<GameplayRoom, int>();
+            foreach (GameplayRoom room in ModManager.Instance.GetGameplayRooms())
+            {
+                multipleBombsRooms.Add(room, getRoomSupportedBombCount(room));
             }
+            Debug.Log("[MultipleBombs]GamePlayRooms processed");
+
+            if (missionDetailPageMonitor == null)
+            {
+                missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
+                missionDetailPageMonitor.MultipleBombs = this;
+            }
+            if (tournamentDetailPageMonitor == null)
+            {
+                tournamentDetailPageMonitor = FindObjectOfType<SetupRoom>().TournamentWhiteboard.TournamentDetailPage.gameObject.AddComponent<TournamentDetailPageMonitor>();
+                tournamentDetailPageMonitor.MultipleBombs = this;
+            }
+            Debug.Log("[MultipleBombs]BombBinder info added");
         }
 
         private IEnumerator setupGameplayState()
@@ -360,6 +369,12 @@ namespace MultipleBombsAssembly
             }
             missionDefusedPageMonitor.SetCurrentMission(missionDetails);
             missionExplodedPageMonitor.SetCurrentMission(missionDetails);
+            if (tournamentPageMonitor == null)
+            {
+                tournamentPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultTournamentPage.gameObject.AddComponent<ResultPageMonitor>();
+                tournamentPageMonitor.MultipleBombs = this;
+            }
+            tournamentPageMonitor.SetCurrentMission(missionDetails);
             Debug.Log("[MultipleBombs]Result screens initialized");
             yield return null;
 

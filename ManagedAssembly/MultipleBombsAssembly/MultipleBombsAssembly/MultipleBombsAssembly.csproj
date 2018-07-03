@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="BombInfoRedirection.cs" />
     <Compile Include="ConfigManager.cs" />
+    <Compile Include="TournamentDetailPageMonitor.cs" />
     <Compile Include="MultipleBombsMissionDetails.cs" />
     <Compile Include="MultipleBombsProperties.cs" />
     <Compile Include="PropertiesBehaviour.cs" />
