@@ -92,7 +92,7 @@ namespace MultipleBombsAssembly
 
         public void OnDestroy()
         {
-            if (SceneManager.Instance.CurrentState != SceneManager.State.ModManager)
+            if (SceneManager.Instance != null && SceneManager.Instance.CurrentState != SceneManager.State.ModManager)
                 throw new NotImplementedException();
             Debug.Log("[MultipleBombs]Destroying");
             if (missionDetailPageMonitor != null)
