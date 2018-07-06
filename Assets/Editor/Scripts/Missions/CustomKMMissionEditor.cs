@@ -207,7 +207,7 @@ public class CustomKMMissionEditor : Editor
             tabs.Add("+");
             bool fits = Screen.width / tabs.Count > minWidth; //Screen.width is not an accurate measure of the available width but having the bar space always visible was too ugly
             if (!fits)
-                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.MaxHeight(40));
+                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(40));
             int newTab = GUILayout.Toolbar(currentTab, tabs.ToArray());
             if (!fits)
                 EditorGUILayout.EndScrollView();
