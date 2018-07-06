@@ -86,10 +86,23 @@ public class CustomKMMissionEditor : Editor
             }
             else if (modType.StartsWith(MULTIPLE_BOMBS_COMPONENT_POOL_ID + ":"))
             {
-                int bombIndex = count;
+                string[] strings = modType.Split(new char[] { ':' }, 3);
+                if (strings.Length != 3)
+                    return;
+                int bombIndex;
+                if (!int.TryParse(strings[1], out bombIndex))
+                    return;
                 if (!multipleBombsGeneratorSettings.ContainsKey(bombIndex) && bombIndex > 0)
                 {
-                    KMGeneratorSetting generatorSetting = JsonConvert.DeserializeObject<KMGeneratorSetting>(modType.Substring(15));
+                    KMGeneratorSetting generatorSetting;
+                    try
+                    {
+                        generatorSetting = JsonConvert.DeserializeObject<KMGeneratorSetting>(strings[2]);
+                    }
+                    catch
+                    {
+                        return;
+                    }
                     multipleBombsGeneratorSettings.Add(bombIndex, new KeyValuePair<KMGeneratorSetting, int>(generatorSetting, index));
                 }
             }
@@ -293,7 +306,7 @@ public class CustomKMMissionEditor : Editor
                     drawGeneratorSetting(dummyMissionObject.FindProperty("GeneratorSetting"), false);
                     if (dummyMissionObject.ApplyModifiedProperties())
                     {
-                        serializedObject.FindProperty("GeneratorSetting").FindPropertyRelative("ComponentPools").GetArrayElementAtIndex(activeKV.Value).FindPropertyRelative("ModTypes").GetArrayElementAtIndex(0).stringValue = "Multiple Bombs:" + JsonConvert.SerializeObject(activeKV.Key);
+                        serializedObject.FindProperty("GeneratorSetting").FindPropertyRelative("ComponentPools").GetArrayElementAtIndex(activeKV.Value).FindPropertyRelative("ModTypes").GetArrayElementAtIndex(0).stringValue = "Multiple Bombs:" + activeGeneratorSetting + ":" + JsonConvert.SerializeObject(activeKV.Key);
                     }
                 }
             }
@@ -619,10 +632,9 @@ public class CustomKMMissionEditor : Editor
         newGeneratorSetting.ComponentPools = new List<KMComponentPool>() { new KMComponentPool() { Count = 1, ModTypes = new List<string>() } };
         int componentPoolIndex = addComponentPool(serializedObject.FindProperty("GeneratorSetting"));
         SerializedProperty componentPool = serializedObject.FindProperty("GeneratorSetting.ComponentPools").GetArrayElementAtIndex(componentPoolIndex);
-        componentPool.FindPropertyRelative("Count").intValue = bombIndex;
         SerializedProperty modTypes = componentPool.FindPropertyRelative("ModTypes");
         modTypes.arraySize = 1;
-        modTypes.GetArrayElementAtIndex(0).stringValue = MULTIPLE_BOMBS_COMPONENT_POOL_ID + ":" + JsonConvert.SerializeObject(newGeneratorSetting);
+        modTypes.GetArrayElementAtIndex(0).stringValue = MULTIPLE_BOMBS_COMPONENT_POOL_ID + ":" + bombIndex + ":" + JsonConvert.SerializeObject(newGeneratorSetting);
         multipleBombsGeneratorSettings.Add(bombIndex, new KeyValuePair<KMGeneratorSetting, int>(newGeneratorSetting, componentPoolIndex));
     }
 

@@ -45,20 +45,24 @@ namespace MultipleBombsAssembly
                             }
                             else if (pool.ModTypes[0].StartsWith("Multiple Bombs:"))
                             {
-                                if (missionDetails.GeneratorSettings.ContainsKey(pool.Count))
-                                {
+                                string[] strings = pool.ModTypes[0].Split(new char[] { ':' }, 3);
+                                if (strings.Length != 3)
                                     continue;
-                                }
+                                int bombIndex;
+                                if (!int.TryParse(strings[1], out bombIndex))
+                                    continue;
+                                if (missionDetails.GeneratorSettings.ContainsKey(bombIndex))
+                                    continue;
                                 GeneratorSetting bombGeneratorSetting = null;
                                 try
                                 {
-                                    bombGeneratorSetting = ModMission.CreateGeneratorSettingsFromMod(JsonConvert.DeserializeObject<KMGeneratorSetting>(pool.ModTypes[0].Substring(15)));
+                                    bombGeneratorSetting = ModMission.CreateGeneratorSettingsFromMod(JsonConvert.DeserializeObject<KMGeneratorSetting>(strings[2]));
                                 }
                                 catch (Exception)
                                 {
                                     continue;
                                 }
-                                missionDetails.GeneratorSettings.Add(pool.Count, bombGeneratorSetting);
+                                missionDetails.GeneratorSettings.Add(bombIndex, bombGeneratorSetting);
                                 generatorSetting.ComponentPools.RemoveAt(i);
                             }
                         }
