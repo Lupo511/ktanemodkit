@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Multiple Bombs</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css?family=Roboto|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../style.css">
+        <link rel="stylesheet" type="text/css" href="../style.css">
+    </head>
+    <body>
+        <div class="banner">
+            <div class="bannercontent">
+                <div class="bannertitle">Multiple Bombs</div>
+                <div class="bannersubtitle">A Keep Talking and Nobody Explodes mod</div>
+            </div>
+        </div>
+        <div class="content">
+            <nav>
+                <ol class="navigationmenu">
+                    <li><a href="./">Multiple Bombs Mod API</a></li>
+                    <span class="separator"></span>
+                    <li class="current">Gameplay Rooms</li>
+                </ol>
+            </nav>
+            <h1>Gameplay Rooms</h1>
+            <h2>Custom bomb spawns</h2>
+            <p>
+                By default all mod gameplay rooms support 2 bombs. The bombs spawn position is automatically determined by Multiple Bombs based on the default bomb spawn point. You can customize the spawn position for each bomb by creating empty GameObjects that follow the naming scheme specified below and placing them at the position and rotation you want the bombs to spawn at.
+            </p>
+            <p>
+                The naming scheme must be <code class="nowrap">MultipleBombs_Spawn_X</code>, where <i>X</i> is the index of the bomb that spawn is for (starting from 0).
+            </p>
+            <p>
+                Note that if the bomb count is set to 1 the first bomb will use the default (vanilla) spawn, while it will use the MultipleBombs spawn if the bomb count is set to 2 or greater. This allows you to define the spawn for the first bomb differently depending on wether there is one or multiple bombs.
+            </p>
+            <h2>Support for more bombs</h2>
+            <p>
+                By default all mod gameplay rooms support 2 bombs. Adding a spawn for bomb indices greater than 1 will allow the room to support more than two bombs. Note that for a room to support a certain number of bombs it needs to specify the spawns for all of the bombs up to the last bomb index; skipping a spawn will make all of the following ones be ignored. However also note that you can skip defining the first two spawns, as the room will still have the default ones in that case. A room is always considered to have at least the spawns for 2 bombs, whether they're the default or the customized ones (you can also decide to customize only one between the first two).
+            </p>
+        </div>
+    </body>
+</html>

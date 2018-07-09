@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Multiple Bombs</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css?family=Roboto|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../style.css">
+        <link rel="stylesheet" type="text/css" href="../style.css">
+    </head>
+    <body>
+        <div class="banner">
+            <div class="bannercontent">
+                <div class="bannertitle">Multiple Bombs</div>
+                <div class="bannersubtitle">A Keep Talking and Nobody Explodes mod</div>
+            </div>
+        </div>
+        <div class="content">
+            <nav>
+                <ol class="navigationmenu">
+                    <li><a href="./">Multiple Bombs Mod API</a></li>
+                    <span class="separator"></span>
+                    <li class="current">Modules</li>
+                </ol>
+            </nav>
+            <h1>Modules</h1>
+            <h2>Multiple Bombs widget queries</h2>
+            <p>
+                Multiple Bombs adds special widget queries to get informations about its state. The queries you can use are the following:
+            </p>
+            <b>Query key</b>: Multiple Bombs<br/>
+            <ul>
+                <li>
+                    <b>Query Info</b>: None (empty string)<br/>
+                    Returns a JSON serialized object containing the following fields:
+                    <ul>
+                        <li><i>bombCount</i>: an integer representing the current number of bombs.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>
+                If you don't get a response from these queries it means that Multiple Bombs is not installed, therefore you can assume the default vanilla values.
+            </p>
+        </div>
+    </body>
+</html>

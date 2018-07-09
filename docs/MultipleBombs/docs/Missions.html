@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Multiple Bombs</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css?family=Roboto|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../style.css">
+        <link rel="stylesheet" type="text/css" href="../style.css">
+    </head>
+    <body>
+        <div class="banner">
+            <div class="bannercontent">
+                <div class="bannertitle">Multiple Bombs</div>
+                <div class="bannersubtitle">A Keep Talking and Nobody Explodes mod</div>
+            </div>
+        </div>
+        <div class="content">
+            <nav>
+                <ol class="navigationmenu">
+                    <li><a href="./">Multiple Bombs Mod API</a></li>
+                    <span class="separator"></span>
+                    <li class="current">Missions</li>
+                </ol>
+            </nav>
+            <h1>Missions</h1>
+            <h2>Missions with multiple bombs</h2>
+            <p>
+                To define a mission with multiple bombs add a component pool to your mission with nothing but the mod type <code class="nowrap">Multiple Bombs</code> (space included). Then set the count of this pool to the number of extra bombs you want the mission to have (e.g. if you set the count to 1 the mission will have 2 bombs).<br/>
+                If you create multiple component pools of this kind, the number of extra bombs the mission will have will be the sum of the counts of all of the component pools.
+            </p>
+            <h2>Different Generator Settings for each bomb</h2>
+            <p>
+                By default all of the bombs will use the generator setting of the first one, that is the one defined in the mission. However you can specify a different generator setting for each bomb. To specify the generator setting for a bomb add a component pool in your mission with nothing but the mod type <code class="nowrap">Multiple Bombs:X:SettingsJSON</code>, where:
+                <ul>
+                    <li><i>X</i> is the index of the bomb that generator setting is for (starting from 0)</li>
+                    <li><i>SettingsJSON</i> is a JSON serialized generator setting</li>
+                </ul>
+                Remember that the bomb indices are 0-based, but this only works for the second (index 1) and the following bombs, as the generator setting for the first bomb is considered to be the one defined in the mission.
+            </p>
+            <p>
+                Note that you don't necessarily have to define a generator setting for each bomb, bombs that don't have a generator setting defined for them will use the first bomb's generator setting.
+            </p>
+            <h3>Custom KMMission Unity Editor</h3>
+            <p>
+                Since writing and modifying the generator setting JSON string can be difficult, this is a custom Unity editor that will show a nice UI to modify the bomb count and the generator setting for each bomb in the Unity inspector (preview screenshot on the right). Additionally, it also allows you to set the mode for the <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1307301431" target="_blank">Factory mod</a> (leaving it to the default value will make the mission have normal behaviour).
+            </p>
+        </div>
+    </body>
+</html>
