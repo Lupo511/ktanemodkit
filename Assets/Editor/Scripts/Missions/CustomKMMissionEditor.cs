@@ -157,7 +157,15 @@ public class CustomKMMissionEditor : Editor
             FactoryMode newFactoryMode = (FactoryMode)EditorGUILayout.Popup("Factory Mode", (int)factoryMode, FactoryModeFriendlyNames);
             if (newFactoryMode != factoryMode)
             {
-                if (factoryModeComponentPool == -1 && newFactoryMode != FactoryMode.Static)
+                if (newFactoryMode == FactoryMode.Static)
+                {
+                    if (factoryModeComponentPool != -1)
+                    {
+                        componentPools.DeleteArrayElementAtIndex(factoryModeComponentPool);
+                        readCurrentMission();
+                    }
+                }
+                else if (factoryModeComponentPool == -1)
                 {
                     int index = addComponentPool(serializedObject.FindProperty("GeneratorSetting"));
                     SerializedProperty componentPool = componentPools.GetArrayElementAtIndex(index);
