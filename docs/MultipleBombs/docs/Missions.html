@@ -36,14 +36,30 @@
                     <li><i>X</i> is the index of the bomb that generator setting is for (starting from 0)</li>
                     <li><i>SettingsJSON</i> is a JSON serialized generator setting</li>
                 </ul>
+            </p>
+            <p>
                 Remember that the bomb indices are 0-based, but this only works for the second (index 1) and the following bombs, as the generator setting for the first bomb is considered to be the one defined in the mission.
             </p>
             <p>
                 Note that you don't necessarily have to define a generator setting for each bomb, bombs that don't have a generator setting defined for them will use the first bomb's generator setting.
             </p>
             <h3>Custom KMMission Unity Editor</h3>
+            <a href="images/editor.png" target="_blank"><img class="right" src="images/editor.png"></a>
             <p>
-                Since writing and modifying the generator setting JSON string can be difficult, this is a custom Unity editor that will show a nice UI to modify the bomb count and the generator setting for each bomb in the Unity inspector (preview screenshot on the right). Additionally, it also allows you to set the mode for the <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1307301431" target="_blank">Factory mod</a> (leaving it to the default value will make the mission have normal behaviour).
+                Since writing and modifying the generator setting JSON string can be difficult, this is a custom Unity editor that will show a nice UI to modify the bomb count and the generator setting for each bomb in the Unity inspector (preview screenshot in the image). Additionally, it also allows you to set the mode for the <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1307301431" target="_blank">Factory mod</a> (leaving it to the default value will make the mission have normal behaviour).
+            </p>
+            <p>
+                To use it, download the script from the link below, then put it in the <code>Assets/Editor/Scripts/Missions</code> folder of your Unity project, replacing the existing one.
+            </p>
+            <p>
+                <form action="files/KMMissionEditor.cs">
+                    <button class="green">Download the editor script</button>
+                </form>
+            </p>
+            <h3>Examples</h3>
+            <p>
+                The mod type of a component pool that specifies the generator settings for a bomb would look like this:
+                <pre><code>Multiple Bombs:1:{"TimeLimit":600.0,"NumStrikes":6,"TimeBeforeNeedyActivation":180,"FrontFaceOnly":false,"OptionalWidgetCount":5,"ComponentPools":[{"Count":11,"AllowedSources":1,"ComponentTypes":[3],"SpecialComponentType":0,"ModTypes":[]}]}</code></pre>
             </p>
         </div>
     </body>

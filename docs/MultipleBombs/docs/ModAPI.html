@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Multiple Bombs</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css?family=Roboto|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../style.css">
+        <link rel="stylesheet" type="text/css" href="../style.css">
+    </head>
+    <body>
+        <div class="banner">
+            <div class="bannercontent">
+                <div class="bannertitle">Multiple Bombs</div>
+                <div class="bannersubtitle">A Keep Talking and Nobody Explodes mod</div>
+            </div>
+        </div>
+        <div class="content">
+            <nav>
+                <ol class="navigationmenu">
+                    <li><a href="./">Multiple Bombs Mod API</a></li>
+                    <span class="separator"></span>
+                    <li class="current">Mod API</li>
+                </ol>
+            </nav>
+            <h1>Mod API</h1>
+            <h2>Interoperability API</h2>
+            <p>
+                Multiple Bombs exposes a public API that can be used by other mods to interoperate with it.<br/>
+                The API is exposed through a GameObject named <code class="nowrap">MultipleBombs_Info</code> that has an <code class="nowrap">IDicionary&lt;string, object&gt;</code> component. This IDictionary contains keys and values (in this text also called properties) that allow for interoperation with the mod. The full set of keys is described in the table below.
+            </p>
+            <p>
+                If the GameObject doesn't exist you can assume that the Multiple Bombs mod is not installed.
+            </p>
+            <p>
+                Please note that the IDictionary is delcared with a generic value type of object in order to allow each property to have their own types. The type of each property is detailed in the properties table. Make sure to cast the values to the right type and to pass objects of the right type when using properties.
+            </p>
+            <p>
+                The available properties are:
+            </p>
+            <table>
+                <tr>
+                    <th>Key</th>
+                    <th>Type</th>
+                    <th>Can Set</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>CurrentMaximumBombCount</td>
+                    <td>int</td>
+                    <td>False</td>
+                    <td>Gets the maximum bomb count allowed by the currently installed gameplay rooms.</td>
+                </tr>
+                <tr>
+                    <td>CurrentFreePlayBombCount</td>
+                    <td>int</td>
+                    <td>True</td>
+                    <td>
+                        Gets or sets the current bomb count in the Free Play settings.<br/>
+                        Note: This can only be set while in the Setup state.
+                    </td>
+                </tr>
+            </table>
+            <h3>Examples</h3>
+            <p>Example of a script using the API:
+                <pre><code>//Example method that uses the API to get the current maximum number of bombs
+public int GetCurrentMaximumBombs()
+{
+    GameObject multipleBombsAPIGameObject = GameObject.Find("MultipleBombs_Info");
+    if(multipleBombsAPIGameObject == null) //If the Multiple Bombs mod is not installed
+        return 1;
+    IDictionary&lt;string, object&gt; multipleBombsAPI = multipleBombsAPIGameObject.GetComponent&lt;IDictionary&lt;string, object&gt;&gt;();
+    return (int)multipleBombsAPI["CurrentMaximumBombCount"];
+}</code></pre>
+            </p>
+        </div>
+    </body>
+</html>

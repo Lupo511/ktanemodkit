@@ -93,24 +93,30 @@ ol.navigationmenu span.separator {
 
 h1 {
     font-weight: normal;
-    margin-top: 0.7em;
+    margin: 0.7em 0 0 0;
     font-size: 2.5em
 }
 
 h2 {
     font-weight: normal;
-    margin-top: 0.6em;
+    margin: 0.6em 0 0 0;
     font-size: 1.8em
 }
 
 h3 {
     font-weight: normal;
-    margin-top: 0.6em;
+    margin: 0.6em 0 0 0;
     font-size: 1.4em
 }
 
+h3::before {
+    content: "";
+    display: block;
+    clear: both
+}
+
 p {
-    margin-top: 0.6em
+    margin: 0.6em 0 0 0
 }
 
 a {
@@ -127,10 +133,76 @@ a:hover {
     color: #039dd6
 }
 
+button.green {
+    display: inline-block;
+    margin: 0;
+    border: 0;
+    padding: 0.7em;
+    background-color: rgb(0, 130, 0);
+    color: white;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 1em
+}
+
+button.green:hover {
+    background-color: rgb(0, 150, 0)
+}
+
+button.green:active {
+    background-color: rgb(0, 120, 0)
+}
+
+img.right {
+    float: right;
+    width: 17em
+}
+
+@media only all and (max-width: 45em) {
+    img.right {
+        float: none;
+        display: block;
+        margin: 0 auto
+    }
+}
+
 code {
     font-family: Inconsolata, monospace
 }
 
 code.nowrap {
     white-space: nowrap
+}
+
+pre {
+    margin: 0.6em 0 0 0;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(100, 100, 100);
+    padding: 0;
+    width: 100%;
+    overflow-x: scroll
+}
+
+ul {
+    margin: 0
+}
+
+table {
+    margin: 0.6em 0 0 0
+}
+
+table, th, td {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(100, 100, 100);
+    border-collapse: collapse
+}
+
+th, td {
+    margin: 0;
+    padding: 0.4em
+}
+
+th {
+    font-weight: bold
 }
