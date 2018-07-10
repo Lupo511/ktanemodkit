@@ -206,3 +206,23 @@ th, td {
 th {
     font-weight: bold
 }
+
+code.cs span.comment {
+    color: green;
+}
+
+code.cs span.keyword {
+    color: blue;
+}
+
+code.cs span.class {
+    color: blue;
+}
+
+code.cs span.interface {
+    color: blue;
+}
+
+code.cs span.string {
+    color: red;
+}

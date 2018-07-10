@@ -63,14 +63,14 @@
             </table>
             <h3>Examples</h3>
             <p>Example of a script using the API:
-                <pre><code>//Example method that uses the API to get the current maximum number of bombs
-public int GetCurrentMaximumBombs()
+                <pre><code class="cs"><span class="comment">//Example method that uses the API to get the current maximum number of bombs</span>
+<span class="keyword">public int</span> GetCurrentMaximumBombs()
 {
-    GameObject multipleBombsAPIGameObject = GameObject.Find("MultipleBombs_Info");
-    if(multipleBombsAPIGameObject == null) //If the Multiple Bombs mod is not installed
-        return 1;
-    IDictionary&lt;string, object&gt; multipleBombsAPI = multipleBombsAPIGameObject.GetComponent&lt;IDictionary&lt;string, object&gt;&gt;();
-    return (int)multipleBombsAPI["CurrentMaximumBombCount"];
+    <span class="class">GameObject</span> multipleBombsAPIGameObject = <span class="class">GameObject</span>.Find(<span class="string">"MultipleBombs_Info"</span>);
+    <span class="keyword">if</span>(multipleBombsAPIGameObject == <span class="keyword">null</span>) <span class="comment">//If the Multiple Bombs mod is not installed</span>
+        <span class="keyword">return</span> 1;
+    <span class="interface">IDictionary</span>&lt;<span class="keyword">string</span>, <span class="keyword">object</span>&gt; multipleBombsAPI = multipleBombsAPIGameObject.GetComponent&lt;<span class="interface">IDictionary</span>&lt;<span class="keyword">string</span>, <span class="keyword">object</span>&gt;&gt;();
+    return (<span class="keyword">int</span>)multipleBombsAPI[<span class="string">"CurrentMaximumBombCount"</span>];
 }</code></pre>
             </p>
         </div>
