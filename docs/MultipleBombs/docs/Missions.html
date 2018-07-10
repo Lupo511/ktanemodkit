@@ -62,7 +62,7 @@
                 <pre><code>Multiple Bombs:1:{"TimeLimit":600.0,"NumStrikes":6,"TimeBeforeNeedyActivation":180,"FrontFaceOnly":false,"OptionalWidgetCount":5,"ComponentPools":[{"Count":11,"AllowedSources":1,"ComponentTypes":[3],"SpecialComponentType":0,"ModTypes":[]}]}</code></pre>
             </p>
             <p>
-                If you're generating a mission at runtime in a script, you can serialize a generator setting using the Newtonsoft.Json library included in the modkit:
+                If you are generating a mission at runtime in a script, you can serialize a generator setting using the Newtonsoft.Json library included in the modkit:
                 <pre><code class="cs"><span class="class">KMGeneratorSetting</span> generatorSetting = <span class="keyword">new</span> <span class="class">KMGeneratorSetting</span>();
 
 <span class="comment">//Set up the generator setting as you wish here</span>
