@@ -421,7 +421,7 @@ namespace MultipleBombsAssembly
             else
                 random = new System.Random(GameplayState.BombSeedToUse);
 
-            for (int i = missionDetails.BombCount - 1; i >= 1; i--)
+            for (int i = 1; i < missionDetails.BombCount; i++)
             {
                 GeneratorSetting generatorSetting;
                 if (!missionDetails.GeneratorSettings.TryGetValue(i, out generatorSetting))
@@ -433,7 +433,7 @@ namespace MultipleBombsAssembly
                 {
                     if (i == 1)
                     {
-                        StartCoroutine(createNewBomb(generatorSetting, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0), random.Next(), redirectedBombInfos));
+                        StartCoroutine(createNewBomb(generatorSetting, SceneManager.Instance.GameplayState.Room.BombSpawnPosition.transform.position + new Vector3(0.4f, 0, 0), new Vector3(0, 30, 0), random.Next(), redirectedBombInfos, i));
                     }
                     else
                     {
@@ -443,7 +443,7 @@ namespace MultipleBombsAssembly
                 }
                 else
                 {
-                    StartCoroutine(createNewBomb(generatorSetting, spawn.transform.position, spawn.transform.eulerAngles, random.Next(), redirectedBombInfos));
+                    StartCoroutine(createNewBomb(generatorSetting, spawn.transform.position, spawn.transform.eulerAngles, random.Next(), redirectedBombInfos, i));
                 }
             }
 
@@ -531,7 +531,7 @@ namespace MultipleBombsAssembly
             }
         }
 
-        private IEnumerator createNewBomb(GeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> redirectedBombInfos)
+        private IEnumerator createNewBomb(GeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> redirectedBombInfos, int selectableShift)
         {
             Debug.Log("[MultipleBombs]Generating new bomb");
 
@@ -557,7 +557,7 @@ namespace MultipleBombsAssembly
             }
             mainSelectable.ChildRowLength++;
             mainSelectable.DefaultSelectableIndex = gameplayState.Room.BombSpawnPosition.SelectableIndexY * mainSelectable.ChildRowLength + gameplayState.Room.BombSpawnPosition.SelectableIndexX;
-            children.Insert(mainSelectable.DefaultSelectableIndex + 1, bomb.GetComponent<Selectable>());
+            children.Insert(mainSelectable.DefaultSelectableIndex + selectableShift, bomb.GetComponent<Selectable>());
             mainSelectable.Children = children.ToArray();
             bomb.GetComponent<Selectable>().Parent = mainSelectable;
             KTInputManager.Instance.SelectableManager.ConfigureSelectableAreas(KTInputManager.Instance.RootSelectable);
