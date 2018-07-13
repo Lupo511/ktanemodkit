@@ -591,7 +591,10 @@ namespace MultipleBombsAssembly
             {
                 missionDetails = MultipleBombsMissionDetails.ReadMission(MissionManager.Instance.GetMission(GameplayState.MissionToLoad));
             }
-            return createBomb(missionDetails.GeneratorSettings[0], position, eulerAngles, seed, knownBombInfos);
+            GeneratorSetting generatorSetting;
+            if (!missionDetails.GeneratorSettings.TryGetValue(generatorSettingsIndex, out generatorSetting))
+                generatorSetting = missionDetails.GeneratorSettings[0];
+            return createBomb(generatorSetting, position, eulerAngles, seed, knownBombInfos);
         }
 
         private Bomb createBomb(GeneratorSetting generatorSetting, Vector3 position, Vector3 eulerAngles, int seed, List<KMBombInfo> knownBombInfos)
