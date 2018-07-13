@@ -18,49 +18,11 @@ MonoBehaviour:
     serials, two separate widget collections, two separate timers, and more!\r\nYou
     can easily change the mod settings from an option in the Free Play menu.\r\nAlso,
     it can work together with custom bomb casings and custom gameplay rooms, so that
-    you can have total control over customization!\r\n\r\n[h1]For mod developers[/h1]\r\n[u]Gameplay
-    Rooms[/u]\r\nIf you're making a gameplay room and you want to customize the spawns
-    of all the bombs, you can do so by simply creating empty gameobjects following
-    the naming scheme specified below at the position and rotation where you want
-    the bombs to spawn.\r\nThe objects must be named:\r\n[code]MultipleBombs_Spawn_X[/code]\r\nwhere
-    [i]X[/i] is the index of the bomb that spawn is for (starting from 0).\r\nImportant
-    note: if the bomb count is set to 1, the default bomb spawn is going to be used,
-    while the MultipleBombs spawns are going to be used when the bomb count is 2 or
-    greater. This allows you (if you want) to specify a different bomb spawn if the
-    bomb is just a single one.\r\n\r\n[u]Modules[/u]\r\nThe mod adds special widget
-    queries that let you get information on its state. The queries you can use are
-    the following:\r\n[b]Query Key:[/b] [i]MultipleBombs[/i]\r\n[list]\r\n[*][b]Query
-    Info:[/b] None (empty string)\r\nRetuns a string serialized JSON object containing
-    the following fields:\r\n[list]\r\n[*][i]bombCount[/i]: an integer representing
-    the current number of bombs.\r\n[/list]\r\n[/list]\r\nIf you don't get a response
-    from these queries it means that the mod is not installed, and therefore you can
-    assume the default vanilla values.\r\n\r\n[u]Missions[/u]\r\nThe mod allows you
-    to create custom missions with multiple bombs. To do that, add a new component
-    pool to your mission with nothing but the following mod type:\r\n[code]Multiple
-    Bombs[/code]\r\n(space included). Then set the count of this component pool to
-    the number of extra bombs you want the mission to have (e.g. if you set the count
-    to 1 the mission will have two bombs).\r\nIf you create multiple component pools
-    like that, the number of extra bombs the mission will have will be the sum of
-    all of them.\r\n\n[u]Mod API[/u]\nThe mod exposes a public API that can be used
-    by other mods to interoperate with it.\nThe API is exposed through a GameObject
-    named [i]MultipleBombs_Info[/i] that has an [i]IDicionary<string, object>[/i]
-    component. This IDictionary contains keys and values (in this text also called
-    properties) that allow for interoperation with the mod. The full set of keys is
-    described in the table below.\nIf the GameObject does not exist it means that
-    the Multiple Bombs mod is not installed.\nPlease note that the IDictionary is
-    delcared with a generic value type of [i]object[/i] to allow each property to
-    have their own types. The type of each property is detailed in the properties
-    table. Make sure to cast the values to the right type and to pass objects of the
-    right type when setting properties.\nAvailable properties:\n[table]\n[tr][th]Key[/th][th]Type[/th][th]Can
-    Set[/th][th]Description[/th][/tr]\n[tr][td]CurrentMaximumBombCount[/td][td]int[/td][td]False[/td][td]Gets
-    the maximum bomb count allowed by the currently installed Gameplay Rooms.[/td][/tr]\n[tr][td]CurrentFreePlayBombCount[/td][td]int[/td][td]True[/td][td]Gets
-    or sets the current bomb count in the Free Play settings.\nNote: This can only
-    be set while in the Setup state.[/td][/tr]\n[/table]\n\nAPI usage example:\n[code]\n//Example
-    method that uses the API to get the current maximum number of bombs\npublic int
-    GetCurrentMaximumBombs()\n{\n\tGameObject multipleBombsAPIGameObject = GameObject.Find(\"MultipleBombs_Info\");\n\tif(multipleBombsAPIGameObject
-    == null) //If the Multiple Bombs mod is not installed\n\t\treturn 1;\n\tIDictionary<string,
-    object> multipleBombsAPI = multipleBombsAPIGameObject.GetComponent<IDictionary<string,
-    object>>();\n\treturn (int)multipleBombsAPI[\"CurrentMaximumBombCount\"];\n}\n[/code]"
-  version: 1.2.4
+    you can have total control over customization!\r\n\r\n[h1]For mod developers[/h1]\r\nThe
+    mod exposes various APIs that other mod developers can use. For example it allows
+    to customize bomb spanws in a Gameplay Room, to build missions with multiple bombs
+    and much more!\nTo learn how to use it and for explanation about all of its features
+    read the [url=https://lupo511.github.io/ktanemodkit/MultipleBombs/docs/]API docs[/url]."
+  version: 1.3.0
   outputFolder: build
   previewImage: {fileID: 2800000, guid: be95b037aca480441806d4efa6da4ce2, type: 3}
