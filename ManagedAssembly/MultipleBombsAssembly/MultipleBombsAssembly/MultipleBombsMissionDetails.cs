@@ -26,7 +26,14 @@ namespace MultipleBombsAssembly
 
         public static MultipleBombsMissionDetails ReadMission(Mission mission)
         {
+            List<ComponentPool> multipleBombsComponentPools;
+            return ReadMission(mission, false, out multipleBombsComponentPools);
+        }
+
+        public static MultipleBombsMissionDetails ReadMission(Mission mission, bool removeComponentPools, out List<ComponentPool> multipleBombsComponentPools)
+        {
             MultipleBombsMissionDetails missionDetails = new MultipleBombsMissionDetails();
+            multipleBombsComponentPools = new List<ComponentPool>();
             if (mission.GeneratorSetting != null)
             {
                 GeneratorSetting generatorSetting = UnityEngine.Object.Instantiate(mission).GeneratorSetting;
@@ -42,6 +49,9 @@ namespace MultipleBombsAssembly
                             {
                                 missionDetails.BombCount += pool.Count;
                                 generatorSetting.ComponentPools.RemoveAt(i);
+                                multipleBombsComponentPools.Add(mission.GeneratorSetting.ComponentPools[i]);
+                                if (removeComponentPools)
+                                    mission.GeneratorSetting.ComponentPools.RemoveAt(i);
                             }
                             else if (pool.ModTypes[0].StartsWith("Multiple Bombs:"))
                             {
@@ -64,6 +74,9 @@ namespace MultipleBombsAssembly
                                 }
                                 missionDetails.GeneratorSettings.Add(bombIndex, bombGeneratorSetting);
                                 generatorSetting.ComponentPools.RemoveAt(i);
+                                multipleBombsComponentPools.Add(mission.GeneratorSetting.ComponentPools[i]);
+                                if (removeComponentPools)
+                                    mission.GeneratorSetting.ComponentPools.RemoveAt(i);
                             }
                         }
                     }

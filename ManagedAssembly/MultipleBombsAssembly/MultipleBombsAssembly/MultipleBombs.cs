@@ -272,24 +272,23 @@ namespace MultipleBombsAssembly
 
         private IEnumerator setupGameplayState()
         {
-            GeneratorSetting originalGeneratorSetting = null;
+            List<ComponentPool> multipleBombsComponentPools = null;
+            Mission mission = null;
             MultipleBombsMissionDetails missionDetails = null;
             if (GameplayState.MissionToLoad == FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
             {
-                missionDetails = new MultipleBombsMissionDetails(currentFreePlayBombCount, FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings).GeneratorSetting);
+                mission = FreeplayMissionGenerator.Generate(GameplayState.FreeplaySettings);
+                missionDetails = new MultipleBombsMissionDetails(currentFreePlayBombCount, mission.GeneratorSetting);
             }
             else if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
             {
-                missionDetails = MultipleBombsMissionDetails.ReadMission(GameplayState.CustomMission);
-                originalGeneratorSetting = GameplayState.CustomMission.GeneratorSetting;
-                GameplayState.CustomMission.GeneratorSetting = missionDetails.GeneratorSettings[0];
+                mission = GameplayState.CustomMission;
+                missionDetails = MultipleBombsMissionDetails.ReadMission(GameplayState.CustomMission, true, out multipleBombsComponentPools);
             }
             else
             {
-                Mission mission = MissionManager.Instance.GetMission(GameplayState.MissionToLoad);
-                missionDetails = MultipleBombsMissionDetails.ReadMission(mission);
-                originalGeneratorSetting = mission.GeneratorSetting;
-                mission.GeneratorSetting = missionDetails.GeneratorSettings[0];
+                mission = MissionManager.Instance.GetMission(GameplayState.MissionToLoad);
+                missionDetails = MultipleBombsMissionDetails.ReadMission(mission, true, out multipleBombsComponentPools);
             }
 
             int maximumBombCount = GetCurrentMaximumBombCount();
@@ -378,15 +377,6 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Result screens initialized");
             yield return null;
 
-            if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID)
-            {
-                GameplayState.CustomMission.GeneratorSetting = originalGeneratorSetting;
-            }
-            else if (GameplayState.MissionToLoad != FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
-            {
-                MissionManager.Instance.GetMission(GameplayState.MissionToLoad).GeneratorSetting = originalGeneratorSetting;
-            }
-
             Debug.Log("[MultipleBombs]Initializing gameplay state");
 
             Debug.Log("[MultipleBombs]Bombs to spawn: " + missionDetails.BombCount);
@@ -426,7 +416,7 @@ namespace MultipleBombsAssembly
                 GeneratorSetting generatorSetting;
                 if (!missionDetails.GeneratorSettings.TryGetValue(i, out generatorSetting))
                 {
-                    generatorSetting = missionDetails.GeneratorSettings[0];
+                    generatorSetting = mission.GeneratorSetting;
                 }
                 GameObject spawn = GameObject.Find("MultipleBombs_Spawn_" + i);
                 if (spawn == null)
@@ -449,6 +439,11 @@ namespace MultipleBombsAssembly
 
             vanillaBomb.GetComponent<Selectable>().Parent.Init();
             Debug.Log("[MultipleBombs]All bombs generated");
+
+            if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID || GameplayState.MissionToLoad != FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+            {
+                mission.GeneratorSetting.ComponentPools.AddRange(multipleBombsComponentPools);
+            }
 
             //PaceMaker
             PaceMakerMonitor monitor = FindObjectOfType<PaceMaker>().gameObject.AddComponent<PaceMakerMonitor>();
