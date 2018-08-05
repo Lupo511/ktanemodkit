@@ -132,10 +132,7 @@ public class CustomKMMissionEditor : Editor
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("ID In-Game");
-            if (ModConfig.Instance != null)
-                EditorGUILayout.SelectableLabel(string.Format("mod_{0}_{1}", ModConfig.ID, serializedObject.targetObject.name));
-            else
-                EditorGUILayout.HelpBox("Configure your mod to get the mission In-Game ID.", MessageType.Error);
+            EditorGUILayout.SelectableLabel(string.Format("mod_{0}_{1}", ModConfig.ID, serializedObject.targetObject.name));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("DisplayName"));
