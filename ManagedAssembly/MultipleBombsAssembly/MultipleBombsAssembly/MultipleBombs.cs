@@ -2,6 +2,7 @@
 using Assets.Scripts.Pacing;
 using Assets.Scripts.Props;
 using Assets.Scripts.Records;
+using Assets.Scripts.Settings;
 using Assets.Scripts.Tournaments;
 using Events;
 using System;
@@ -207,6 +208,7 @@ namespace MultipleBombsAssembly
                     return;
                 currentFreePlayBombCount++;
                 currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
+                updateDifficulty(device);
             });
             decrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
             {
@@ -214,6 +216,7 @@ namespace MultipleBombsAssembly
                     return;
                 currentFreePlayBombCount--;
                 currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
+                updateDifficulty(device);
             });
             //string textColor = "#" + valueText.color.r.ToString("x2") + valueText.color.g.ToString("x2") + valueText.color.b.ToString("x2");
             incrementButtonSelectable.OnHighlight = new Action(() =>
@@ -228,6 +231,13 @@ namespace MultipleBombsAssembly
                 bombsLed.SetState(true);
                 device.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
             });
+
+            patchButtonPush(device.ModuleCountDecrement.GetComponent<KeypadButton>(), device);
+            patchButtonPush(device.ModuleCountIncrement.GetComponent<KeypadButton>(), device);
+            patchButtonPush(device.TimeDecrement.GetComponent<KeypadButton>(), device);
+            patchButtonPush(device.TimeIncrement.GetComponent<KeypadButton>(), device);
+            patchToggle(device.NeedyToggle.GetComponent<ToggleSwitch>(), device);
+            patchToggle(device.HardcoreToggle.GetComponent<ToggleSwitch>(), device);
 
             Action disableBomsLed = new Action(() => bombsLed.SetState(false));
             device.ModuleCountIncrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
@@ -275,6 +285,55 @@ namespace MultipleBombsAssembly
                 tournamentDetailPageMonitor.MultipleBombs = this;
             }
             Debug.Log("[MultipleBombs]BombBinder info added");
+        }
+
+        private Delegate findFreePlayDeviceEvent(Delegate source, FreeplayDevice device)
+        {
+            foreach (Delegate del in source.GetInvocationList())
+            {
+                if (ReferenceEquals(del.Target, device))
+                {
+                    return del;
+                }
+            }
+            return null;
+        }
+
+        private void patchButtonPush(KeypadButton button, FreeplayDevice device)
+        {
+            PushEvent original = (PushEvent)findFreePlayDeviceEvent(button.OnPush, device);
+            button.OnPush -= original;
+            button.OnPush += new PushEvent(() =>
+            {
+                if (original != null)
+                    original();
+                updateDifficulty(device);
+            });
+        }
+
+        private void patchToggle(ToggleSwitch toggle, FreeplayDevice device)
+        {
+            ToggleEvent original = (ToggleEvent)findFreePlayDeviceEvent(toggle.OnToggle, device);
+            toggle.OnToggle -= original;
+            toggle.OnToggle += new ToggleEvent((bool toggleState) =>
+            {
+                if (original != null)
+                    original(toggleState);
+                updateDifficulty(device);
+            });
+        }
+
+        private void updateDifficulty(FreeplayDevice device)
+        {
+            if (device.CurrentSettings.IsHardCore)
+            {
+                device.DifficultyIndicator.Configure(device.CurrentSettings.Time, device.CurrentSettings.ModuleCount * currentFreePlayBombCount, device.CurrentSettings.HasNeedy, true);
+            }
+            else
+            {
+                device.DifficultyIndicator.Configure(device.CurrentSettings.Time, device.CurrentSettings.ModuleCount, device.CurrentSettings.HasNeedy, false);
+                device.DifficultyIndicator.Difficulty *= currentFreePlayBombCount;
+            }
         }
 
         private IEnumerator setupGameplayState()
