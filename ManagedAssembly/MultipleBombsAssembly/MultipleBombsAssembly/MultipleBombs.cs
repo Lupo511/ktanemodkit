@@ -328,6 +328,8 @@ namespace MultipleBombsAssembly
             if (device.CurrentSettings.IsHardCore)
             {
                 device.DifficultyIndicator.Configure(device.CurrentSettings.Time, device.CurrentSettings.ModuleCount * currentFreePlayBombCount, device.CurrentSettings.HasNeedy, true);
+                if (device.CurrentSettings.HasNeedy)
+                    device.DifficultyIndicator.Difficulty += currentFreePlayBombCount - 1;
             }
             else
             {
