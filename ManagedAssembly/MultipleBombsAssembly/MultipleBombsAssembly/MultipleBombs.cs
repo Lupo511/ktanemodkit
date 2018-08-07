@@ -239,17 +239,28 @@ namespace MultipleBombsAssembly
             patchToggle(device.NeedyToggle.GetComponent<ToggleSwitch>(), device);
             patchToggle(device.HardcoreToggle.GetComponent<ToggleSwitch>(), device);
 
+            Action setCustomModulesText = new Action(() =>
+            {
+                device.Screen.CurrentState = FreeplayScreen.State.Modules;
+                device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
+            });
             Action disableBomsLed = new Action(() => bombsLed.SetState(false));
-            device.ModuleCountIncrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
+            Selectable moduleCountDecrementSelectable = device.ModuleCountDecrement.GetComponent<Selectable>();
+            Action moduleCountDecrementAction = (Action)findFreePlayDeviceEvent(moduleCountDecrementSelectable.OnHighlight, device);
+            if (moduleCountDecrementAction != null)
             {
-                device.Screen.CurrentState = FreeplayScreen.State.Modules;
-                device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
-            }), disableBomsLed);
-            device.ModuleCountDecrement.GetComponent<Selectable>().OnHighlight = (Action)Delegate.Combine(new Action(() =>
+                moduleCountDecrementSelectable.OnHighlight -= moduleCountDecrementAction;
+                moduleCountDecrementSelectable.OnHighlight += setCustomModulesText;
+            }
+            moduleCountDecrementSelectable.OnHighlight += disableBomsLed;
+            Selectable moduleCountIncrementSelectable = device.ModuleCountIncrement.GetComponent<Selectable>();
+            Action moduleCountIncrementAction = (Action)findFreePlayDeviceEvent(moduleCountIncrementSelectable.OnHighlight, device);
+            if (moduleCountIncrementAction != null)
             {
-                device.Screen.CurrentState = FreeplayScreen.State.Modules;
-                device.Screen.ScreenText.text = "MODULES:\n\nNumber of modules\nper bomb";
-            }), disableBomsLed);
+                moduleCountIncrementSelectable.OnHighlight -= moduleCountIncrementAction;
+                moduleCountIncrementSelectable.OnHighlight += setCustomModulesText;
+            }
+            moduleCountIncrementSelectable.OnHighlight += disableBomsLed;
             device.TimeDecrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
             device.TimeIncrement.GetComponent<Selectable>().OnHighlight += disableBomsLed;
             device.NeedyToggle.GetComponent<Selectable>().OnHighlight += disableBomsLed;
