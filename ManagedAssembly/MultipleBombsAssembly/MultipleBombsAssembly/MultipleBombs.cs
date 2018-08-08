@@ -197,11 +197,17 @@ namespace MultipleBombsAssembly
             children.Insert(2, decrementButtonSelectable);
             deviceSelectable.Children = children.ToArray();
             deviceSelectable.Init();
+
+            //Call the Awake callback
+            bombsObject.SetActive(true);
+            bombsObject.SetActive(false);
+
             if (KTInputManager.Instance.IsMotionControlMode())
             {
                 incrementButtonSelectable.ActivateMotionControls();
                 decrementButtonSelectable.ActivateMotionControls();
             }
+
             incrementButton.GetComponent<KeypadButton>().OnPush = new PushEvent(() =>
             {
                 if (currentFreePlayBombCount >= GetCurrentMaximumBombCount())
