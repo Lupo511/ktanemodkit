@@ -16,10 +16,12 @@ MonoBehaviour:
   description: "[i]You've lived all your life writing however you wanted without giving
     a second thought to who would be reading what you misspelled. But now, your life
     depends on your grammar and orthography, and this bomb is very nitpicky. You should
-    of paid more attention in you're English class.\r\n\r\n...Oh, carp.[/i]\r\n\r\n[h1]Manual[/h1]\r\nThe
-    PDF manual is included in the download.\r\nThe HTML manual can be viewed from
-    the following pages:\r\n[list]\r\n[*]Module: [url=https://lupo511.github.io/ktanemodkit/EnglishTest/Manual/EnglishTest.html]https://lupo511.github.io/ktanemodkit/EnglishTest/Manual/EnglishTest.html[/url]\r\n[*]Grammar
-    Appendix: [url=https://lupo511.github.io/ktanemodkit/EnglishTest/Manual/GrammarAppendix.html]https://lupo511.github.io/ktanemodkit/EnglishTest/Manual/GrammarAppendix.html[/url]\r\n[/list]\r\n\r\n[h1]Module
+    of paid more attention in you're English class.\r\n\r\n...Oh, carp.[/i]\r\n\r\n[h1]Manual[/h1]\r\nYou
+    can download both the HTML and the PDF versions of the manual from the links below.
+    The PDF manual is also included in the download.\r\n[list]\r\n[*]Module: [url=https://lupo511.github.io/ktanemods/EnglishTest/Manual/EnglishTest.html]HTML[/url],
+    [url=https://lupo511.github.io/ktanemods/EnglishTest/Manual/EnglishTest.pdf]PDF[/url]\r\n[*]Grammar
+    Appendix: [url=https://lupo511.github.io/ktanemods/EnglishTest/Manual/GrammarAppendix.html]HTML[/url],
+    [url=https://lupo511.github.io/ktanemods/EnglishTest/Manual/GrammarAppendix.pdf]PDF[/url]\r\n[/list]\r\n\r\n[h1]Module
     Type Name[/h1]\r\nThe Module Type Name is EnglishTest."
   version: 1.07
   outputFolder: build
