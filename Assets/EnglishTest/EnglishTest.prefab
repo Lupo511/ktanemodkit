@@ -1321,6 +1321,13 @@ MonoBehaviour:
   m_Script: {fileID: 993498448, guid: ec1f31b55bf60ee4b87e54d5e2a8f667, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Module: {fileID: 11450360}
+  Audio: {fileID: 11461404}
+  TopDisplay: {fileID: 107908}
+  TopText: {fileID: 10258020}
+  BottomDisplay: {fileID: 188040}
+  BottomText: {fileID: 10216792}
+  OptionsText: {fileID: 10283020}
   UnlitShader: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!114 &11478188
 MonoBehaviour:

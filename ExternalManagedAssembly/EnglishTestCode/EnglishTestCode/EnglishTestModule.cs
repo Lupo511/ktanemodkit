@@ -7,15 +7,14 @@ using System.Collections.Generic;
 
 public class EnglishTestModule : MonoBehaviour
 {
+    public KMBombModule Module;
+    public KMAudio Audio;
+    public GameObject TopDisplay;
+    public TextMesh TopText;
+    public GameObject BottomDisplay;
+    public TextMesh BottomText;
+    public TextMesh OptionsText;
     public Shader UnlitShader;
-
-    private KMBombModule module;
-    private KMAudio audio;
-    private GameObject topDisplay;
-    private TextMesh topText;
-    private GameObject bottomDisplay;
-    private TextMesh bottomText;
-    private TextMesh optionsText;
 
     private bool activated;
     private List<Question> questions;
@@ -284,75 +283,5 @@ public class EnglishTestModule : MonoBehaviour
                 return childGo;
         }
         return null;
-    }
-
-    public KMBombModule Module
-    {
-        get
-        {
-            if (module == null)
-                module = GetComponent<KMBombModule>();
-            return module;
-        }
-    }
-
-    public KMAudio Audio
-    {
-        get
-        {
-            if (audio == null)
-                audio = GetComponent<KMAudio>();
-            return audio;
-        }
-    }
-
-    public GameObject TopDisplay
-    {
-        get
-        {
-            if (topDisplay == null)
-                topDisplay = findChildGameObjectByName(gameObject, "Top Display");
-            return topDisplay;
-        }
-    }
-
-    public TextMesh TopText
-    {
-        get
-        {
-            if (topText == null)
-                topText = findChildGameObjectByName(gameObject, "Top Text").GetComponent<TextMesh>();
-            return topText;
-        }
-    }
-
-    public GameObject BottomDisplay
-    {
-        get
-        {
-            if (bottomDisplay == null)
-                bottomDisplay = findChildGameObjectByName(gameObject, "Bottom Display");
-            return bottomDisplay;
-        }
-    }
-
-    public TextMesh BottomText
-    {
-        get
-        {
-            if (bottomText == null)
-                bottomText = findChildGameObjectByName(gameObject, "Bottom Text").GetComponent<TextMesh>();
-            return bottomText;
-        }
-    }
-
-    public TextMesh OptionsText
-    {
-        get
-        {
-            if (optionsText == null)
-                optionsText = findChildGameObjectByName(gameObject, "Options Text").GetComponent<TextMesh>();
-            return optionsText;
-        }
     }
 }
