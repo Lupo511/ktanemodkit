@@ -217,43 +217,42 @@ public class EnglishTestModule : MonoBehaviour
 
     private void updateOptionsText()
     {
+        float maxX = BottomDisplay.transform.localScale.x - 0.007f;
+
+        string unformattedText = "";
+        int wordBeginIndex = 0;
+        for (int i = 0; i < currentQuestion.Answers.Count; i++)
+        {
+            if (i > 0)
+                unformattedText += " ";
+
+            if (i == selectedAnswerIndex)
+                wordBeginIndex = unformattedText.Length;
+
+            unformattedText += currentQuestion.Answers[i];
+        }
+
         OptionsText.fontSize = 35;
-        float wordWidth = 0;
-        float wordBegin = 0;
+        float optionsTextWidth = 0;
         while (true)
         {
-            string str = "";
-            for (int i = 0; i < currentQuestion.Answers.Count; i++)
-            {
-                if (i > 0)
-                    str += " ";
-
-                if (i == selectedAnswerIndex)
-                {
-                    OptionsText.text = currentQuestion.Answers[i];
-                    wordWidth = getGameObjectSize(OptionsText.gameObject).x;
-                    OptionsText.text = str;
-                    wordBegin = getGameObjectSize(OptionsText.gameObject).x;
-                    str += "<color=#000000>" + currentQuestion.Answers[i] + "</color>";
-                }
-                else
-                {
-                    str += currentQuestion.Answers[i];
-                }
-            }
-            OptionsText.text = str;
-            if (getGameObjectSize(OptionsText.gameObject).x < BottomDisplay.GetComponent<BoxCollider>().size.x * BottomDisplay.transform.localScale.x)
+            optionsTextWidth = getTextWidth(unformattedText, OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
+            if (optionsTextWidth <= maxX)
                 break;
             OptionsText.fontSize--;
         }
+
+        float wordBegin = getTextWidth(unformattedText.Remove(wordBeginIndex), OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
+        float wordWidth = getTextWidth(currentQuestion.Answers[selectedAnswerIndex], OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
+        OptionsText.text = unformattedText.Insert(wordBeginIndex + currentQuestion.Answers[selectedAnswerIndex].Length, "</color>").Insert(wordBeginIndex, "<color=#000000>");
 
         if (OptionsText.transform.childCount > 0)
             Destroy(OptionsText.transform.GetChild(0).gameObject);
         GameObject background = GameObject.CreatePrimitive(PrimitiveType.Plane);
         background.name = "Highlight plane";
         background.transform.parent = OptionsText.gameObject.transform;
-        background.transform.localPosition = new Vector3(wordBegin - (getGameObjectSize(OptionsText.gameObject).x / 2) + wordWidth / 2, 0, 0.000001f);
-        background.transform.localScale = new Vector3(wordWidth / 10, 1, getGameObjectSize(OptionsText.gameObject).y / 10);
+        background.transform.localPosition = new Vector3(wordBegin - (optionsTextWidth / 2) + (wordWidth / 2), 0, 0.000001f);
+        background.transform.localScale = new Vector3(wordWidth * 0.1f, 1, getGameObjectSize(OptionsText.gameObject).y * 0.1f);
         background.transform.localRotation = Quaternion.Euler(new Vector3(-90, 0, 0));
         background.GetComponent<Renderer>().materials[0].shader = UnlitShader;
         background.GetComponent<Renderer>().materials[0].color = Color.green;
@@ -261,14 +260,19 @@ public class EnglishTestModule : MonoBehaviour
 
     private float getTextWidth(TextMesh textMesh)
     {
+        return getTextWidth(textMesh.text, textMesh.font, textMesh.fontSize, textMesh.fontStyle) * textMesh.characterSize;
+    }
+
+    private float getTextWidth(string text, Font font, int fontSize, FontStyle fontStyle)
+    {
         float width = 0;
-        foreach (string line in textMesh.text.Split('\n', '\r'))
+        foreach (string line in text.Split('\n', '\r'))
         {
             float lineWidth = 0;
             foreach (char c in line)
             {
                 CharacterInfo characterInfo;
-                if (textMesh.font.GetCharacterInfo(c, out characterInfo, textMesh.fontSize, textMesh.fontStyle))
+                if (font.GetCharacterInfo(c, out characterInfo, fontSize, fontStyle))
                 {
                     lineWidth += characterInfo.advance;
                 }
@@ -276,7 +280,7 @@ public class EnglishTestModule : MonoBehaviour
             if (lineWidth > width)
                 width = lineWidth;
         }
-        return width * textMesh.characterSize * 0.1f;
+        return width * 0.1f;
     }
 
     private Vector3 getGameObjectSize(GameObject go)
