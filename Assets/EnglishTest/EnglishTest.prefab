@@ -1328,6 +1328,9 @@ MonoBehaviour:
   BottomDisplay: {fileID: 188040}
   BottomText: {fileID: 10216792}
   OptionsText: {fileID: 10283020}
+  SubmitSelectable: {fileID: 11413462}
+  LeftSelectable: {fileID: 11478188}
+  RightSelectable: {fileID: 11406932}
   UnlitShader: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!114 &11478188
 MonoBehaviour:
