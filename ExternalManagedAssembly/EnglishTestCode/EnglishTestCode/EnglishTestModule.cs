@@ -176,19 +176,21 @@ public class EnglishTestModule : MonoBehaviour
 
     private void setBottomText(string text)
     {
-        float maxX = BottomDisplay.GetComponent<BoxCollider>().size.x * BottomDisplay.transform.localScale.x - 0.007f;
-        float maxZ = BottomDisplay.GetComponent<BoxCollider>().size.z * BottomDisplay.transform.localScale.z;
+        float maxX = BottomDisplay.transform.localScale.x - 0.007f;
+        //float maxZ = BottomDisplay.transform.localScale.z; unused
+
         BottomText.fontSize = 35;
         BottomText.text = text;
+
         string originalText = BottomText.text;
-        while (getGameObjectSize(BottomText.gameObject).x > maxX)
+        while (getTextWidth(BottomText) > maxX)
         {
             string currentText = BottomText.text;
             List<int> indices = findAllIndicesOf(currentText, ' ');
             int i = indices.Count - 1;
             if (i >= 0)
             {
-                while (getGameObjectSize(BottomText.gameObject).x > maxX)
+                while (getTextWidth(BottomText) > maxX)
                 {
                     BottomText.text = currentText.Substring(0, indices[i]);
                     i--;
@@ -203,8 +205,9 @@ public class EnglishTestModule : MonoBehaviour
             else
             {
                 BottomText.fontSize--;
+                BottomText.text = originalText;
             }
-            if (findAllIndicesOf(BottomText.text, '\n').Count > 3)
+            if (findAllIndicesOf(BottomText.text, '\n').Count > 3) //At most 4 lines
             {
                 BottomText.fontSize--;
                 BottomText.text = originalText;
@@ -254,6 +257,26 @@ public class EnglishTestModule : MonoBehaviour
         background.transform.localRotation = Quaternion.Euler(new Vector3(-90, 0, 0));
         background.GetComponent<Renderer>().materials[0].shader = UnlitShader;
         background.GetComponent<Renderer>().materials[0].color = Color.green;
+    }
+
+    private float getTextWidth(TextMesh textMesh)
+    {
+        float width = 0;
+        foreach (string line in textMesh.text.Split('\n', '\r'))
+        {
+            float lineWidth = 0;
+            foreach (char c in line)
+            {
+                CharacterInfo characterInfo;
+                if (textMesh.font.GetCharacterInfo(c, out characterInfo, textMesh.fontSize, textMesh.fontStyle))
+                {
+                    lineWidth += characterInfo.advance;
+                }
+            }
+            if (lineWidth > width)
+                width = lineWidth;
+        }
+        return width * textMesh.characterSize * 0.1f;
     }
 
     private Vector3 getGameObjectSize(GameObject go)
