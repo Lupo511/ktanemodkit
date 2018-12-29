@@ -177,7 +177,6 @@ public class EnglishTestModule : MonoBehaviour
     private void setBottomText(string text)
     {
         float maxX = BottomDisplay.transform.localScale.x - 0.007f;
-        //float maxZ = BottomDisplay.transform.localScale.z; unused
 
         BottomText.fontSize = 35;
         BottomText.text = text;
@@ -231,20 +230,21 @@ public class EnglishTestModule : MonoBehaviour
 
             unformattedText += currentQuestion.Answers[i];
         }
+        OptionsText.text = unformattedText; //Assigning it to make sure that the characters get added to the font texture
 
         OptionsText.fontSize = 35;
         float optionsTextWidth = 0;
         while (true)
         {
-            optionsTextWidth = getTextWidth(unformattedText, OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
+            optionsTextWidth = getTextWidth(OptionsText);
             if (optionsTextWidth <= maxX)
                 break;
             OptionsText.fontSize--;
         }
 
-        float wordBegin = getTextWidth(unformattedText.Remove(wordBeginIndex), OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
+        float wordBegin = getTextWidth(OptionsText.text.Remove(wordBeginIndex), OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
         float wordWidth = getTextWidth(currentQuestion.Answers[selectedAnswerIndex], OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
-        OptionsText.text = unformattedText.Insert(wordBeginIndex + currentQuestion.Answers[selectedAnswerIndex].Length, "</color>").Insert(wordBeginIndex, "<color=#000000>");
+        OptionsText.text = OptionsText.text.Insert(wordBeginIndex + currentQuestion.Answers[selectedAnswerIndex].Length, "</color>").Insert(wordBeginIndex, "<color=#000000>");
 
         if (OptionsText.transform.childCount > 0)
             Destroy(OptionsText.transform.GetChild(0).gameObject);
@@ -252,7 +252,7 @@ public class EnglishTestModule : MonoBehaviour
         background.name = "Highlight plane";
         background.transform.parent = OptionsText.gameObject.transform;
         background.transform.localPosition = new Vector3(wordBegin - (optionsTextWidth / 2) + (wordWidth / 2), 0, 0.000001f);
-        background.transform.localScale = new Vector3(wordWidth * 0.1f, 1, getGameObjectSize(OptionsText.gameObject).y * 0.1f);
+        background.transform.localScale = new Vector3(wordWidth * 0.1f, 1, OptionsText.font.lineHeight * (OptionsText.fontSize / OptionsText.font.fontSize) * OptionsText.characterSize * 0.01f);
         background.transform.localRotation = Quaternion.Euler(new Vector3(-90, 0, 0));
         background.GetComponent<Renderer>().materials[0].shader = UnlitShader;
         background.GetComponent<Renderer>().materials[0].color = Color.green;
@@ -265,6 +265,7 @@ public class EnglishTestModule : MonoBehaviour
 
     private float getTextWidth(string text, Font font, int fontSize, FontStyle fontStyle)
     {
+        //font.RequestCharactersInTexture(text, fontSize, fontStyle); Instead assumes that the requested characters are already in the texture
         float width = 0;
         foreach (string line in text.Split('\n', '\r'))
         {
@@ -281,14 +282,6 @@ public class EnglishTestModule : MonoBehaviour
                 width = lineWidth;
         }
         return width * 0.1f;
-    }
-
-    private Vector3 getGameObjectSize(GameObject go)
-    {
-        BoxCollider col = go.AddComponent<BoxCollider>();
-        Vector3 size = col.size;
-        Destroy(col);
-        return size;
     }
 
     private List<int> findAllIndicesOf(string str, char chr)
