@@ -7,6 +7,8 @@ using System.Collections.Generic;
 
 public class EnglishTestModule : MonoBehaviour
 {
+    private static List<Question> questions;
+
     public KMBombModule Module;
     public KMAudio Audio;
     public GameObject TopDisplay;
@@ -20,23 +22,13 @@ public class EnglishTestModule : MonoBehaviour
     public KMSelectable RightSelectable;
 
     private bool activated;
-    private List<Question> questions;
     private int solvedQuestions;
     private int targetQuestions;
     private Question currentQuestion;
     private int selectedAnswerIndex;
 
-    public void Start()
+    static EnglishTestModule()
     {
-        activated = false;
-        solvedQuestions = 0;
-        targetQuestions = 3;
-
-        Module.OnActivate += OnActivate;
-        SubmitSelectable.OnInteract += OnSubmitInteract;
-        LeftSelectable.OnInteract += OnLeftInteract;
-        RightSelectable.OnInteract += OnRightInteract;
-
         questions = new List<Question>();
         string[] lines = EnglishTestCode.Properties.Resources.sentences.Split('\n', '\r');
         for (int i = 0; i < lines.Length; i++)
@@ -70,6 +62,18 @@ public class EnglishTestModule : MonoBehaviour
                 Debug.Log("Couldn't find options match for string at line " + i);
             }
         }
+    }
+
+    public void Start()
+    {
+        activated = false;
+        solvedQuestions = 0;
+        targetQuestions = 3;
+
+        Module.OnActivate += OnActivate;
+        SubmitSelectable.OnInteract += OnSubmitInteract;
+        LeftSelectable.OnInteract += OnLeftInteract;
+        RightSelectable.OnInteract += OnRightInteract;
     }
 
     public void OnDestroy()
