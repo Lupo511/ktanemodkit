@@ -14,10 +14,10 @@ public class EnglishTestModule : MonoBehaviour
     public GameObject BottomDisplay;
     public TextMesh BottomText;
     public TextMesh OptionsText;
+    public GameObject OptionsBackground;
     public KMSelectable SubmitSelectable;
     public KMSelectable LeftSelectable;
     public KMSelectable RightSelectable;
-    public Shader UnlitShader;
 
     private bool activated;
     private List<Question> questions;
@@ -246,16 +246,8 @@ public class EnglishTestModule : MonoBehaviour
         float wordWidth = getTextWidth(currentQuestion.Answers[selectedAnswerIndex], OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
         OptionsText.text = OptionsText.text.Insert(wordBeginIndex + currentQuestion.Answers[selectedAnswerIndex].Length, "</color>").Insert(wordBeginIndex, "<color=#000000>");
 
-        if (OptionsText.transform.childCount > 0)
-            Destroy(OptionsText.transform.GetChild(0).gameObject);
-        GameObject background = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        background.name = "Highlight plane";
-        background.transform.parent = OptionsText.gameObject.transform;
-        background.transform.localPosition = new Vector3(wordBegin - (optionsTextWidth / 2) + (wordWidth / 2), 0, 0.000001f);
-        background.transform.localScale = new Vector3(wordWidth * 0.1f, 1, OptionsText.font.lineHeight * (OptionsText.fontSize / OptionsText.font.fontSize) * OptionsText.characterSize * 0.01f);
-        background.transform.localRotation = Quaternion.Euler(new Vector3(-90, 0, 0));
-        background.GetComponent<Renderer>().materials[0].shader = UnlitShader;
-        background.GetComponent<Renderer>().materials[0].color = Color.green;
+        OptionsBackground.transform.localPosition = new Vector3(wordBegin - (optionsTextWidth / 2) + (wordWidth / 2), 0, 0.000001f);
+        OptionsBackground.transform.localScale = new Vector3(wordWidth * 0.1f, 1, OptionsText.font.lineHeight * (OptionsText.fontSize / OptionsText.font.fontSize) * OptionsText.characterSize * 0.01f);
     }
 
     private float getTextWidth(TextMesh textMesh)
