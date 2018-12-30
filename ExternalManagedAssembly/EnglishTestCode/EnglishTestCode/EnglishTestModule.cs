@@ -61,7 +61,7 @@ public class EnglishTestModule : MonoBehaviour
             }
             else
             {
-                Debug.Log("Couldn't find options match for string at line " + i);
+                throw new Exception("Couldn't find answers for question at line " + i);
             }
         }
     }
