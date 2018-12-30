@@ -185,7 +185,7 @@ public class EnglishTestModule : MonoBehaviour
         float maxX = BottomDisplay.transform.localScale.x - 0.007f;
 
         BottomText.fontSize = 35;
-        BottomText.text = currentQuestion.QuestionText.Insert(currentQuestion.AnswerTextIndex, "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>");
+        BottomText.text = currentQuestion.QuestionText.Insert(currentQuestion.AnswerTextIndex, currentQuestion.Answers[selectedAnswerIndex]);
 
         string originalText = BottomText.text;
         while (getTextWidth(BottomText) > maxX)
@@ -218,6 +218,8 @@ public class EnglishTestModule : MonoBehaviour
                 BottomText.text = originalText;
             }
         }
+
+        BottomText.text = BottomText.text.Insert(currentQuestion.AnswerTextIndex + currentQuestion.Answers[selectedAnswerIndex].Length, "</i>").Insert(currentQuestion.AnswerTextIndex, "<i>");
     }
 
     private void updateOptionsText()
