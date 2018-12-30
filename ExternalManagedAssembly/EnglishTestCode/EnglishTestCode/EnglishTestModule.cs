@@ -43,7 +43,9 @@ public class EnglishTestModule : MonoBehaviour
             if (match.Success)
             {
                 Question question = new Question();
-                question.QuestionText = line.Replace(match.Value, "%");
+                int answerTextIndex = line.IndexOf("[" + match.Value + "]");
+                question.QuestionText = line.Remove(answerTextIndex, match.Value.Length + 2);
+                question.AnswerTextIndex = answerTextIndex;
                 string[] answers = match.Value.Split('|');
                 for (int j = 0; j < answers.Length; j++)
                 {
@@ -97,7 +99,7 @@ public class EnglishTestModule : MonoBehaviour
         if (currentQuestion == null)
             return false;
 
-        StartCoroutine(nextQuestion(selectedAnswerIndex == currentQuestion.CorrectAnswerIndex));
+        StartCoroutine(answerSubmitted(selectedAnswerIndex == currentQuestion.CorrectAnswerIndex));
         return false;
     }
 
@@ -113,7 +115,7 @@ public class EnglishTestModule : MonoBehaviour
         selectedAnswerIndex--;
         if (selectedAnswerIndex < 0)
             selectedAnswerIndex = currentQuestion.Answers.Count - 1;
-        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>"));
+        updateBottomText();
         updateOptionsText();
         return false;
     }
@@ -130,12 +132,12 @@ public class EnglishTestModule : MonoBehaviour
         selectedAnswerIndex++;
         if (selectedAnswerIndex >= currentQuestion.Answers.Count)
             selectedAnswerIndex = 0;
-        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>"));
+        updateBottomText();
         updateOptionsText();
         return false;
     }
 
-    private IEnumerator nextQuestion(bool correct)
+    private IEnumerator answerSubmitted(bool correct)
     {
         currentQuestion = null;
         BottomText.gameObject.SetActive(false);
@@ -171,19 +173,19 @@ public class EnglishTestModule : MonoBehaviour
         TopText.text = "Question " + (solvedQuestions + 1) + "/" + targetQuestions;
         TopText.gameObject.SetActive(true);
 
-        setBottomText(currentQuestion.QuestionText.Replace("[%]", "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>"));
+        updateBottomText();
         BottomText.gameObject.SetActive(true);
 
         updateOptionsText();
         OptionsText.gameObject.SetActive(true);
     }
 
-    private void setBottomText(string text)
+    private void updateBottomText()
     {
         float maxX = BottomDisplay.transform.localScale.x - 0.007f;
 
         BottomText.fontSize = 35;
-        BottomText.text = text;
+        BottomText.text = currentQuestion.QuestionText.Insert(currentQuestion.AnswerTextIndex, "<i>" + currentQuestion.Answers[selectedAnswerIndex] + "</i>");
 
         string originalText = BottomText.text;
         while (getTextWidth(BottomText) > maxX)
