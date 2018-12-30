@@ -38,7 +38,7 @@ public class EnglishTestModule : MonoBehaviour
         RightSelectable.OnInteract += OnRightInteract;
 
         questions = new List<Question>();
-        string[] lines = EnglishTestCode.Properties.Resources.setnences.Split('\n', '\r');
+        string[] lines = EnglishTestCode.Properties.Resources.sentences.Split('\n', '\r');
         for (int i = 0; i < lines.Length; i++)
         {
             string line = lines[i];

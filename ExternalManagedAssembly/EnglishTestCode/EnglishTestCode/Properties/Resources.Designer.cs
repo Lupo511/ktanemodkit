@@ -73,9 +73,9 @@ namespace EnglishTestCode.Properties {
         ///[!Your|You&apos;re] pizza is on its way.
         ///[Your|!You&apos;re] del [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string setnences {
+        internal static string sentences {
             get {
-                return ResourceManager.GetString("setnences", resourceCulture);
+                return ResourceManager.GetString("sentences", resourceCulture);
             }
         }
     }
