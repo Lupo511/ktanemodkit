@@ -11,7 +11,6 @@ public class EnglishTestModule : MonoBehaviour
 
     public KMBombModule Module;
     public KMAudio Audio;
-    public GameObject TopDisplay;
     public TextMesh TopText;
     public GameObject BottomDisplay;
     public TextMesh BottomText;

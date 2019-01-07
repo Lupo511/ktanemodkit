@@ -1311,7 +1311,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Module: {fileID: 11450360}
   Audio: {fileID: 11461404}
-  TopDisplay: {fileID: 107908}
   TopText: {fileID: 10258020}
   BottomDisplay: {fileID: 188040}
   BottomText: {fileID: 10216792}
