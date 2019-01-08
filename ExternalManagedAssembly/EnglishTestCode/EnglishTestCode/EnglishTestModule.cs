@@ -46,7 +46,7 @@ public class EnglishTestModule : MonoBehaviour
                 question.QuestionText = line.Remove(answerTextIndex, match.Value.Length + 2);
                 question.AnswerTextIndex = answerTextIndex;
                 string[] answers = match.Value.Split('|');
-                for (int j = 0; j < answers.Length; j++)
+                for (byte j = 0; j < answers.Length; j++)
                 {
                     string answer = answers[j];
                     if (answer.StartsWith("!"))
