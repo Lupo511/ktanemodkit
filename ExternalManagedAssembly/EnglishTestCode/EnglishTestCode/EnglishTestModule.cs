@@ -253,8 +253,16 @@ public class EnglishTestModule : MonoBehaviour
         float wordWidth = getTextWidth(currentQuestion.Answers[selectedAnswerIndex], OptionsText.font, OptionsText.fontSize, OptionsText.fontStyle) * OptionsText.characterSize;
         OptionsText.text = OptionsText.text.Insert(wordBeginIndex + currentQuestion.Answers[selectedAnswerIndex].Length, "</color>").Insert(wordBeginIndex, "<color=#000000>");
 
+        float highlightBoxHeight = 0;
+        OptionsText.font.RequestCharactersInTexture("|", OptionsText.fontSize, OptionsText.fontStyle);
+        CharacterInfo characterInfo;
+        if (OptionsText.font.GetCharacterInfo('|', out characterInfo, OptionsText.fontSize, OptionsText.fontStyle))
+        {
+            highlightBoxHeight = (characterInfo.maxY - characterInfo.minY) * 0.1f * OptionsText.characterSize;
+        }
+
         OptionsBackground.transform.localPosition = new Vector3(wordBegin - (optionsTextWidth / 2) + (wordWidth / 2), 0, 0.000001f);
-        OptionsBackground.transform.localScale = new Vector3(wordWidth * 0.1f, 1, OptionsText.font.lineHeight * (OptionsText.fontSize / OptionsText.font.fontSize) * OptionsText.characterSize * 0.01f);
+        OptionsBackground.transform.localScale = new Vector3(wordWidth * 0.1f, 1, highlightBoxHeight * 0.1f);
     }
 
     private float getTextWidth(TextMesh textMesh)
