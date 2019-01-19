@@ -187,15 +187,25 @@ public class CustomKMMissionEditor : Editor
             EditorGUILayout.Separator();
             EditorGUILayout.LabelField("Generator Settings");
 
-            EditorGUILayout.BeginVertical("box");
+            List<string> unusedGeneratorSettings = new List<string>();
             List<KeyValuePair<int, string>> tabMap = new List<KeyValuePair<int, string>>();
             tabMap.Add(new KeyValuePair<int, string>(0, "Bomb 0"));
             foreach (KeyValuePair<int, KeyValuePair<KMGeneratorSetting, int>> kv in multipleBombsGeneratorSettings)
             {
                 if (kv.Key < totalBombCount || factoryMode >= FactoryMode.InfiniteSequence)
                     tabMap.Add(new KeyValuePair<int, string>(kv.Key, "Bomb " + kv.Key));
+                else
+                    unusedGeneratorSettings.Add(kv.Key.ToString());
             }
             tabMap.Sort((x, y) => x.Key.CompareTo(y.Key));
+
+            if (unusedGeneratorSettings.Count > 0)
+            {
+                string unusedGeneratorSettingsWarningMessage = "The mission contains unused generator settings (for " + (unusedGeneratorSettings.Count > 1 ? "bombs " + string.Join(", ", unusedGeneratorSettings.ToArray()) : "bomb " + unusedGeneratorSettings[0]) + ").";
+                EditorGUILayout.HelpBox(unusedGeneratorSettingsWarningMessage, MessageType.Warning);
+            }
+
+            EditorGUILayout.BeginVertical("box");
             int currentTab = activeGeneratorSetting != -1 ? tabMap.FindIndex((x) => x.Key == activeGeneratorSetting) : tabMap.Count;
             if (currentTab == -1)
             {
