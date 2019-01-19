@@ -102,30 +102,30 @@ namespace MultipleBombsAssembly
                 page.TextDescription.text = currentMission.Description;
             }
 
+            float maxTime = 0;
+            int totalModules = 0;
+            int totalStrikes = 0;
+            for (int i = 0; i < missionDetails.BombCount; i++)
+            {
+                GeneratorSetting generatorSetting;
+                if (missionDetails.GeneratorSettings.TryGetValue(i, out generatorSetting))
+                {
+                    if (generatorSetting.TimeLimit > maxTime)
+                        maxTime = generatorSetting.TimeLimit;
+                    totalModules += generatorSetting.GetComponentCount();
+                    totalStrikes += generatorSetting.NumStrikes;
+                }
+                else
+                {
+                    totalModules += missionDetails.GeneratorSettings[0].GetComponentCount();
+                    totalStrikes += missionDetails.GeneratorSettings[0].NumStrikes;
+                }
+            }
+
+            page.TextModuleCount.text = totalModules + (totalModules == 1 ? " Module" : " Modules");
             if (missionDetails.BombCount > 1)
             {
-                float maxTime = 0;
-                int totalModules = 0;
-                int totalStrikes = 0;
-                for (int i = 0; i < missionDetails.BombCount; i++)
-                {
-                    GeneratorSetting generatorSetting;
-                    if (missionDetails.GeneratorSettings.TryGetValue(i, out generatorSetting))
-                    {
-                        if (generatorSetting.TimeLimit > maxTime)
-                            maxTime = generatorSetting.TimeLimit;
-                        totalModules += generatorSetting.GetComponentCount();
-                        totalStrikes += generatorSetting.NumStrikes;
-                    }
-                    else
-                    {
-                        totalModules += missionDetails.GeneratorSettings[0].GetComponentCount();
-                        totalStrikes += missionDetails.GeneratorSettings[0].NumStrikes;
-                    }
-                }
-
                 page.TextTime.text = string.Format("{0}:{1:00}", (int)maxTime / 60, maxTime % 60);
-                page.TextModuleCount.text = totalModules + (totalModules == 1 ? " Module" : " Modules");
                 page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.TextStrikes.enableAutoSizing = false;
                 page.TextStrikes.text = missionDetails.BombCount + " Bombs\n" + totalStrikes + (totalStrikes == 1 ? " Strike" : " Strikes") + "\n ";
