@@ -201,7 +201,7 @@ public class CustomKMMissionEditor : Editor
 
             if (unusedGeneratorSettings.Count > 0)
             {
-                string unusedGeneratorSettingsWarningMessage = "The mission has unused generator settings (for " + (unusedGeneratorSettings.Count > 1 ? "bombs " + string.Join(", ", unusedGeneratorSettings.ToArray()) : "bomb " + unusedGeneratorSettings[0]) + ").";
+                string unusedGeneratorSettingsWarningMessage = "The mission contains unused generator settings (for " + (unusedGeneratorSettings.Count > 1 ? "bombs " + string.Join(", ", unusedGeneratorSettings.ToArray()) : "bomb " + unusedGeneratorSettings[0]) + ").";
                 EditorGUILayout.HelpBox(unusedGeneratorSettingsWarningMessage, MessageType.Warning);
             }
 
