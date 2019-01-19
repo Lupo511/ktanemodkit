@@ -23,6 +23,6 @@ MonoBehaviour:
     to customize bomb spanws in a Gameplay Room, to build missions with multiple bombs
     and much more!\nTo learn how to use it and for explanation about all of its features
     read the [url=https://lupo511.github.io/ktanemods/MultipleBombs/docs/]API docs[/url]."
-  version: 1.3.2
+  version: 1.3.3
   outputFolder: build
   previewImage: {fileID: 2800000, guid: be95b037aca480441806d4efa6da4ce2, type: 3}
