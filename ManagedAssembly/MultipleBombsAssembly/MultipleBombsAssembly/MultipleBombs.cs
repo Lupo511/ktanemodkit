@@ -5,6 +5,7 @@ using Assets.Scripts.Records;
 using Assets.Scripts.Settings;
 using Assets.Scripts.Tournaments;
 using Events;
+using I2.Loc;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -161,7 +162,9 @@ namespace MultipleBombsAssembly
             device.ObjectsToDisableOnLidClose.Add(bombsObject);
             bombsObject.name = "BombCountSettings";
             bombsObject.transform.localPosition += new Vector3(0, 0f, -0.025f);
-            bombsObject.transform.Find("ModuleCountLabel").GetComponent<TextMeshPro>().text = "Bombs";
+            TextMeshPro currentFreePlayBombsLabel = bombsObject.transform.Find("ModuleCountLabel").GetComponent<TextMeshPro>();
+            Destroy(currentFreePlayBombsLabel.GetComponent<Localize>());
+            currentFreePlayBombsLabel.text = "Bombs";
             currentFreePlayBombCountLabel = bombsObject.transform.Find("ModuleCountValue").GetComponent<TextMeshPro>();
             currentFreePlayBombCountLabel.gameObject.name = "BombCountLabel";
             currentFreePlayBombCountLabel.text = currentFreePlayBombCount.ToString();
