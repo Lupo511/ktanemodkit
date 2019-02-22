@@ -145,6 +145,8 @@ namespace MultipleBombsAssembly
                 textTime.text = string.Format("{0}:{1:00}", (int)maxTime / 60, maxTime % 60);
                 Localization.SetTerm("BombBinder/txtStrikeCount", textStrikes.gameObject);
                 Localization.SetParameter("STRIKE_COUNT", totalStrikes.ToString(), textStrikes.gameObject);
+                textStrikes.alignment = TextAlignmentOptions.Right;
+                textStrikes.enableAutoSizing = false;
                 textStrikes.text = missionDetails.BombCount + " Bombs\n" + textStrikes.text;
             }
 

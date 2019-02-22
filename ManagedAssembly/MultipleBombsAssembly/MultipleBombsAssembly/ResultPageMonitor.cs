@@ -77,8 +77,6 @@ namespace MultipleBombsAssembly
                 originalAllignment = page.NumStrikes.alignment;
                 originalEnableAutosizing = page.NumStrikes.enableAutoSizing;
                 yield return null;
-                page.NumStrikes.alignment = TMPro.TextAlignmentOptions.Right;
-                page.NumStrikes.enableAutoSizing = false;
 
                 MissionDetailPageMonitor.UpdateMissionDetailInformation(currentMission, null, MultipleBombs.GetCurrentMaximumBombCount(), null, page.InitialTime, page.NumModules, page.NumStrikes);
             }
