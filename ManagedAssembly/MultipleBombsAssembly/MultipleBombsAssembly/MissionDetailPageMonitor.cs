@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using TMPro;
 using UnityEngine;
 
 namespace MultipleBombsAssembly
@@ -49,27 +50,15 @@ namespace MultipleBombsAssembly
             page.TextStrikes.gameObject.SetActive(true);
 
             Mission currentMission = (Mission)page.GetType().BaseType.GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
-            MultipleBombsMissionDetails missionDetails = MultipleBombsMissionDetails.ReadMission(currentMission);
 
-            float maxTime = 0;
-            int totalModules = 0;
-            int totalStrikes = 0;
-            string error = GetMissionDetailInformation(missionDetails, MultipleBombs.GetCurrentMaximumBombCount(), out maxTime, out totalModules, out totalStrikes);
-            canStartField.SetValue(page, error == null);
-            page.TextDescription.text = error ?? currentMission.Description;
-
-            page.TextModuleCount.text = totalModules + (totalModules == 1 ? " Module" : " Modules");
-            if (missionDetails.BombCount > 1)
-            {
-                page.TextTime.text = string.Format("{0}:{1:00}", (int)maxTime / 60, maxTime % 60);
-                page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
-                page.TextStrikes.enableAutoSizing = false;
-                page.TextStrikes.text = missionDetails.BombCount + " Bombs\n" + totalStrikes + (totalStrikes == 1 ? " Strike" : " Strikes") + "\n ";
-            }
+            bool canStart = UpdateMissionDetailInformation(MultipleBombsMissionDetails.ReadMission(currentMission), currentMission.DescriptionTerm, MultipleBombs.GetCurrentMaximumBombCount(), page.TextDescription, page.TextTime, page.TextModuleCount, page.TextStrikes);
+            canStartField.SetValue(page, canStart);
         }
 
-        public static string GetMissionDetailInformation(MultipleBombsMissionDetails missionDetails, int maxBombCount, out float maxTime, out int totalModules, out int totalStrikes)
+        public static bool UpdateMissionDetailInformation(MultipleBombsMissionDetails missionDetails, string descriptionTerm, int maxBombCount, TextMeshPro textDescription, TextMeshPro textTime, TextMeshPro textModuleCount, TextMeshPro textStrikes)
         {
+            bool canStart = false;
+
             List<string> missingModTypes = new List<string>();
             int maxModuleCount = Math.Max(11, ModManager.Instance.GetMaximumModules());
             int maxFrontFaceModuleCount = Math.Max(5, ModManager.Instance.GetMaximumModulesFrontFace());
@@ -97,9 +86,9 @@ namespace MultipleBombsAssembly
                     requiredModuleCount = Math.Max(requiredModuleCount, moduleCount);
             }
 
-            maxTime = 0;
-            totalModules = 0;
-            totalStrikes = 0;
+            float maxTime = 0;
+            int totalModules = 0;
+            int totalStrikes = 0;
             for (int i = 0; i < missionDetails.BombCount; i++)
             {
                 GeneratorSetting generatorSetting;
@@ -117,26 +106,49 @@ namespace MultipleBombsAssembly
                 }
             }
 
-            if (missingModTypes.Count > 0)
+            if (textDescription != null)
             {
-                return "Missing mods:\n" + string.Join("\n", missingModTypes.ToArray());
+                if (missingModTypes.Count > 0)
+                {
+                    canStart = false;
+                    Localization.SetTerm("BombBinder/error_missingModules", textDescription.gameObject);
+                    Localization.SetParameter("MISSING_MODULES_LIST", string.Join("\n", missingModTypes.ToArray()), textDescription.gameObject);
+                }
+                else if (requiredModuleCount > maxModuleCount)
+                {
+                    canStart = false;
+                    Localization.SetTerm("BombBinder/error_needABiggerBomb", textDescription.gameObject);
+                    Localization.SetParameter("MAX_MODULE_COUNT", maxModuleCount.ToString(), textDescription.gameObject);
+                }
+                else if (requiredFrontFaceModuleCount > maxFrontFaceModuleCount)
+                {
+                    canStart = false;
+                    Localization.SetTerm("BombBinder/error_needABiggerBomb", textDescription.gameObject);
+                    Localization.SetParameter("MAX_MODULE_COUNT", maxModuleCount.ToString(), textDescription.gameObject);
+                }
+                else if (missionDetails.BombCount > maxBombCount)
+                {
+                    canStart = false;
+                    textDescription.text = "A room that can support more bombs is required.\n\nCurrent rooms only support up to " + maxBombCount + " bombs.";
+                }
+                else
+                {
+                    canStart = true;
+                    Localization.SetTerm(descriptionTerm, textDescription.gameObject);
+                }
             }
-            else if (requiredModuleCount > maxModuleCount)
+
+            Localization.SetTerm("BombBinder/txtModuleCount", textModuleCount.gameObject);
+            Localization.SetParameter("MODULE_COUNT", totalModules.ToString(), textModuleCount.gameObject);
+            if (missionDetails.BombCount > 1)
             {
-                return "A bomb that can support more modules is required.\n\nCurrent bombs only support up to " + maxModuleCount + " modules.";
+                textTime.text = string.Format("{0}:{1:00}", (int)maxTime / 60, maxTime % 60);
+                Localization.SetTerm("BombBinder/txtStrikeCount", textStrikes.gameObject);
+                Localization.SetParameter("STRIKE_COUNT", totalStrikes.ToString(), textStrikes.gameObject);
+                textStrikes.text = missionDetails.BombCount + " Bombs\n" + textStrikes.text;
             }
-            else if (requiredFrontFaceModuleCount > maxFrontFaceModuleCount)
-            {
-                return "A bomb that can support more modules is required.\n\nCurrent bombs only support up to " + maxFrontFaceModuleCount + " modules.";
-            }
-            else if (missionDetails.BombCount > maxBombCount)
-            {
-                return "A room that can support more bombs is required.\n\nCurrent rooms only support up to " + maxBombCount + " bombs.";
-            }
-            else
-            {
-                return null;
-            }
+
+            return canStart;
         }
     }
 }

@@ -41,7 +41,11 @@ namespace MultipleBombsAssembly
             {
                 yield return null;
                 ResultFreeplayPage page = GetComponent<ResultFreeplayPage>();
-                page.MissionName.Text = "Free Play - " + currentMission.BombCount + " Bombs";
+                if (page.MissionName.SingleLine.IsActive())
+                    page.MissionName.SingleLine.text += " - " + currentMission.BombCount + " Bombs";
+                else
+                    page.MissionName.DoubleLine.text += " - " + currentMission.BombCount + " Bombs";
+
                 float time = currentMission.GeneratorSettings[0].TimeLimit;
                 int modules = currentMission.GeneratorSettings[0].GetComponentCount();
                 bool isHardcore = currentMission.GeneratorSettings[0].NumStrikes == 1;
@@ -61,9 +65,11 @@ namespace MultipleBombsAssembly
                         modules += currentMission.GeneratorSettings[0].GetComponentCount();
                     }
                 }
+
                 page.FreeplayTime.text = string.Format("{0}:{1:00}", (int)time / 60, time % 60);
-                page.FreeplayModules.text = modules + (modules == 1 ? " Module" : " Modules");
-                page.FreeplayHardcore.text = isHardcore ? "Hardcore: ON" : "Hardcore: OFF";
+                Localization.SetTerm("BombBinder/txtModuleCount", page.FreeplayModules.gameObject);
+                Localization.SetParameter("MODULE_COUNT", modules.ToString(), page.FreeplayModules.gameObject);
+                Localization.SetTerm(isHardcore ? "BombBinder/results_HardcoreOn" : "BombBinder/results_HardcoreOff", page.FreeplayHardcore.gameObject);
             }
             else
             {
@@ -71,31 +77,10 @@ namespace MultipleBombsAssembly
                 originalAllignment = page.NumStrikes.alignment;
                 originalEnableAutosizing = page.NumStrikes.enableAutoSizing;
                 yield return null;
-                float time = currentMission.GeneratorSettings[0].TimeLimit;
-                int modules = currentMission.GeneratorSettings[0].GetComponentCount();
-                int strikes = currentMission.GeneratorSettings[0].NumStrikes;
-                for (int i = 1; i < currentMission.BombCount; i++)
-                {
-                    GeneratorSetting generatorSetting;
-                    if (currentMission.GeneratorSettings.TryGetValue(i, out generatorSetting))
-                    {
-                        if (generatorSetting.TimeLimit > time)
-                            time = generatorSetting.TimeLimit;
-                        modules += generatorSetting.GetComponentCount();
-                        strikes += generatorSetting.NumStrikes;
-                    }
-                    else
-                    {
-                        modules += currentMission.GeneratorSettings[0].GetComponentCount();
-                        strikes += currentMission.GeneratorSettings[0].NumStrikes;
-                    }
-                }
                 page.NumStrikes.alignment = TMPro.TextAlignmentOptions.Right;
                 page.NumStrikes.enableAutoSizing = false;
-                page.InitialTime.text = string.Format("{0}:{1:00}", (int)time / 60, time % 60);
-                page.NumModules.text = modules + (modules == 1 ? " Module" : " Modules");
-                //page.NumModules.text = "<size=0.1>" + currentMission.BombCount + " x </size>" + page.NumModules.text;
-                page.NumStrikes.text = currentMission.BombCount + " Bombs\n" + strikes + (strikes == 1 ? " Strike" : " Strikes") + "\n ";
+
+                MissionDetailPageMonitor.UpdateMissionDetailInformation(currentMission, null, MultipleBombs.GetCurrentMaximumBombCount(), null, page.InitialTime, page.NumModules, page.NumStrikes);
             }
         }
 

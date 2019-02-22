@@ -49,23 +49,9 @@ namespace MultipleBombsAssembly
             page.TextStrikes.gameObject.SetActive(true);
 
             Mission currentMission = (Mission)page.GetType().GetField("currentMission", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(page);
-            MultipleBombsMissionDetails missionDetails = MultipleBombsMissionDetails.ReadMission(currentMission);
-            
-            float maxTime = 0;
-            int totalModules = 0;
-            int totalStrikes = 0;
-            string error = MissionDetailPageMonitor.GetMissionDetailInformation(missionDetails, MultipleBombs.GetCurrentMaximumBombCount(), out maxTime, out totalModules, out totalStrikes);
-            canStartField.SetValue(page, error == null);
-            page.TextDescription.text = error ?? currentMission.Description;
 
-            page.TextModuleCount.text = totalModules + (totalModules == 1 ? " Module" : " Modules");
-            if (missionDetails.BombCount > 1)
-            {
-                page.TextTime.text = string.Format("{0}:{1:00}", (int)maxTime / 60, maxTime % 60);
-                page.TextStrikes.alignment = TMPro.TextAlignmentOptions.Right;
-                page.TextStrikes.enableAutoSizing = false;
-                page.TextStrikes.text = missionDetails.BombCount + " Bombs\n" + totalStrikes + (totalStrikes == 1 ? " Strike" : " Strikes") + "\n ";
-            }
+            bool canStart = MissionDetailPageMonitor.UpdateMissionDetailInformation(MultipleBombsMissionDetails.ReadMission(currentMission), currentMission.DescriptionTerm, MultipleBombs.GetCurrentMaximumBombCount(), page.TextDescription, page.TextTime, page.TextModuleCount, page.TextStrikes);
+            canStartField.SetValue(page, canStart);
         }
     }
 }
