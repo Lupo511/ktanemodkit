@@ -147,7 +147,7 @@ namespace MultipleBombsAssembly
                 Localization.SetParameter("STRIKE_COUNT", totalStrikes.ToString(), textStrikes.gameObject);
                 textStrikes.alignment = TextAlignmentOptions.Right;
                 textStrikes.enableAutoSizing = false;
-                textStrikes.text = missionDetails.BombCount + " Bombs\n" + textStrikes.text;
+                textStrikes.text = missionDetails.BombCount + " Bombs\n" + textStrikes.text + "\n ";
             }
 
             return canStart;
