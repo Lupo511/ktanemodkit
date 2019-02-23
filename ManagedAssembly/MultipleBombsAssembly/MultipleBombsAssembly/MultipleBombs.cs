@@ -409,6 +409,11 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Result screens initialized");
             yield return null;
 
+            if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID || GameplayState.MissionToLoad != FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
+            {
+                mission.GeneratorSetting.ComponentPools.AddRange(multipleBombsComponentPools);
+            }
+
             Debug.Log("[MultipleBombs]Initializing gameplay state");
 
             Debug.Log("[MultipleBombs]Bombs to spawn: " + missionDetails.BombCount);
@@ -448,7 +453,7 @@ namespace MultipleBombsAssembly
                 GeneratorSetting generatorSetting;
                 if (!missionDetails.GeneratorSettings.TryGetValue(i, out generatorSetting))
                 {
-                    generatorSetting = mission.GeneratorSetting;
+                    generatorSetting = missionDetails.GeneratorSettings[0];
                 }
                 GameObject spawn = GameObject.Find("MultipleBombs_Spawn_" + i);
                 if (spawn == null)
@@ -471,11 +476,6 @@ namespace MultipleBombsAssembly
 
             vanillaBomb.GetComponent<Selectable>().Parent.Init();
             Debug.Log("[MultipleBombs]All bombs generated");
-
-            if (GameplayState.MissionToLoad == ModMission.CUSTOM_MISSION_ID || GameplayState.MissionToLoad != FreeplayMissionGenerator.FREEPLAY_MISSION_ID)
-            {
-                mission.GeneratorSetting.ComponentPools.AddRange(multipleBombsComponentPools);
-            }
 
             //PaceMaker
             PaceMakerMonitor monitor = FindObjectOfType<PaceMaker>().gameObject.AddComponent<PaceMakerMonitor>();
