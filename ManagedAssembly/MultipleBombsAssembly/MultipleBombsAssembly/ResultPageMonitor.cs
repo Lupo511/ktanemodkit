@@ -19,10 +19,7 @@ namespace MultipleBombsAssembly
 
         protected virtual void OnEnable()
         {
-            if (currentMission.BombCount >= 2)
-            {
-                StartCoroutine(changeTextNextFrame());
-            }
+            StartCoroutine(changeTextNextFrame());
         }
 
         protected virtual void OnDisable()
@@ -42,22 +39,25 @@ namespace MultipleBombsAssembly
         {
             if (GetComponent<ResultFreeplayPage>() != null)
             {
-                yield return null;
-                ResultFreeplayPage page = GetComponent<ResultFreeplayPage>();
-                if (page.MissionName.SingleLine.IsActive())
-                    page.MissionName.SingleLine.text += " - " + currentMission.BombCount + " Bombs";
-                else
-                    page.MissionName.DoubleLine.text += " - " + currentMission.BombCount + " Bombs";
+                if (currentMission.BombCount > 1)
+                {
+                    yield return null;
+                    ResultFreeplayPage page = GetComponent<ResultFreeplayPage>();
+                    if (page.MissionName.SingleLine.IsActive())
+                        page.MissionName.SingleLine.text += " - " + currentMission.BombCount + " Bombs";
+                    else
+                        page.MissionName.DoubleLine.text += " - " + currentMission.BombCount + " Bombs";
 
-                float time;
-                int modules;
-                int strikes;
-                currentMission.GetMissionInfo(out time, out modules, out strikes);
+                    float time;
+                    int modules;
+                    int strikes;
+                    currentMission.GetMissionInfo(out time, out modules, out strikes);
 
-                page.FreeplayTime.text = string.Format("{0}:{1:00}", (int)time / 60, time % 60);
-                Localization.SetTerm("BombBinder/txtModuleCount", page.FreeplayModules.gameObject);
-                Localization.SetParameter("MODULE_COUNT", modules.ToString(), page.FreeplayModules.gameObject);
-                Localization.SetTerm(strikes == currentMission.BombCount ? "BombBinder/results_HardcoreOn" : "BombBinder/results_HardcoreOff", page.FreeplayHardcore.gameObject); //Assumes always positive strikes
+                    page.FreeplayTime.text = string.Format("{0}:{1:00}", (int)time / 60, time % 60);
+                    Localization.SetTerm("BombBinder/txtModuleCount", page.FreeplayModules.gameObject);
+                    Localization.SetParameter("MODULE_COUNT", modules.ToString(), page.FreeplayModules.gameObject);
+                    Localization.SetTerm(strikes == currentMission.BombCount ? "BombBinder/results_HardcoreOn" : "BombBinder/results_HardcoreOff", page.FreeplayHardcore.gameObject); //Assumes always positive strikes
+                }
             }
             else
             {
