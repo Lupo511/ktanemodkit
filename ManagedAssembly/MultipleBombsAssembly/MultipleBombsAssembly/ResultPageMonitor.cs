@@ -1,10 +1,12 @@
 ﻿using Assets.Scripts.Missions;
 using Assets.Scripts.Records;
+using I2.Loc;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TMPro;
 using UnityEngine;
 
 namespace MultipleBombsAssembly
@@ -13,8 +15,7 @@ namespace MultipleBombsAssembly
     {
         private MultipleBombs multipleBombs;
         private MultipleBombsMissionDetails currentMission;
-        private TMPro.TextAlignmentOptions originalAllignment;
-        private bool originalEnableAutosizing;
+        private TextMeshPro numBombs;
 
         protected virtual void OnEnable()
         {
@@ -27,12 +28,14 @@ namespace MultipleBombsAssembly
         protected virtual void OnDisable()
         {
             StopAllCoroutines();
-            ResultMissionPage page = GetComponent<ResultMissionPage>();
-            if (page != null)
-            {
-                page.NumStrikes.alignment = originalAllignment;
-                page.NumStrikes.enableAutoSizing = originalEnableAutosizing;
-            }
+            if (numBombs != null)
+                numBombs.gameObject.SetActive(false);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (numBombs != null)
+                Destroy(numBombs);
         }
 
         private IEnumerator changeTextNextFrame()
@@ -74,11 +77,17 @@ namespace MultipleBombsAssembly
             else
             {
                 ResultMissionPage page = GetComponent<ResultMissionPage>();
-                originalAllignment = page.NumStrikes.alignment;
-                originalEnableAutosizing = page.NumStrikes.enableAutoSizing;
                 yield return null;
+                if (numBombs == null)
+                {
+                    numBombs = Instantiate(page.NumStrikes, page.NumStrikes.transform.position, page.NumStrikes.transform.rotation, page.NumStrikes.transform.parent);
+                    numBombs.gameObject.SetActive(false);
+                    Destroy(numBombs.GetComponent<Localize>());
+                    numBombs.transform.localPosition += new Vector3(0, 0.012f, 0);
+                    numBombs.text = "X Bombs";
+                }
 
-                MissionDetailPageMonitor.UpdateMissionDetailInformation(currentMission, null, MultipleBombs.GetCurrentMaximumBombCount(), null, page.InitialTime, page.NumModules, page.NumStrikes);
+                MissionDetailPageMonitor.UpdateMissionDetailInformation(currentMission, null, MultipleBombs.GetCurrentMaximumBombCount(), null, page.InitialTime, page.NumModules, page.NumStrikes, numBombs);
             }
         }
 
