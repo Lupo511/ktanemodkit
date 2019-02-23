@@ -29,13 +29,6 @@ namespace MultipleBombsAssembly
         private Dictionary<Bomb, BombEvents.BombSolvedEvent> bombSolvedEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentPassEvent> bombComponentPassEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent> bombComponentStrikeEvents;
-        private ResultPageMonitor freePlayDefusedPageMonitor;
-        private ResultPageMonitor freePlayExplodedPageMonitor;
-        private ResultPageMonitor missionDefusedPageMonitor;
-        private ResultPageMonitor missionExplodedPageMonitor;
-        private ResultPageMonitor tournamentPageMonitor;
-        private MissionDetailPageMonitor missionDetailPageMonitor;
-        private TournamentDetailPageMonitor tournamentDetailPageMonitor;
         private KMGameInfo gameInfo;
         private KMGameCommands gameCommands;
         private MultipleBombsProperties publicProperties;
@@ -97,34 +90,6 @@ namespace MultipleBombsAssembly
             if (SceneManager.Instance != null && SceneManager.Instance.CurrentState != SceneManager.State.ModManager)
                 throw new NotImplementedException();
             Debug.Log("[MultipleBombs]Destroying");
-            if (missionDetailPageMonitor != null)
-            {
-                Destroy(missionDetailPageMonitor);
-            }
-            if (tournamentDetailPageMonitor != null)
-            {
-                Destroy(tournamentDetailPageMonitor);
-            }
-            if (freePlayDefusedPageMonitor != null)
-            {
-                Destroy(freePlayDefusedPageMonitor);
-            }
-            if (freePlayExplodedPageMonitor != null)
-            {
-                Destroy(freePlayDefusedPageMonitor);
-            }
-            if (missionDefusedPageMonitor != null)
-            {
-                Destroy(missionDefusedPageMonitor);
-            }
-            if (missionExplodedPageMonitor != null)
-            {
-                Destroy(missionDefusedPageMonitor);
-            }
-            if (tournamentPageMonitor != null)
-            {
-                Destroy(tournamentPageMonitor);
-            }
             gameInfo.OnStateChange -= onGameStateChanged;
             Debug.Log("[MultipleBombs]Destroyed");
         }
@@ -294,16 +259,10 @@ namespace MultipleBombsAssembly
             }
             Debug.Log("[MultipleBombs]GamePlayRooms processed");
 
-            if (missionDetailPageMonitor == null)
-            {
-                missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
-                missionDetailPageMonitor.MultipleBombs = this;
-            }
-            if (tournamentDetailPageMonitor == null)
-            {
-                tournamentDetailPageMonitor = FindObjectOfType<SetupRoom>().TournamentWhiteboard.TournamentDetailPage.gameObject.AddComponent<TournamentDetailPageMonitor>();
-                tournamentDetailPageMonitor.MultipleBombs = this;
-            }
+            MissionDetailPageMonitor missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
+            missionDetailPageMonitor.MultipleBombs = this;
+            TournamentDetailPageMonitor tournamentDetailPageMonitor = FindObjectOfType<SetupRoom>().TournamentWhiteboard.TournamentDetailPage.gameObject.AddComponent<TournamentDetailPageMonitor>();
+            tournamentDetailPageMonitor.MultipleBombs = this;
             Debug.Log("[MultipleBombs]BombBinder info added");
         }
 
@@ -432,35 +391,20 @@ namespace MultipleBombsAssembly
             Debug.Log("[MultipleBombs]Events initialized");
 
             //Setup results screen
-            if (freePlayDefusedPageMonitor == null)
-            {
-                freePlayDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayDefusedPage.gameObject.AddComponent<ResultPageMonitor>();
-                freePlayDefusedPageMonitor.MultipleBombs = this;
-            }
-            if (freePlayExplodedPageMonitor == null)
-            {
-                freePlayExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
-                freePlayExplodedPageMonitor.MultipleBombs = this;
-            }
+            ResultPageMonitor freePlayDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayDefusedPage.gameObject.AddComponent<ResultPageMonitor>();
+            freePlayDefusedPageMonitor.MultipleBombs = this;
             freePlayDefusedPageMonitor.SetCurrentMission(missionDetails);
+            ResultPageMonitor freePlayExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultFreeplayExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
+            freePlayExplodedPageMonitor.MultipleBombs = this;
             freePlayExplodedPageMonitor.SetCurrentMission(missionDetails);
-            if (missionDefusedPageMonitor == null)
-            {
-                missionDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultDefusedPage.gameObject.AddComponent<ResultPageMonitor>();
-                missionDefusedPageMonitor.MultipleBombs = this;
-            }
-            if (missionExplodedPageMonitor == null)
-            {
-                missionExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
-                missionExplodedPageMonitor.MultipleBombs = this;
-            }
+            ResultPageMonitor missionDefusedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultDefusedPage.gameObject.AddComponent<ResultPageMonitor>();
+            missionDefusedPageMonitor.MultipleBombs = this;
             missionDefusedPageMonitor.SetCurrentMission(missionDetails);
+            ResultPageMonitor missionExplodedPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultExplodedPage.gameObject.AddComponent<ResultPageMonitor>();
+            missionExplodedPageMonitor.MultipleBombs = this;
             missionExplodedPageMonitor.SetCurrentMission(missionDetails);
-            if (tournamentPageMonitor == null)
-            {
-                tournamentPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultTournamentPage.gameObject.AddComponent<ResultPageMonitor>();
-                tournamentPageMonitor.MultipleBombs = this;
-            }
+            ResultPageMonitor tournamentPageMonitor = SceneManager.Instance.PostGameState.Room.BombBinder.ResultTournamentPage.gameObject.AddComponent<ResultPageMonitor>();
+            tournamentPageMonitor.MultipleBombs = this;
             tournamentPageMonitor.SetCurrentMission(missionDetails);
             Debug.Log("[MultipleBombs]Result screens initialized");
             yield return null;
