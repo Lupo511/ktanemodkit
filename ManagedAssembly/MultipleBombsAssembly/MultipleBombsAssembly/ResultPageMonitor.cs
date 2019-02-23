@@ -49,30 +49,15 @@ namespace MultipleBombsAssembly
                 else
                     page.MissionName.DoubleLine.text += " - " + currentMission.BombCount + " Bombs";
 
-                float time = currentMission.GeneratorSettings[0].TimeLimit;
-                int modules = currentMission.GeneratorSettings[0].GetComponentCount();
-                bool isHardcore = currentMission.GeneratorSettings[0].NumStrikes == 1;
-                for (int i = 1; i < currentMission.BombCount; i++)
-                {
-                    GeneratorSetting generatorSetting;
-                    if (currentMission.GeneratorSettings.TryGetValue(i, out generatorSetting))
-                    {
-                        if (generatorSetting.TimeLimit > time)
-                            time = generatorSetting.TimeLimit;
-                        modules += generatorSetting.GetComponentCount();
-                        if (isHardcore && generatorSetting.NumStrikes != 1)
-                            isHardcore = false;
-                    }
-                    else
-                    {
-                        modules += currentMission.GeneratorSettings[0].GetComponentCount();
-                    }
-                }
+                float time;
+                int modules;
+                int strikes;
+                currentMission.GetMissionInfo(out time, out modules, out strikes);
 
                 page.FreeplayTime.text = string.Format("{0}:{1:00}", (int)time / 60, time % 60);
                 Localization.SetTerm("BombBinder/txtModuleCount", page.FreeplayModules.gameObject);
                 Localization.SetParameter("MODULE_COUNT", modules.ToString(), page.FreeplayModules.gameObject);
-                Localization.SetTerm(isHardcore ? "BombBinder/results_HardcoreOn" : "BombBinder/results_HardcoreOff", page.FreeplayHardcore.gameObject);
+                Localization.SetTerm(strikes == currentMission.BombCount ? "BombBinder/results_HardcoreOn" : "BombBinder/results_HardcoreOff", page.FreeplayHardcore.gameObject); //Assumes always positive strikes
             }
             else
             {

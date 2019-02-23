@@ -98,25 +98,10 @@ namespace MultipleBombsAssembly
                     requiredModuleCount = Math.Max(requiredModuleCount, moduleCount);
             }
 
-            float maxTime = 0;
-            int totalModules = 0;
-            int totalStrikes = 0;
-            for (int i = 0; i < missionDetails.BombCount; i++)
-            {
-                GeneratorSetting generatorSetting;
-                if (missionDetails.GeneratorSettings.TryGetValue(i, out generatorSetting))
-                {
-                    if (generatorSetting.TimeLimit > maxTime)
-                        maxTime = generatorSetting.TimeLimit;
-                    totalModules += generatorSetting.GetComponentCount();
-                    totalStrikes += generatorSetting.NumStrikes;
-                }
-                else
-                {
-                    totalModules += missionDetails.GeneratorSettings[0].GetComponentCount();
-                    totalStrikes += missionDetails.GeneratorSettings[0].NumStrikes;
-                }
-            }
+            float maxTime;
+            int totalModules;
+            int totalStrikes;
+            missionDetails.GetMissionInfo(out maxTime, out totalModules, out totalStrikes);
 
             if (textDescription != null)
             {

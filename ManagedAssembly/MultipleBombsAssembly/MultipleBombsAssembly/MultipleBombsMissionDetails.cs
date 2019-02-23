@@ -88,5 +88,28 @@ namespace MultipleBombsAssembly
             }
             return missionDetails;
         }
+
+        public void GetMissionInfo(out float maxTime, out int totalModules, out int totalStrikes)
+        {
+            maxTime = 0;
+            totalModules = 0;
+            totalStrikes = 0;
+            for (int i = 0; i < BombCount; i++)
+            {
+                GeneratorSetting generatorSetting;
+                if (GeneratorSettings.TryGetValue(i, out generatorSetting))
+                {
+                    if (generatorSetting.TimeLimit > maxTime)
+                        maxTime = generatorSetting.TimeLimit;
+                    totalModules += generatorSetting.GetComponentCount();
+                    totalStrikes += generatorSetting.NumStrikes;
+                }
+                else
+                {
+                    totalModules += GeneratorSettings[0].GetComponentCount();
+                    totalStrikes += GeneratorSettings[0].NumStrikes;
+                }
+            }
+        }
     }
 }
