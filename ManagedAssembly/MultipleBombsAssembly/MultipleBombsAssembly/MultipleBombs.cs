@@ -31,6 +31,7 @@ namespace MultipleBombsAssembly
         private Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent> bombComponentStrikeEvents;
         private KMGameInfo gameInfo;
         private KMGameCommands gameCommands;
+        private Shader unlitColorShader;
         private MultipleBombsProperties publicProperties;
 
         public void Awake()
@@ -44,6 +45,7 @@ namespace MultipleBombsAssembly
             gameInfo = GetComponent<KMGameInfo>();
             gameCommands = GetComponent<KMGameCommands>();
             gameInfo.OnStateChange += onGameStateChanged;
+            unlitColorShader = Shader.Find("Unlit/Color");
 
             GameObject infoObject = new GameObject("MultipleBombs_Info");
             infoObject.transform.parent = gameObject.transform;
@@ -149,7 +151,9 @@ namespace MultipleBombsAssembly
 
                 GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 background.name = "BombCountBackground";
-                background.GetComponent<Renderer>().material.color = Color.black;
+                Renderer backgroundRenderer = background.GetComponent<Renderer>();
+                backgroundRenderer.material.shader = unlitColorShader;
+                backgroundRenderer.material.color = Color.black;
                 background.transform.localScale = new Vector3(0.048f, 0.023f, 0.005f); //Accurate Y would be 0.025
                 background.transform.parent = bombsObject.transform;
                 background.transform.localPosition = currentFreePlayBombCountLabel.gameObject.transform.localPosition + new Vector3(0.00025f, -0.0027f, 0);
