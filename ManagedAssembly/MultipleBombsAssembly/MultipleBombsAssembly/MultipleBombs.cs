@@ -262,10 +262,14 @@ namespace MultipleBombsAssembly
             }
             Debug.Log("[MultipleBombs]GamePlayRooms processed");
 
-            MissionDetailPageMonitor missionDetailPageMonitor = FindObjectOfType<SetupRoom>().BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
+            SetupRoom setupRoom = FindObjectOfType<SetupRoom>();
+            MissionDetailPageMonitor missionDetailPageMonitor = setupRoom.BombBinder.MissionDetailPage.gameObject.AddComponent<MissionDetailPageMonitor>();
             missionDetailPageMonitor.MultipleBombs = this;
-            TournamentDetailPageMonitor tournamentDetailPageMonitor = FindObjectOfType<SetupRoom>().TournamentWhiteboard.TournamentDetailPage.gameObject.AddComponent<TournamentDetailPageMonitor>();
-            tournamentDetailPageMonitor.MultipleBombs = this;
+            if (setupRoom.TournamentWhiteboard != null)
+            {
+                TournamentDetailPageMonitor tournamentDetailPageMonitor = setupRoom.TournamentWhiteboard.TournamentDetailPage.gameObject.AddComponent<TournamentDetailPageMonitor>();
+                tournamentDetailPageMonitor.MultipleBombs = this;
+            }
             Debug.Log("[MultipleBombs]BombBinder info added");
         }
 
