@@ -265,11 +265,18 @@ code.cs span.string {
 }
 
 @media only all and (max-width: 45em) {
+    .credits p {
+        margin-top: 1.6em;
+    }
+
     .credits .job {
         width: 100%;
         text-align: center;
         padding-right: 0;
-        margin-top: 0.3em;
+    }
+
+    .credits .job:not(:first-child) {
+        margin-top: 0.8em;
     }
 
     .credits .jobempty {
