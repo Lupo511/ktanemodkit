@@ -240,7 +240,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Examples\1.13 GameEffectsPlayer\GameEffectPlayer.cs" />
     <Compile Include="Assets\Scripts\GeneralExtensions.cs" />
     <Compile Include="Assets\Scripts\KMBombInfoExtensions.cs" />
     <Compile Include="Assets\Scripts\KMBossModule.cs" />
