@@ -240,13 +240,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\GeneralExtensions.cs" />
-    <Compile Include="Assets\Scripts\KMBombInfoExtensions.cs" />
-    <Compile Include="Assets\Scripts\KMBossModule.cs" />
-    <Compile Include="Assets\Scripts\KMColorblindMode.cs" />
-    <Compile Include="Assets\Scripts\KMRuleSeedable.cs" />
-    <Compile Include="Assets\Scripts\PrivateWhenPlayingAttribute.cs" />
-    <Compile Include="Assets\Scripts\ReadOnlyWhenPlayingAttribute.cs" />
     <Compile Include="Assets\TestHarness\EdgeworkConfiguration.cs" />
     <Compile Include="Assets\TestHarness\Examples\1.1 Module\ExampleModule.cs" />
     <Compile Include="Assets\TestHarness\Examples\1.10 NeedyModule\ExampleNeedyModule.cs" />
