@@ -295,12 +295,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\Scripts\AssetBundler.cs" />
+    <Compile Include="Assets\Editor\Scripts\EdgeworkConfigurationEditor.cs" />
+    <Compile Include="Assets\Editor\Scripts\KMModuleEditor.cs" />
     <Compile Include="Assets\Editor\Scripts\Missions\CustomKMMissionEditor.cs" />
     <Compile Include="Assets\Editor\Scripts\Missions\KMMissionEditor.cs" />
     <Compile Include="Assets\Editor\Scripts\Missions\KMMissionTableOfContentsEditor.cs" />
     <Compile Include="Assets\Editor\Scripts\Missions\TableOfContentsSectionList.cs" />
     <Compile Include="Assets\Editor\Scripts\ModConfig.cs" />
     <Compile Include="Assets\Editor\Scripts\ModKitSettingsEditor.cs" />
+    <Compile Include="Assets\Editor\Scripts\PrivateWhenPlayingAttributeDrawer.cs" />
+    <Compile Include="Assets\Editor\Scripts\ReadOnlyWhenPlayingAttributeDrawer.cs" />
     <Compile Include="Assets\Editor\Scripts\Workshop\WorkshopEditorWindow.cs" />
     <Compile Include="Assets\Editor\Scripts\Workshop\WorkshopItem.cs" />
     <Compile Include="Assets\Editor\Scripts\Workshop\WorkshopItemEditor.cs" />
@@ -382,6 +386,7 @@
     <Compile Include="Assets\Editor\Steamworks.NET\types\SteamUserStats\SteamLeaderboardEntries_t.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Examples\Assets\Shaders\KT_3D_Text-Diffuse.shader" />
     <None Include="Assets\Plugins\Managed\KMFramework.XML" />
     <None Include="Assets\Plugins\Managed\Newtonsoft.Json_license.txt" />
     <None Include="Assets\Plugins\Steamworks.NET\redist\steam_appid.txt" />
@@ -394,7 +399,8 @@
     <None Include="Assets\TestHarness\Examples\Assets\Shaders\MobileTransparentDiffuseUnderlay.shader" />
     <None Include="Assets\TestHarness\Examples\Assets\Shaders\UnlitTexturedLightmap.shader" />
     <None Include="Assets\TestHarness\Examples\Assets\Shaders\UnlitTransparentVertexColorUnderlay.shader" />
-    <None Include="Assets\TestHarness\Outline.shader" />
+    <None Include="Assets\TestHarness\Shaders\Outline.shader" />
+    <None Include="Assets\TestHarness\Widgets\Shaders\3DText.shader" />
     <None Include="Assets\TestHarness\_THIS_FOLDER_IS_EXCLUDED_FROM_BUNDLES.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
