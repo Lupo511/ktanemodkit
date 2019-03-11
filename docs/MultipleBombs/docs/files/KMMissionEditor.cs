@@ -135,7 +135,9 @@ public class CustomKMMissionEditor : Editor
             EditorGUILayout.SelectableLabel(string.Format("mod_{0}_{1}", ModConfig.ID, serializedObject.targetObject.name));
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("DisplayName"));
+            SerializedProperty displayNameProperty = serializedObject.FindProperty("DisplayName");
+            EditorGUILayout.PropertyField(displayNameProperty);
+            displayNameProperty.stringValue = displayNameProperty.stringValue.Trim();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Description"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("PacingEventsEnabled"));
 
@@ -564,7 +566,14 @@ public class CustomKMMissionEditor : Editor
                         EditorGUILayout.EndVertical();
                     }
 
-                    EditorGUILayout.PropertyField(componentPool.FindPropertyRelative("ModTypes"), true);
+                    SerializedProperty modTypesProperty = componentPool.FindPropertyRelative("ModTypes");
+                    EditorGUILayout.PropertyField(modTypesProperty, true);
+                    for (int i = 0; i < modTypesProperty.arraySize; i++)
+                    {
+                        SerializedProperty element = modTypesProperty.GetArrayElementAtIndex(i);
+                        element.stringValue = element.stringValue.Trim();
+                    }
+
                     if (componentPool.FindPropertyRelative("ModTypes").arraySize != 0)
                         componentPool.FindPropertyRelative("SpecialComponentType").intValue = (int)KMComponentPool.SpecialComponentTypeEnum.None;
                 }
