@@ -564,7 +564,14 @@ public class CustomKMMissionEditor : Editor
                         EditorGUILayout.EndVertical();
                     }
 
-                    EditorGUILayout.PropertyField(componentPool.FindPropertyRelative("ModTypes"), true);
+                    SerializedProperty modTypesProperty = componentPool.FindPropertyRelative("ModTypes");
+                    EditorGUILayout.PropertyField(modTypesProperty, true);
+                    for (int i = 0; i < modTypesProperty.arraySize; i++)
+                    {
+                        SerializedProperty element = modTypesProperty.GetArrayElementAtIndex(i);
+                        element.stringValue = element.stringValue.Trim();
+                    }
+
                     if (componentPool.FindPropertyRelative("ModTypes").arraySize != 0)
                         componentPool.FindPropertyRelative("SpecialComponentType").intValue = (int)KMComponentPool.SpecialComponentTypeEnum.None;
                 }
