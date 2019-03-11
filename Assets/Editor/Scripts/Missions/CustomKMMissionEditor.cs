@@ -135,7 +135,9 @@ public class CustomKMMissionEditor : Editor
             EditorGUILayout.SelectableLabel(string.Format("mod_{0}_{1}", ModConfig.ID, serializedObject.targetObject.name));
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("DisplayName"));
+            SerializedProperty displayNameProperty = serializedObject.FindProperty("DisplayName");
+            EditorGUILayout.PropertyField(displayNameProperty);
+            displayNameProperty.stringValue = displayNameProperty.stringValue.Trim();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("Description"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("PacingEventsEnabled"));
 
