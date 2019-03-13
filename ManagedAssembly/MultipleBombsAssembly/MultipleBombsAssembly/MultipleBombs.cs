@@ -490,7 +490,7 @@ namespace MultipleBombsAssembly
 
             //PaceMaker
             PaceMakerMonitor monitor = FindObjectOfType<PaceMaker>().gameObject.AddComponent<PaceMakerMonitor>();
-            foreach (Bomb bomb in FindObjectsOfType<Bomb>())
+            foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
             {
                 if (bomb != vanillaBomb) //The vanilla bomb is still handled by PaceMaker
                     bomb.GetTimer().TimerTick = (TimerComponent.TimerTickEvent)Delegate.Combine(bomb.GetTimer().TimerTick, new TimerComponent.TimerTickEvent((elapsed, remaining) => monitor.OnBombTimerTick(bomb, elapsed, remaining)));
