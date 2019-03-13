@@ -37,13 +37,12 @@ namespace MultipleBombsAssembly
         {
             if (remaining < 60 && !oneMinuteLeftBombs.Contains(bomb))
             {
-                //Debug.Log("[MultipleBombs-PaceMaker]A bomb reached 60 seconds");
                 oneMinuteLeftBombs.Add(bomb);
                 paceMaker.ExecuteRandomAction(PaceEvent.OneMinuteLeft);
             }
         }
 
-        public void FixedUpdate()
+        public void Update()
         {
             if ((bool)isActiveField.GetValue(paceMaker))
             {
@@ -67,28 +66,40 @@ namespace MultipleBombsAssembly
 
         public float CalculateCustomSuccessRating()
         {
-            Bomb[] bombs = FindObjectsOfType<Bomb>();
-            if (bombs.Length == 0)
-                return 0f;
-            int solvableComponentCount = bombs[0].GetSolvableComponentCount() * bombs.Length;
+            if (SceneManager.Instance.GameplayState.Bombs.Count == 0)
+                return 1f;
+
+            int solvableComponentCount = 0;
             int solvedComponentCount = 0;
-            foreach (Bomb bomb in bombs)
-                solvedComponentCount += bomb.GetSolvedComponentCount();
             int numStrikes = 0;
-            foreach (Bomb bomb in bombs)
-                numStrikes += bomb.NumStrikes;
-            int numStrikesToLose = bombs[0].NumStrikesToLose * bombs.Length;
-            float totalTime = SceneManager.Instance.GameplayState.Bomb.TotalTime;
+            int numStrikesToLose = 0;
+            float totalTime = 0;
             float timeRemaining = float.MaxValue;
-            foreach (Bomb bomb in bombs)
-                if (bomb.GetTimer().TimeRemaining < timeRemaining)
-                    timeRemaining = bomb.GetTimer().TimeRemaining;
+            foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
+            {
+                solvableComponentCount += bomb.GetSolvableComponentCount();
+                solvedComponentCount += bomb.GetSolvedComponentCount();
+
+                if (bomb.NumStrikesToLose > 1)
+                {
+                    numStrikes += bomb.NumStrikes;
+                    numStrikesToLose += bomb.NumStrikesToLose;
+                }
+
+                if (bomb.TotalTime > totalTime)
+                    totalTime = bomb.TotalTime;
+                TimerComponent timer = bomb.GetTimer();
+                if (timer.TimeRemaining < timeRemaining)
+                    timeRemaining = timer.TimeRemaining;
+            }
+
             float solvedFactorMultiplier = 0.5f;
             float solvedFactor = 1f;
             float strikesFactorMultiplier = 0.3f;
             float strikesFactor = 0f;
             float timeFactorMultiplier = 0.2f;
             float timeFactor = 0f;
+
             if ((solvedComponentCount < solvableComponentCount) && (solvableComponentCount > 1))
             {
                 solvedFactor = solvedComponentCount / (float)(solvableComponentCount - 1);
