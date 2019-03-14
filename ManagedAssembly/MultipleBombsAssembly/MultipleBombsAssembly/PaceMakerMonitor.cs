@@ -73,7 +73,7 @@ namespace MultipleBombsAssembly
             int solvedComponentCount = 0;
             int numStrikes = 0;
             int numStrikesToLose = 0;
-            float totalTime = 0;
+            float totalTime = float.MaxValue;
             float timeRemaining = float.MaxValue;
             foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
             {
@@ -86,7 +86,7 @@ namespace MultipleBombsAssembly
                     numStrikesToLose += bomb.NumStrikesToLose;
                 }
 
-                if (bomb.TotalTime > totalTime)
+                if (bomb.TotalTime < totalTime)
                     totalTime = bomb.TotalTime;
                 TimerComponent timer = bomb.GetTimer();
                 if (timer.TimeRemaining < timeRemaining)
