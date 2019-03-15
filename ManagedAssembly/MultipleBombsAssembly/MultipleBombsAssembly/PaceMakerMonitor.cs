@@ -89,7 +89,7 @@ namespace MultipleBombsAssembly
                 if (bomb.TotalTime < totalTime)
                     totalTime = bomb.TotalTime;
                 TimerComponent timer = bomb.GetTimer();
-                if (timer.TimeRemaining < timeRemaining)
+                if (!bomb.IsSolved() && timer.TimeRemaining < timeRemaining)
                     timeRemaining = timer.TimeRemaining;
             }
 

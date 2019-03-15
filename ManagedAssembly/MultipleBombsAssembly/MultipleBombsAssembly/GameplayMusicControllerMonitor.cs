@@ -42,7 +42,7 @@ namespace MultipleBombsAssembly
                 float totalTime = float.MaxValue;
                 foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
                 {
-                    if (bomb.GetTimer().TimeRemaining < timeRemaining)
+                    if (!bomb.IsSolved() && bomb.GetTimer().TimeRemaining < timeRemaining)
                         timeRemaining = bomb.GetTimer().TimeRemaining;
                     if (bomb.TotalTime < totalTime)
                         totalTime = bomb.TotalTime;
