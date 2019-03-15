@@ -29,6 +29,7 @@ namespace MultipleBombsAssembly
         private Dictionary<Bomb, BombEvents.BombSolvedEvent> bombSolvedEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentPassEvent> bombComponentPassEvents;
         private Dictionary<Bomb, BombComponentEvents.ComponentStrikeEvent> bombComponentStrikeEvents;
+        private GameplayMusicControllerMonitor gameplayMusicControllerMonitor;
         private KMGameInfo gameInfo;
         private KMGameCommands gameCommands;
         private Shader unlitColorShader;
@@ -51,6 +52,10 @@ namespace MultipleBombsAssembly
             infoObject.transform.parent = gameObject.transform;
             publicProperties = infoObject.AddComponent<MultipleBombsProperties>();
             publicProperties.MultipleBombs = this;
+
+            Debug.Log("[MultipleBombs]Basic initialization finished");
+
+            gameplayMusicControllerMonitor = MusicManager.Instance.GameplayMusicController.gameObject.AddComponent<GameplayMusicControllerMonitor>();
 
             Debug.Log("[MultipleBombs]Initialized");
         }
@@ -93,6 +98,8 @@ namespace MultipleBombsAssembly
                 throw new NotImplementedException();
             Debug.Log("[MultipleBombs]Destroying");
             gameInfo.OnStateChange -= onGameStateChanged;
+            if (gameplayMusicControllerMonitor != null)
+                Destroy(gameplayMusicControllerMonitor);
             Debug.Log("[MultipleBombs]Destroyed");
         }
 
