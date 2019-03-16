@@ -14,6 +14,8 @@ namespace MultipleBombsAssembly
         private PlaylistController playlistController;
         private FieldInfo isPlayingField;
         private FieldInfo stingerResultField;
+        private string currentStinger;
+        private bool stingerPlayed;
         private int currentSongIndex;
 
         public void Awake()
@@ -34,6 +36,11 @@ namespace MultipleBombsAssembly
             gameplayMusicController.enabled = true;
         }
 
+        public void NewRoundStarted()
+        {
+            currentStinger = gameplayMusicController.Settings.StingerName;
+        }
+
         public void Update()
         {
             if (gameplayMusicController.Settings.PlaylistName != string.Empty && SceneManager.Instance != null && SceneManager.Instance.GameplayState != null && (bool)isPlayingField.GetValue(gameplayMusicController))
@@ -47,10 +54,23 @@ namespace MultipleBombsAssembly
                     if (bomb.TotalTime < totalTime)
                         totalTime = bomb.TotalTime;
                 }
-                if (gameplayMusicController.Settings.StingerName != null && gameplayMusicController.Settings.StingerName != string.Empty && timeRemaining < (30f + SceneManager.Instance.GameplayState.AdjustTime(gameplayMusicController.Settings.StingerTime)))
+                if (currentStinger != null && currentStinger != string.Empty)
                 {
-                    stingerResultField.SetValue(gameplayMusicController, MasterAudio.PlaySound3DAtTransform(gameplayMusicController.Settings.StingerName, transform, 1f, null, 0f, null, false, false));
-                    gameplayMusicController.Settings.StingerName = null;
+                    bool stingerTime = timeRemaining < (30f + SceneManager.Instance.GameplayState.AdjustTime(gameplayMusicController.Settings.StingerTime));
+                    if (stingerTime && !stingerPlayed)
+                    {
+                        if (gameplayMusicController.Settings.StingerName != null && gameplayMusicController.Settings.StingerName != string.Empty) //To make sure it's as consistent as possible with vanilla behaviour
+                            gameplayMusicController.Settings.StingerName = null;
+                        stingerResultField.SetValue(gameplayMusicController, MasterAudio.PlaySound3DAtTransform(currentStinger, transform, 1f, null, 0f, null, false, false));
+                        stingerPlayed = true;
+                    }
+                    if (!stingerTime && stingerPlayed)
+                    {
+                        PlaySoundResult stingerResult = (PlaySoundResult)stingerResultField.GetValue(gameplayMusicController);
+                        if (stingerResult != null && stingerResult.ActingVariation != null)
+                            stingerResult.ActingVariation.Stop();
+                        stingerPlayed = false;
+                    }
                 }
                 if (timeRemaining < 30f)
                 {

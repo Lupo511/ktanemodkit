@@ -393,6 +393,8 @@ namespace MultipleBombsAssembly
                     FindObjectOfType<BombGenerator>().BombPrefabOverride = room.GetComponent<GameplayRoom>().BombPrefabOverride;
                     Debug.Log("[MultipleBombs]Room initialized");
                 }
+
+                gameplayMusicControllerMonitor.NewRoundStarted();
             }
 
             BombInfoRedirection.SetBombCount(missionDetails.BombCount);
