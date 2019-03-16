@@ -47,16 +47,21 @@ namespace MultipleBombsAssembly
             {
                 float timeRemaining = float.MaxValue;
                 float totalTime = float.MaxValue;
+                bool stingerTime = false;
                 foreach (Bomb bomb in SceneManager.Instance.GameplayState.Bombs)
                 {
-                    if (!bomb.IsSolved() && bomb.GetTimer().TimeRemaining < timeRemaining)
-                        timeRemaining = bomb.GetTimer().TimeRemaining;
+                    if (!bomb.IsSolved())
+                    {
+                        if (bomb.GetTimer().TimeRemaining < timeRemaining)
+                            timeRemaining = bomb.GetTimer().TimeRemaining;
+                        if (!stingerTime)
+                            stingerTime = bomb.GetTimer().TimeRemaining < 30f + bomb.GetTimer().GetRate() * gameplayMusicController.Settings.StingerTime;
+                    }
                     if (bomb.TotalTime < totalTime)
                         totalTime = bomb.TotalTime;
                 }
                 if (currentStinger != null && currentStinger != string.Empty)
                 {
-                    bool stingerTime = timeRemaining < (30f + SceneManager.Instance.GameplayState.AdjustTime(gameplayMusicController.Settings.StingerTime));
                     if (stingerTime && !stingerPlayed)
                     {
                         if (gameplayMusicController.Settings.StingerName != null && gameplayMusicController.Settings.StingerName != string.Empty) //To make sure it's as consistent as possible with vanilla behaviour
