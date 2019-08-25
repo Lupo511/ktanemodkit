@@ -443,7 +443,7 @@ public class CustomKMMissionEditor : Editor
         SerializedProperty componentPool = generatorSetting.FindPropertyRelative("ComponentPools").GetArrayElementAtIndex(index);
 
         EditorGUILayout.BeginHorizontal();
-        componentPool.FindPropertyRelative("Count").intValue = EditorGUILayout.IntPopup(componentPool.FindPropertyRelative("Count").intValue, new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" }, new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }, GUILayout.Width(60));
+        componentPool.FindPropertyRelative("Count").intValue = Math.Max(EditorGUILayout.IntField(componentPool.FindPropertyRelative("Count").intValue, GUILayout.Width(60)), 1);
         drawComponentPoolSummaryLabel(componentPool);
         if (GUILayout.Button("Edit", EditorStyles.miniButtonLeft, GUILayout.Width(60)))
         {
