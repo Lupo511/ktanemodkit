@@ -732,6 +732,7 @@ namespace MultipleBombsAssembly
                                 bombSolvedEvents[bomb] += bombSolvedDelegate;
                             else
                                 bombSolvedEvents.Add(bomb, bombSolvedDelegate);
+                            BombEvents.OnBombSolved -= bombSolvedDelegate;
                             break;
                         }
                     }
