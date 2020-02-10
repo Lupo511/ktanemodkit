@@ -97,6 +97,7 @@ namespace MultipleBombsAssembly
                 else
                     requiredModuleCount = Math.Max(requiredModuleCount, moduleCount);
             }
+            missingModTypes.Sort();
 
             float maxTime;
             int totalModules;
