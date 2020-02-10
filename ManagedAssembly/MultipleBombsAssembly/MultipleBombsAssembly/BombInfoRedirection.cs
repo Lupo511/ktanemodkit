@@ -36,12 +36,15 @@ namespace MultipleBombsAssembly
 
         private static Delegate patchDelegateHard(Delegate source, object removeTarget, Delegate add)
         {
-            foreach (Delegate target in source.GetInvocationList())
+            if (source != null)
             {
-                if (target.Target != null && ReferenceEquals(target.Target, removeTarget))
+                foreach (Delegate target in source.GetInvocationList())
                 {
-                    source = Delegate.Remove(source, target);
-                    break;
+                    if (target.Target != null && ReferenceEquals(target.Target, removeTarget))
+                    {
+                        source = Delegate.Remove(source, target);
+                        break;
+                    }
                 }
             }
             source = Delegate.Combine(source, add);
