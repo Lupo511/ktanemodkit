@@ -43,16 +43,21 @@ namespace MultipleBombsAssembly
                 {
                     yield return null;
                     ResultFreeplayPage page = GetComponent<ResultFreeplayPage>();
-                    if (page.MissionName.SingleLine.IsActive())
-                        page.MissionName.SingleLine.text += " - " + currentMission.BombCount + " Bombs";
-                    else
-                        page.MissionName.DoubleLine.text += " - " + currentMission.BombCount + " Bombs";
+                    if (numBombs == null)
+                    {
+                        numBombs = Instantiate(page.FreeplayModules, page.FreeplayModules.transform.position, page.FreeplayModules.transform.rotation, page.FreeplayModules.transform.parent);
+                        Destroy(numBombs.GetComponent<Localize>());
+                        numBombs.transform.localPosition += new Vector3(0, 0.012f, 0);
+                        numBombs.text = "X Bombs";
+                    }
 
                     float time;
                     int modules;
                     int strikes;
                     currentMission.GetMissionInfo(out time, out modules, out strikes);
 
+                    numBombs.text = currentMission.BombCount + " Bombs";
+                    numBombs.gameObject.SetActive(true);
                     page.FreeplayTime.text = string.Format("{0}:{1:00}", (int)time / 60, time % 60);
                     Localization.SetTerm("BombBinder/txtModuleCount", page.FreeplayModules.gameObject);
                     Localization.SetParameter("MODULE_COUNT", modules.ToString(), page.FreeplayModules.gameObject);
