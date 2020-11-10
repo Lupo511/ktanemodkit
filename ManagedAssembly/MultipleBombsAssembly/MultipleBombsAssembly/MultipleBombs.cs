@@ -219,12 +219,12 @@ namespace MultipleBombsAssembly
                     freePlayDevice.Screen.ScreenText.text = "BOMBS:\n\nNumber of bombs\nto defuse\n\n<size=20><#00ff00>Multiple Bombs Mod</color></size>";
                 });
 
-                patchButtonPush(freePlayDevice.ModuleCountDecrement.GetComponent<KeypadButton>(), freePlayDevice);
-                patchButtonPush(freePlayDevice.ModuleCountIncrement.GetComponent<KeypadButton>(), freePlayDevice);
-                patchButtonPush(freePlayDevice.TimeDecrement.GetComponent<KeypadButton>(), freePlayDevice);
-                patchButtonPush(freePlayDevice.TimeIncrement.GetComponent<KeypadButton>(), freePlayDevice);
-                patchToggle(freePlayDevice.NeedyToggle.GetComponent<ToggleSwitch>(), freePlayDevice);
-                patchToggle(freePlayDevice.HardcoreToggle.GetComponent<ToggleSwitch>(), freePlayDevice);
+                patchButtonPushDifficulty(freePlayDevice.ModuleCountDecrement.GetComponent<KeypadButton>(), freePlayDevice);
+                patchButtonPushDifficulty(freePlayDevice.ModuleCountIncrement.GetComponent<KeypadButton>(), freePlayDevice);
+                patchButtonPushDifficulty(freePlayDevice.TimeDecrement.GetComponent<KeypadButton>(), freePlayDevice);
+                patchButtonPushDifficulty(freePlayDevice.TimeIncrement.GetComponent<KeypadButton>(), freePlayDevice);
+                patchToggleDifficulty(freePlayDevice.NeedyToggle.GetComponent<ToggleSwitch>(), freePlayDevice);
+                patchToggleDifficulty(freePlayDevice.HardcoreToggle.GetComponent<ToggleSwitch>(), freePlayDevice);
 
                 Action setCustomModulesText = new Action(() =>
                 {
@@ -296,7 +296,7 @@ namespace MultipleBombsAssembly
             return null;
         }
 
-        private void patchButtonPush(KeypadButton button, FreeplayDevice device)
+        private void patchButtonPushDifficulty(KeypadButton button, FreeplayDevice device)
         {
             PushEvent original = (PushEvent)findFreePlayDeviceEvent(button.OnPush, device);
             button.OnPush -= original;
@@ -308,7 +308,7 @@ namespace MultipleBombsAssembly
             });
         }
 
-        private void patchToggle(ToggleSwitch toggle, FreeplayDevice device)
+        private void patchToggleDifficulty(ToggleSwitch toggle, FreeplayDevice device)
         {
             ToggleEvent original = (ToggleEvent)findFreePlayDeviceEvent(toggle.OnToggle, device);
             toggle.OnToggle -= original;
